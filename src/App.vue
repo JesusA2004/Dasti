@@ -1,35 +1,34 @@
 <script setup lang="ts">
 import AppNavbar from '@/components/AppNavbar.vue'
-import HeroSection from '@/components/HeroSection.vue'
-import AboutSection from '@/components/AboutSection.vue'
-import ServicesSection from '@/components/ServicesSection.vue'
-import SolutionsByNeed from '@/components/SolutionsByNeed.vue'
-import QuoterSection from '@/components/QuoterSection.vue'
-import ProcessSection from '@/components/ProcessSection.vue'
-import WhyDasti from '@/components/WhyDasti.vue'
-import UseCases from '@/components/UseCases.vue'
-import FaqSection from '@/components/FaqSection.vue'
-import ContactSection from '@/components/ContactSection.vue'
 import FooterSection from '@/components/FooterSection.vue'
 import FloatingCTA from '@/components/FloatingCTA.vue'
+import ThemeSelector from '@/components/ThemeSelector.vue'
 </script>
 
 <template>
-  <div class="relative min-h-screen overflow-x-hidden" style="background-color: #050D1A; color: #F1F5F9;">
+  <div class="relative min-h-screen overflow-x-hidden"
+    style="background-color: var(--bg-base); color: var(--text-primary);">
     <AppNavbar />
     <main>
-      <HeroSection />
-      <AboutSection />
-      <ServicesSection />
-      <SolutionsByNeed />
-      <QuoterSection />
-      <ProcessSection />
-      <WhyDasti />
-      <UseCases />
-      <FaqSection />
-      <ContactSection />
+      <RouterView v-slot="{ Component }">
+        <Transition name="page" mode="out-in">
+          <component :is="Component" :key="$route.path" />
+        </Transition>
+      </RouterView>
     </main>
     <FooterSection />
     <FloatingCTA />
+    <ThemeSelector />
   </div>
 </template>
+
+<style>
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.18s ease;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+</style>

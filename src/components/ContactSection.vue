@@ -1,22 +1,25 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Send, MessageCircle, Mail, Phone, Clock, MapPin } from '@lucide/vue'
+import { Send, MessageCircle, Mail, Phone, Clock, MapPin, Video, CalendarCheck } from '@lucide/vue'
 
-const WHATSAPP_NUMBER = '521XXXXXXXXXX'
+
+const WHATSAPP_NUMBER = '521XXXXXXXXXX' // Reemplazar con número real
 const CONTACT_EMAIL = 'contacto@dasti.cloud'
-const CONTACT_PHONE = '+52 1 XXX XXX XXXX'
+const CONTACT_PHONE = '+52 1 XXX XXX XXXX' // Reemplazar con número real
 const BUSINESS_HOURS = 'Lunes a Viernes, 9:00 – 18:00 hrs'
 
 const services = [
   'Desarrollo web',
-  'Software a la medida',
-  'Automatización de procesos',
-  'Chatbots y asistentes digitales',
-  'Correo empresarial',
-  'Redes e infraestructura',
-  'Soporte técnico y mantenimiento',
+  'Software a medida',
+  'Correos corporativos',
+  'Redes y sistemas mesh',
+  'Soporte técnico',
   'Equipos de cómputo',
-  'Marketing digital',
+  'Impresoras y periféricos',
+  'Automatización',
+  'Integración de sistemas',
+  'Presencia digital / redes sociales',
+  'Proyecto grande o personalizado',
   'Otro / No estoy seguro',
 ]
 
@@ -45,9 +48,7 @@ const resetForm = () => {
 }
 
 const openWhatsApp = () => {
-  const lines = [
-    'Hola, me interesa conocer más sobre los servicios de DASTI.',
-  ]
+  const lines = ['Hola, me interesa conocer más sobre los servicios de DASTI.']
   if (form.value.name) lines.push(`Nombre: ${form.value.name}`)
   if (form.value.company) lines.push(`Empresa: ${form.value.company}`)
   if (form.value.service) lines.push(`Servicio de interés: ${form.value.service}`)
@@ -64,7 +65,6 @@ const openWhatsApp = () => {
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <!-- Header -->
       <div
         v-motion
         :initial="{ opacity: 0, y: 20 }"
@@ -77,7 +77,7 @@ const openWhatsApp = () => {
           <span class="gradient-text block">necesita tu empresa</span>
         </h2>
         <p class="text-slate-400 text-lg max-w-2xl mx-auto">
-          Te ayudamos a encontrar la mejor solución tecnológica. Escríbenos y con gusto agendamos una llamada.
+          Podemos orientarte para elegir la mejor solución en TI para tu empresa. Cuéntanos qué necesitas y con gusto te asesoramos.
         </p>
       </div>
 
@@ -98,10 +98,8 @@ const openWhatsApp = () => {
             </p>
           </div>
 
-          <!-- Contact details -->
           <div class="space-y-4">
-            <a :href="`mailto:${CONTACT_EMAIL}`"
-              class="flex items-center gap-3 group">
+            <a :href="`mailto:${CONTACT_EMAIL}`" class="flex items-center gap-3 group">
               <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                 style="background: rgba(37,99,235,0.15); border: 1px solid rgba(59,130,246,0.25);">
                 <Mail :size="18" class="text-blue-400" />
@@ -134,8 +132,7 @@ const openWhatsApp = () => {
               </div>
             </div>
 
-            <a href="https://dasti.cloud" target="_blank" rel="noopener"
-              class="flex items-center gap-3 group">
+            <a href="https://dasti.cloud" target="_blank" rel="noopener" class="flex items-center gap-3 group">
               <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                 style="background: rgba(37,99,235,0.15); border: 1px solid rgba(59,130,246,0.25);">
                 <MapPin :size="18" class="text-blue-400" />
@@ -147,12 +144,9 @@ const openWhatsApp = () => {
             </a>
           </div>
 
-          <!-- WhatsApp CTA -->
-          <button
-            @click="openWhatsApp"
+          <button @click="openWhatsApp"
             class="flex items-center gap-3 p-4 rounded-xl transition-all duration-250 group"
-            style="background: rgba(37, 211, 102, 0.08); border: 1px solid rgba(37,211,102,0.25);"
-          >
+            style="background: rgba(37,211,102,0.08); border: 1px solid rgba(37,211,102,0.25);">
             <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
               style="background: rgba(37,211,102,0.15);">
               <MessageCircle :size="20" style="color: #25D366;" />
@@ -160,6 +154,32 @@ const openWhatsApp = () => {
             <div class="text-left">
               <div class="text-sm font-semibold text-white group-hover:text-green-300 transition-colors">Escribir por WhatsApp</div>
               <div class="text-xs text-slate-500">Respuesta rápida y directa</div>
+            </div>
+          </button>
+
+          <button @click="openWhatsApp"
+            class="flex items-center gap-3 p-4 rounded-xl transition-all duration-250 group"
+            style="background: rgba(37,99,235,0.08); border: 1px solid rgba(59,130,246,0.25);">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              style="background: rgba(37,99,235,0.15);">
+              <Video :size="20" class="text-blue-400" />
+            </div>
+            <div class="text-left">
+              <div class="text-sm font-semibold text-white group-hover:text-blue-300 transition-colors">Agendar videollamada</div>
+              <div class="text-xs text-slate-500">Coordinamos horario por WhatsApp</div>
+            </div>
+          </button>
+
+          <button @click="openWhatsApp"
+            class="flex items-center gap-3 p-4 rounded-xl transition-all duration-250 group"
+            style="background: rgba(129,140,248,0.08); border: 1px solid rgba(129,140,248,0.25);">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              style="background: rgba(129,140,248,0.15);">
+              <CalendarCheck :size="20" style="color: #818CF8;" />
+            </div>
+            <div class="text-left">
+              <div class="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors">Solicitar visita presencial</div>
+              <div class="text-xs text-slate-500">Disponible en Morelos y zona cercana</div>
             </div>
           </button>
         </div>
@@ -191,63 +211,44 @@ const openWhatsApp = () => {
               <div class="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-slate-400 mb-1.5">Nombre *</label>
-                  <input
-                    v-model="form.name"
-                    type="text"
-                    required
-                    placeholder="Tu nombre"
-                    class="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all duration-200 focus:ring-1"
-                    style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);"
-                    onfocus="this.style.borderColor='rgba(59,130,246,0.5)'; this.style.background='rgba(37,99,235,0.06)'"
-                    onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.04)'"
-                  />
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-slate-400 mb-1.5">Empresa</label>
-                  <input
-                    v-model="form.company"
-                    type="text"
-                    placeholder="Nombre de tu empresa"
+                  <input v-model="form.name" type="text" required placeholder="Tu nombre"
                     class="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all duration-200"
                     style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);"
                     onfocus="this.style.borderColor='rgba(59,130,246,0.5)'; this.style.background='rgba(37,99,235,0.06)'"
-                    onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.04)'"
-                  />
+                    onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.04)'" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-400 mb-1.5">Empresa</label>
+                  <input v-model="form.company" type="text" placeholder="Nombre de tu empresa"
+                    class="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all duration-200"
+                    style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);"
+                    onfocus="this.style.borderColor='rgba(59,130,246,0.5)'; this.style.background='rgba(37,99,235,0.06)'"
+                    onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.04)'" />
                 </div>
               </div>
 
               <div class="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-slate-400 mb-1.5">Teléfono</label>
-                  <input
-                    v-model="form.phone"
-                    type="tel"
-                    placeholder="+52 (XXX) XXX XXXX"
+                  <input v-model="form.phone" type="tel" placeholder="+52 (XXX) XXX XXXX"
                     class="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all duration-200"
                     style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);"
                     onfocus="this.style.borderColor='rgba(59,130,246,0.5)'; this.style.background='rgba(37,99,235,0.06)'"
-                    onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.04)'"
-                  />
+                    onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.04)'" />
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-slate-400 mb-1.5">Correo *</label>
-                  <input
-                    v-model="form.email"
-                    type="email"
-                    required
-                    placeholder="tu@empresa.com"
+                  <input v-model="form.email" type="email" required placeholder="tu@empresa.com"
                     class="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all duration-200"
                     style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);"
                     onfocus="this.style.borderColor='rgba(59,130,246,0.5)'; this.style.background='rgba(37,99,235,0.06)'"
-                    onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.04)'"
-                  />
+                    onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.04)'" />
                 </div>
               </div>
 
               <div>
                 <label class="block text-xs font-medium text-slate-400 mb-1.5">Servicio de interés</label>
-                <select
-                  v-model="form.service"
+                <select v-model="form.service"
                   class="w-full rounded-xl px-4 py-3 text-sm outline-none transition-all duration-200 cursor-pointer"
                   style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #F1F5F9; -webkit-appearance: none;"
                   onfocus="this.style.borderColor='rgba(59,130,246,0.5)'"
@@ -262,10 +263,7 @@ const openWhatsApp = () => {
 
               <div>
                 <label class="block text-xs font-medium text-slate-400 mb-1.5">Mensaje *</label>
-                <textarea
-                  v-model="form.message"
-                  required
-                  rows="4"
+                <textarea v-model="form.message" required rows="4"
                   placeholder="Cuéntanos brevemente qué necesita tu empresa..."
                   class="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all duration-200 resize-none"
                   style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);"
@@ -274,11 +272,7 @@ const openWhatsApp = () => {
                 />
               </div>
 
-              <button
-                type="submit"
-                :disabled="sending"
-                class="btn-primary w-full justify-center"
-              >
+              <button type="submit" :disabled="sending" class="btn-primary w-full justify-center">
                 <span v-if="sending">Enviando...</span>
                 <span v-else class="flex items-center gap-2 justify-center w-full">
                   Enviar mensaje

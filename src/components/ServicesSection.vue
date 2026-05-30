@@ -1,71 +1,100 @@
 <script setup lang="ts">
-import { Code2, Globe, Zap, Bot, Mail, Network, Wrench, Monitor, BarChart2 } from '@lucide/vue'
-
-const scrollTo = (id: string) => document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' })
+import { Code2, Globe, Zap, Bot, Mail, Network, Wrench, Monitor, BarChart2, GitMerge, Printer, Wifi, Lightbulb } from '@lucide/vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const services = [
   {
     icon: Code2,
-    title: 'Desarrollo de software a la medida',
-    desc: 'Sistemas personalizados para controlar procesos, administrar información, generar reportes, automatizar tareas y mejorar la operación interna de tu empresa.',
+    title: 'Desarrollo de software a medida',
+    desc: 'Desarrollamos sistemas personalizados para administrar información, controlar procesos, generar reportes, automatizar tareas y mejorar la operación interna de la empresa.',
     color: '#3B82F6',
-    tags: ['Sistemas', 'Reportes', 'Paneles administrativos'],
+    tags: ['Paneles administrativos', 'Reportes', 'Control de usuarios', 'Integración'],
   },
   {
     icon: Globe,
     title: 'Desarrollo web',
-    desc: 'Sitios rápidos, modernos y responsivos para mostrar tu empresa, servicios y captar prospectos. Diseño profesional adaptado a tu identidad.',
+    desc: 'Desarrollamos sitios web modernos, responsivos y profesionales para presentar empresas, servicios y proyectos. El objetivo es transmitir confianza y facilitar el contacto con clientes.',
     color: '#818CF8',
-    tags: ['Landing page', 'Sitio corporativo', 'Diseño responsivo'],
-  },
-  {
-    icon: Zap,
-    title: 'Automatización de procesos',
-    desc: 'Automatizamos tareas repetitivas, flujos internos, reportes, capturas y notificaciones para ahorrar tiempo y reducir errores operativos.',
-    color: '#34D399',
-    tags: ['Flujos de trabajo', 'Reportes automáticos', 'Notificaciones'],
-  },
-  {
-    icon: Bot,
-    title: 'Chatbots y asistentes digitales',
-    desc: 'Asistentes digitales para atención inicial, preguntas frecuentes, captación de datos y seguimiento de prospectos en canales digitales.',
-    color: '#FBBF24',
-    tags: ['Atención al cliente', 'Captación de prospectos', 'Canales digitales'],
+    tags: ['Landing pages', 'Sitios corporativos', 'Formularios', 'Móvil optimizado'],
   },
   {
     icon: Mail,
-    title: 'Correo empresarial administrado',
-    desc: 'Cuentas con dominio propio, administración de usuarios, configuración técnica, seguridad del dominio y soporte continuo.',
+    title: 'Correos corporativos administrados',
+    desc: 'Implementamos y administramos correos empresariales con dominio propio, cuentas por área, configuración técnica, seguridad del dominio y soporte continuo.',
     color: '#F472B6',
-    tags: ['Dominio propio', 'Cuentas por área', 'Seguridad'],
+    tags: ['Dominio propio', 'Outlook y webmail', 'SPF / DKIM / DMARC', 'Administración'],
   },
   {
-    icon: Network,
-    title: 'Redes e infraestructura',
-    desc: 'Configuración de redes, conectividad, impresoras, accesos compartidos y apoyo en infraestructura tecnológica para mejorar tu operación.',
+    icon: Wifi,
+    title: 'Infraestructura de red y sistemas mesh',
+    desc: 'Diseñamos e implementamos redes empresariales con puntos de acceso, sistemas mesh y roaming para ofrecer cobertura WiFi estable en toda la empresa sin cambios manuales de red.',
     color: '#60A5FA',
-    tags: ['Conectividad', 'Infraestructura', 'Seguridad de red'],
+    tags: ['Sistemas mesh', 'Roaming', 'Cobertura total', 'Segmentación de red'],
+    highlight: true,
   },
   {
     icon: Wrench,
     title: 'Soporte técnico y mantenimiento',
-    desc: 'Diagnóstico, mantenimiento preventivo, instalación de software autorizado, optimización y configuración de equipos de cómputo.',
+    desc: 'Brindamos soporte para equipos de cómputo: configuración, diagnóstico, optimización, instalación de software autorizado, mantenimiento preventivo y solución de fallas.',
     color: '#A78BFA',
-    tags: ['Diagnóstico', 'Mantenimiento preventivo', 'Optimización'],
+    tags: ['Diagnóstico', 'Mantenimiento preventivo', 'Optimización', 'Configuración'],
   },
   {
     icon: Monitor,
-    title: 'Actualización y adquisición de equipo',
-    desc: 'Evaluamos si conviene actualizar o adquirir equipos nuevos y los entregamos configurados y listos para trabajar según el perfil de uso.',
+    title: 'Actualización y adquisición de equipos',
+    desc: 'Evaluamos si conviene actualizar un equipo existente con SSD, RAM u optimización, o adquirir uno nuevo. Entregamos equipos configurados desde cero y listos para operar.',
     color: '#FB923C',
-    tags: ['Oficina', 'Multitarea', 'Alto rendimiento'],
+    tags: ['Actualización', 'Equipos nuevos', 'Configuración incluida', 'Por perfil de uso'],
+  },
+  {
+    icon: Printer,
+    title: 'Impresoras y periféricos',
+    desc: 'Apoyamos en la selección, suministro y configuración de impresoras y periféricos multimarca según las necesidades del cliente. Disponibilidad sujeta a marca y modelo.',
+    color: '#2DD4BF',
+    tags: ['Multimarca', 'Configuración en red', 'Soporte', 'Selección técnica'],
+  },
+  {
+    icon: GitMerge,
+    title: 'Integración de sistemas',
+    desc: 'Integramos sistemas, plataformas y herramientas para que la información fluya mejor entre áreas y procesos: formularios, bases de datos, APIs, reportes y plataformas internas.',
+    color: '#34D399',
+    tags: ['APIs', 'Bases de datos', 'Automatización de flujos', 'Plataformas internas'],
+  },
+  {
+    icon: Zap,
+    title: 'Automatización de procesos',
+    desc: 'Implementamos automatizaciones para reducir tareas repetitivas, mejorar flujos internos, generar reportes, enviar notificaciones y conectar herramientas de trabajo.',
+    color: '#FBBF24',
+    tags: ['Reportes automáticos', 'Notificaciones', 'Flujos de trabajo', 'Reducción de errores'],
+  },
+  {
+    icon: Bot,
+    title: 'Chatbots y asistentes digitales',
+    desc: 'Implementamos chatbots y asistentes digitales para atención inicial, respuestas frecuentes, captación de prospectos y seguimiento básico en canales digitales.',
+    color: '#FB923C',
+    tags: ['Atención 24h', 'Captación de datos', 'Integración con sistemas', 'Canales digitales'],
   },
   {
     icon: BarChart2,
-    title: 'Marketing digital y presencia en redes',
-    desc: 'Apoyo en soluciones digitales para mejorar presencia en línea, estructura de comunicación y herramientas tecnológicas para redes sociales.',
+    title: 'Presencia digital y redes sociales',
+    desc: 'Apoyamos con presencia digital, estructura de comunicación, recursos para redes sociales y herramientas que ayudan a mejorar la imagen de la empresa en línea.',
     color: '#2DD4BF',
-    tags: ['Presencia digital', 'Comunicación', 'Herramientas'],
+    tags: ['Imagen corporativa', 'Estructura digital', 'Herramientas', 'Comunicación'],
+  },
+  {
+    icon: Network,
+    title: 'Configuración de impresoras y recursos',
+    desc: 'Configuramos impresoras en red, carpetas compartidas, accesos por área y dispositivos periféricos para que los equipos de trabajo los utilicen correctamente desde el inicio.',
+    color: '#93C5FD',
+    tags: ['Impresoras en red', 'Accesos compartidos', 'Configuración de área', 'Dispositivos'],
+  },
+  {
+    icon: Lightbulb,
+    title: 'Asesoramiento tecnológico',
+    desc: 'Orientamos a empresas para tomar mejores decisiones en TI: qué herramientas implementar, cómo estructurar la infraestructura tecnológica, qué priorizar y cómo planificar la inversión.',
+    color: '#E879F9',
+    tags: ['Diagnóstico TI', 'Priorización', 'Estrategia tecnológica', 'Sin compromiso'],
   },
 ]
 </script>
@@ -85,14 +114,14 @@ const services = [
         :visibleOnce="{ opacity: 1, y: 0, transition: { duration: 600 } }"
         class="text-center mb-16"
       >
-        <span class="tag mb-4 inline-block">Nuestros servicios</span>
+        <span class="tag mb-4 inline-block">Servicios y soluciones</span>
         <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-5">
-          <span class="text-white">Soluciones tecnológicas</span>
-          <span class="gradient-text block">para tu empresa</span>
+          <span class="text-white">Soluciones integrales en</span>
+          <span class="gradient-text block">Tecnologías de la Información</span>
         </h2>
         <p class="text-slate-400 text-lg max-w-2xl mx-auto">
-          Ofrecemos un portafolio completo de servicios de TI para cubrir todas las necesidades operativas,
-          digitales e infraestructurales de tu negocio.
+          Desarrollamos, implementamos y administramos soluciones en cada área de TI que necesita tu empresa,
+          desde software y redes hasta equipos y automatización.
         </p>
       </div>
 
@@ -104,8 +133,12 @@ const services = [
           v-motion
           :initial="{ opacity: 0, y: 30 }"
           :visibleOnce="{ opacity: 1, y: 0, transition: { delay: (i % 3) * 100, duration: 600 } }"
-          class="glass-card service-card rounded-2xl p-6 group cursor-default"
+          class="glass-card service-card rounded-2xl p-6 group cursor-default relative overflow-hidden"
         >
+          <!-- Highlight glow for mesh -->
+          <div v-if="service.highlight" class="absolute inset-0 rounded-2xl pointer-events-none"
+            style="background: linear-gradient(135deg, rgba(96,165,250,0.05) 0%, transparent 60%);" />
+
           <!-- Icon -->
           <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110"
             :style="`background: ${service.color}15; border: 1px solid ${service.color}35;`">
@@ -128,7 +161,7 @@ const services = [
             </span>
           </div>
 
-          <!-- Hover glow line -->
+          <!-- Bottom glow on hover -->
           <div class="absolute bottom-0 left-6 right-6 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"
             :style="`background: linear-gradient(90deg, transparent, ${service.color}50, transparent);`" />
         </div>
@@ -141,12 +174,9 @@ const services = [
         :visibleOnce="{ opacity: 1, y: 0, transition: { duration: 600 } }"
         class="text-center mt-14"
       >
-        <p class="text-slate-400 mb-5">¿Tienes un proyecto en mente? Calcula el costo aproximado.</p>
-        <button
-          @click="scrollTo('#cotizador')"
-          class="btn-primary"
-        >
-          Calcular costo aproximado
+        <p class="text-slate-400 mb-5">¿Necesitas una solución en TI para tu empresa?</p>
+        <button @click="router.push('/cotizador')" class="btn-primary">
+          Estimar inversión
         </button>
       </div>
     </div>

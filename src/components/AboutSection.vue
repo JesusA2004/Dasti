@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import { Target, Users, Layers, ShieldCheck } from '@lucide/vue'
+import { Layers, Wrench, Users, Target } from '@lucide/vue'
 
 const pillars = [
   {
-    icon: Target,
-    title: 'Enfoque práctico',
-    desc: 'Analizamos cada situación para proponer soluciones funcionales, no genéricas.',
+    icon: Layers,
+    title: 'Soluciones integrales en TI',
+    desc: 'No nos limitamos a un solo servicio. Integramos software, infraestructura, soporte técnico, equipos y herramientas digitales para que la tecnología funcione como parte real de la operación.',
     color: '#3B82F6',
   },
   {
-    icon: Layers,
-    title: 'Soluciones personalizadas',
-    desc: 'Cada empresa tiene necesidades distintas. Adaptamos la tecnología a tu operación.',
+    icon: Target,
+    title: 'Desarrollo e implementación',
+    desc: 'Desarrollamos, implementamos y configuramos cada solución con base en las necesidades reales de la empresa, no en plantillas genéricas.',
     color: '#818CF8',
   },
   {
-    icon: Users,
-    title: 'Acompañamiento técnico',
-    desc: 'No desaparecemos al entregar. Acompañamos al cliente durante y después de la implementación.',
+    icon: Wrench,
+    title: 'Infraestructura y soporte',
+    desc: 'Administramos redes, equipos de cómputo, impresoras y sistemas de comunicación para mantener la operación tecnológica funcionando de forma estable.',
     color: '#34D399',
   },
   {
-    icon: ShieldCheck,
-    title: 'Tecnología para empresas',
-    desc: 'Trabajamos con negocios reales que necesitan soluciones confiables, seguras y escalables.',
+    icon: Users,
+    title: 'Tecnología alineada a la operación',
+    desc: 'Trabajamos con un enfoque práctico: analizamos la necesidad, proponemos una solución viable, la implementamos y acompañamos al cliente durante el proceso.',
     color: '#FBBF24',
   },
 ]
@@ -32,14 +32,11 @@ const pillars = [
 <template>
   <section id="nosotros" class="relative py-24 overflow-hidden" style="background: #050D1A;">
     <div class="absolute inset-0 grid-bg opacity-40 pointer-events-none" />
-
-    <!-- Gradient orb -->
     <div class="orb w-[500px] h-[500px] top-0 left-1/2 -translate-x-1/2"
       style="background: rgba(37,99,235,0.05);" />
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <!-- Section label -->
       <div
         v-motion
         :initial="{ opacity: 0, y: 20 }"
@@ -48,17 +45,15 @@ const pillars = [
       >
         <span class="tag mb-4 inline-block">Quiénes somos</span>
         <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
-          <span class="text-white">Tecnología con propósito,</span>
-          <span class="gradient-text block">enfocada en tu operación</span>
+          <span class="text-white">Soluciones en TI para</span>
+          <span class="gradient-text block">la operación empresarial</span>
         </h2>
         <p class="text-slate-400 text-lg max-w-3xl mx-auto leading-relaxed">
-          DASTI nace con el objetivo de acercar soluciones tecnológicas funcionales a negocios y empresas
-          que buscan mejorar su operación, automatizar procesos, fortalecer su presencia digital y contar con
-          soporte técnico confiable.
+          DASTI, Desarrollo y Aplicación de Soluciones en TI, es una empresa enfocada en desarrollar, implementar y administrar
+          soluciones tecnológicas para empresas que buscan mejorar su operación, infraestructura, comunicación y procesos internos.
         </p>
       </div>
 
-      <!-- Main grid -->
       <div class="grid lg:grid-cols-2 gap-12 items-center mb-20">
 
         <!-- Left: Text -->
@@ -68,25 +63,25 @@ const pillars = [
           :visibleOnce="{ opacity: 1, x: 0, transition: { duration: 700 } }"
         >
           <h3 class="font-display text-2xl font-bold text-white mb-4">
-            No vendemos soluciones genéricas
+            No nos limitamos a un solo servicio
           </h3>
-          <p class="text-slate-400 leading-relaxed mb-6">
-            En DASTI aplicamos la tecnología para resolver necesidades reales de las empresas. Analizamos el problema,
-            proponemos una solución funcional y acompañamos al cliente en la implementación.
+          <p class="text-slate-400 leading-relaxed mb-5">
+            Integramos software, infraestructura, soporte técnico, equipos de cómputo, redes, correos corporativos y
+            herramientas digitales para que la tecnología funcione como una parte real de la operación del negocio.
           </p>
           <p class="text-slate-400 leading-relaxed mb-8">
-            Nos enfocamos en entender las necesidades reales de cada cliente para proponer soluciones claras,
-            escalables y adaptadas a su operación, desde la primera reunión hasta la entrega final.
+            Trabajamos con un enfoque práctico: analizamos la necesidad, proponemos una solución viable,
+            la implementamos y acompañamos al cliente durante el proceso.
           </p>
 
-          <!-- Stats strip -->
-          <div class="grid grid-cols-3 gap-4">
+          <div class="grid grid-cols-2 gap-3">
             <div v-for="(stat, i) in [
-              { label: 'Soluciones a medida', sub: 'Para cada empresa' },
-              { label: 'Implementación', sub: 'Profesional y documentada' },
-              { label: 'Acompañamiento', sub: 'Antes y después' },
+              { label: 'Software a medida', sub: 'Desarrollado para tu operación' },
+              { label: 'Infraestructura', sub: 'Redes, mesh y equipos' },
+              { label: 'Soporte técnico', sub: 'Prevención y solución' },
+              { label: 'Acompañamiento', sub: 'Antes, durante y después' },
             ]" :key="i"
-              class="text-center p-4 rounded-xl"
+              class="p-4 rounded-xl"
               style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);"
             >
               <div class="text-xs font-semibold text-blue-300 mb-1">{{ stat.label }}</div>

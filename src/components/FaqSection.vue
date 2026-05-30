@@ -1,45 +1,85 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChevronDown, ChevronUp } from '@lucide/vue'
+import { ChevronDown } from '@lucide/vue'
 
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const openIndex = ref<number | null>(null)
 
 const faqs = [
   {
-    q: '¿Qué tipo de empresas atiende DASTI?',
-    a: 'Atendemos negocios, emprendedores y empresas de cualquier tamaño que buscan mejorar su operación tecnológica, presencia digital o infraestructura. Trabajamos con empresas de servicios, comercio, administración y sectores varios que requieren soluciones de TI confiables.',
+    q: '¿DASTI solo desarrolla páginas web?',
+    a: 'No. DASTI desarrolla e implementa soluciones en Tecnologías de la Información: software a medida, correos corporativos, redes, sistemas mesh, soporte técnico, equipos de cómputo, automatización, integración de sistemas y presencia digital. El desarrollo web es solo una parte del portafolio.',
   },
   {
-    q: '¿Los precios del cotizador son finales?',
-    a: 'No. Los precios del cotizador son estimaciones aproximadas orientativas. El costo final depende del alcance real del proyecto, requerimientos específicos, licencias de software, hardware necesario, integraciones con otros sistemas y tiempos de entrega acordados. Siempre emitimos una propuesta formal antes de iniciar.',
+    q: '¿Qué significa DASTI?',
+    a: 'DASTI significa Desarrollo y Aplicación de Soluciones en TI. Es el enfoque central de la empresa: desarrollar e implementar soluciones tecnológicas reales y funcionales para negocios y empresas.',
+  },
+  {
+    q: '¿Pueden apoyarme con una red WiFi empresarial?',
+    a: 'Sí. Podemos revisar cobertura actual, configurar routers y puntos de acceso, implementar sistemas mesh para ampliar señal y habilitar roaming automático entre puntos. Apoyamos con soluciones para oficinas, bodegas, salas y distintas áreas de trabajo.',
+  },
+  {
+    q: '¿Qué es un sistema mesh?',
+    a: 'Un sistema mesh utiliza varios puntos de acceso que trabajan juntos como una sola red. Esto permite mejorar cobertura WiFi y estabilidad sin que el usuario tenga que cambiar manualmente de red al moverse dentro de la empresa.',
+  },
+  {
+    q: '¿Qué es el roaming en una red?',
+    a: 'El roaming permite que celulares, laptops u otros dispositivos se conecten automáticamente al punto de acceso más cercano mientras el usuario se desplaza dentro de la empresa, manteniendo la conexión estable y sin interrupciones.',
+  },
+  {
+    q: '¿También venden equipos de cómputo?',
+    a: 'Sí. Podemos evaluar si conviene actualizar equipos existentes con SSD, RAM u optimización, o adquirir equipos nuevos configurados según el perfil de uso de cada área: administrativo, multitarea o alto rendimiento.',
+  },
+  {
+    q: '¿Pueden ser proveedores de impresoras?',
+    a: 'Sí. Podemos apoyar con impresoras y periféricos multimarca, sujeto a disponibilidad, marca, modelo y requerimientos del cliente. La disponibilidad se confirma al momento de la cotización.',
   },
   {
     q: '¿DASTI desarrolla software a la medida?',
-    a: 'Sí. Podemos crear sistemas personalizados según las necesidades de operación interna: control de inventario, gestión de clientes, reportes automáticos, paneles de administración, flujos de trabajo y más. Cada sistema se desarrolla conforme a la operación real de la empresa.',
+    a: 'Sí. Desarrollamos sistemas personalizados según las necesidades de operación de la empresa: control de información, gestión de usuarios, reportes automáticos, paneles administrativos, flujos de trabajo y más.',
   },
   {
-    q: '¿Pueden administrar correos empresariales?',
-    a: 'Sí. Implementamos y administramos correos corporativos con dominio propio, configuramos cuentas por área, gestionamos usuarios, aplicamos configuración técnica de seguridad (SPF, DKIM, DMARC) y brindamos soporte técnico continuo.',
+    q: '¿Pueden administrar correos corporativos?',
+    a: 'Sí. Implementamos y administramos correos con dominio propio, configuramos cuentas por área, aplicamos configuración técnica de seguridad (SPF, DKIM, DMARC) y brindamos soporte continuo.',
   },
   {
-    q: '¿También dan soporte a equipos de cómputo?',
-    a: 'Sí. Realizamos diagnóstico de equipos, mantenimiento preventivo, instalación de software autorizado, optimización del sistema operativo y apoyo en la adquisición de equipos nuevos según el perfil de uso de cada colaborador.',
+    q: '¿Pueden manejar redes sociales?',
+    a: 'Podemos apoyar con presencia digital y gestión básica de redes sociales según el alcance acordado con el cliente, como parte de una estrategia de comunicación digital.',
   },
   {
-    q: '¿Pueden ayudar con redes e infraestructura?',
-    a: 'Sí. Apoyamos con configuración de redes locales, conectividad, impresoras compartidas, accesos por área, seguridad básica de red y mejoras de infraestructura tecnológica para oficinas y empresas.',
+    q: '¿Qué pasa si mi proyecto es grande o complejo?',
+    a: 'Para proyectos de mayor alcance, integraciones especiales, infraestructura de red o implementaciones por etapas, podemos coordinar una videollamada o junta presencial para revisar necesidades, alcance y tiempos. La modalidad presencial depende de ubicación y disponibilidad.',
   },
   {
-    q: '¿El sitio web incluye dominio y hosting?',
-    a: 'Depende del paquete que se elija. El dominio y hosting pueden incluirse en la propuesta o cotizarse por separado según las necesidades del cliente. Siempre se aclara en la propuesta formal.',
+    q: '¿El cotizador da un precio final?',
+    a: 'No. El cotizador muestra una referencia aproximada orientativa. El precio final se confirma después de revisar el alcance real, requerimientos técnicos, licencias, equipos, ubicación y tiempos de entrega en una propuesta formal.',
   },
   {
     q: '¿Pueden emitir factura?',
-    a: 'Sí, DASTI puede emitir CFDI (Comprobante Fiscal Digital por Internet) en caso de ser requerido por el cliente o la empresa contratante.',
+    a: 'Sí. DASTI puede emitir CFDI (Comprobante Fiscal Digital por Internet) en caso de ser requerido por el cliente o la empresa contratante.',
+  },
+  {
+    q: '¿DASTI está ubicado en Morelos o Cuernavaca?',
+    a: 'Sí. DASTI opera principalmente en Morelos, con enfoque en Cuernavaca y la zona metropolitana cercana. Desde ahí atendemos proyectos locales de forma presencial o remota.',
+  },
+  {
+    q: '¿Atienden proyectos fuera de Morelos?',
+    a: 'Sí. También atendemos proyectos en la Ciudad de México, Estado de México, Puebla y estados cercanos. La mayoría de servicios de software, correo, automatización e integración se realizan de forma remota sin restricción geográfica. Para servicios que requieren presencia física (redes, equipos, instalación de infraestructura), evaluamos viabilidad y costos de traslado según el proyecto.',
+  },
+  {
+    q: '¿Todos los servicios pueden ser presenciales o remotos?',
+    a: 'Depende del servicio. El desarrollo de software, correos corporativos, automatización, integración de sistemas y asesoramiento se realizan de forma remota. Los servicios de instalación de redes, configuración de equipos e impresoras pueden requerir presencia física. Para proyectos fuera de Morelos, coordinamos según el alcance y la ubicación del cliente.',
+  },
+  {
+    q: '¿Pueden asesorarme si aún no sé qué solución necesito?',
+    a: 'Sí. El asesoramiento tecnológico es parte de nuestros servicios. Si no tienes claro qué necesitas o por dónde empezar, podemos hacer un diagnóstico de tu situación actual y orientarte sobre qué implementar, en qué orden y cómo planificar la inversión. No es necesario contratar nada para recibir orientación inicial.',
+  },
+  {
+    q: '¿Por qué algunos servicios aparecen como "A cotizar"?',
+    a: 'Algunos servicios tienen un costo que depende del alcance específico del proyecto: número de puntos de acceso en una red, modelos de impresoras, integraciones involucradas, cantidad de módulos, entre otros factores. Para esos casos, necesitamos revisar el contexto del cliente antes de dar una cifra. El cotizador muestra "A cotizar" para ser transparentes: preferimos dar un precio real después de entender el proyecto que dar uno genérico que no aplique.',
   },
 ]
-
-const scrollTo = (id: string) => document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' })
 
 const toggle = (i: number) => {
   openIndex.value = openIndex.value === i ? null : i
@@ -54,7 +94,6 @@ const toggle = (i: number) => {
 
     <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <!-- Header -->
       <div
         v-motion
         :initial="{ opacity: 0, y: 20 }"
@@ -67,22 +106,20 @@ const toggle = (i: number) => {
           <span class="gradient-text block">a tus dudas</span>
         </h2>
         <p class="text-slate-400 text-lg">
-          Lo que más nos preguntan sobre nuestros servicios y forma de trabajo.
+          Lo que más nos preguntan sobre nuestros servicios, tecnologías y forma de trabajo.
         </p>
       </div>
 
-      <!-- Accordion -->
       <div class="space-y-3">
         <div
           v-for="(faq, i) in faqs"
           :key="i"
           v-motion
           :initial="{ opacity: 0, y: 20 }"
-          :visibleOnce="{ opacity: 1, y: 0, transition: { delay: i * 60, duration: 500 } }"
+          :visibleOnce="{ opacity: 1, y: 0, transition: { delay: i * 50, duration: 500 } }"
           class="glass-card rounded-xl overflow-hidden transition-all duration-300"
           :class="openIndex === i ? 'border-blue-500/30' : ''"
         >
-          <!-- Question -->
           <button
             class="w-full flex items-center justify-between gap-4 px-6 py-5 text-left group"
             @click="toggle(i)"
@@ -103,10 +140,9 @@ const toggle = (i: number) => {
             </div>
           </button>
 
-          <!-- Answer -->
           <Transition
             enter-active-class="transition-all duration-300 ease-out"
-            enter-from-class="opacity-0 max-h-0"
+            enter-from-class="opacity-0"
             enter-to-class="opacity-100"
             leave-active-class="transition-all duration-200"
             leave-to-class="opacity-0"
@@ -118,7 +154,6 @@ const toggle = (i: number) => {
         </div>
       </div>
 
-      <!-- Contact prompt -->
       <div
         v-motion
         :initial="{ opacity: 0, y: 20 }"
@@ -126,10 +161,7 @@ const toggle = (i: number) => {
         class="text-center mt-12"
       >
         <p class="text-slate-400 mb-4">¿Tienes una pregunta que no está aquí?</p>
-        <button
-          @click="scrollTo('#contacto')"
-          class="btn-outline"
-        >
+        <button @click="router.push('/contacto')" class="btn-outline">
           Escríbenos directamente
         </button>
       </div>

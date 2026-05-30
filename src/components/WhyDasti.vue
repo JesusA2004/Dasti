@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Layers, MessageSquare, Cpu, Target, Users, TrendingUp, FileCheck, Wrench } from '@lucide/vue'
-
-const scrollTo = (id: string) => document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' })
+import { Layers, MessageSquare, Cpu, Target, Users, TrendingUp, FileCheck, Wrench, Lightbulb } from '@lucide/vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const reasons = [
   {
@@ -51,6 +51,12 @@ const reasons = [
     title: 'Soporte posterior',
     desc: 'Ofrecemos seguimiento técnico post-entrega según el tipo de proyecto y necesidades del cliente.',
     color: '#FB923C',
+  },
+  {
+    icon: Lightbulb,
+    title: 'Asesoramiento sin compromiso',
+    desc: 'Si aún no tienes claro qué necesitas, te orientamos. Ayudamos a diagnosticar y priorizar antes de contratar cualquier servicio.',
+    color: '#E879F9',
   },
 ]
 </script>
@@ -112,23 +118,29 @@ const reasons = [
           style="background: rgba(37,99,235,0.08);" />
         <div class="relative">
           <h3 class="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
-            ¿Listo para mejorar la tecnología de tu empresa?
+            ¿Listo para optimizar la tecnología de tu empresa?
           </h3>
           <p class="text-slate-400 mb-7 max-w-lg mx-auto">
-            Cuéntanos qué necesitas y te ayudamos a encontrar la mejor solución tecnológica.
+            Cuéntanos qué necesita tu empresa y te ayudamos a implementar la solución en TI adecuada.
           </p>
           <div class="flex flex-wrap gap-4 justify-center">
             <button
-              @click="scrollTo('#contacto')"
+              @click="router.push('/contacto')"
               class="btn-primary"
             >
               Hablar con DASTI
             </button>
             <button
-              @click="scrollTo('#cotizador')"
+              @click="router.push('/proyectos')"
               class="btn-outline"
             >
-              Calcular costo aproximado
+              Ver proyectos
+            </button>
+            <button
+              @click="router.push('/cotizador')"
+              class="btn-outline"
+            >
+              Estimar inversión
             </button>
           </div>
         </div>

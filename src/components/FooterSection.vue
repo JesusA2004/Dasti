@@ -1,30 +1,31 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 const year = new Date().getFullYear()
 
 const navLinks = [
-  { name: 'Inicio', href: '#inicio' },
-  { name: 'Nosotros', href: '#nosotros' },
-  { name: 'Servicios', href: '#servicios' },
-  { name: 'Cotizador', href: '#cotizador' },
-  { name: 'Preguntas frecuentes', href: '#faq' },
-  { name: 'Contacto', href: '#contacto' },
+  { name: 'Inicio', href: '/' },
+  { name: 'Servicios', href: '/servicios' },
+  { name: 'Proyectos', href: '/proyectos' },
+  { name: 'Cotizador', href: '/cotizador' },
+  { name: 'Nosotros', href: '/nosotros' },
+  { name: 'Contacto', href: '/contacto' },
 ]
 
 const serviceLinks = [
   'Desarrollo web',
   'Software a medida',
-  'Automatización',
-  'Chatbots',
-  'Correos empresariales',
-  'Redes e infraestructura',
+  'Correos corporativos',
+  'Redes y sistemas mesh',
   'Soporte técnico',
   'Equipos de cómputo',
+  'Impresoras y periféricos',
+  'Automatización',
+  'Integración de sistemas',
+  'Chatbots',
+  'Asesoramiento en TI',
 ]
-
-const scrollTo = (href: string) => {
-  const el = document.querySelector(href)
-  if (el) el.scrollIntoView({ behavior: 'smooth' })
-}
 </script>
 
 <template>
@@ -67,13 +68,12 @@ const scrollTo = (href: string) => {
           <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-widest mb-4">Navegación</h4>
           <ul class="space-y-2.5">
             <li v-for="link in navLinks" :key="link.name">
-              <a
-                :href="link.href"
-                @click.prevent="scrollTo(link.href)"
-                class="text-sm text-slate-500 hover:text-slate-200 transition-colors cursor-pointer"
+              <button
+                @click="router.push(link.href)"
+                class="text-sm text-slate-500 hover:text-slate-200 transition-colors cursor-pointer text-left"
               >
                 {{ link.name }}
-              </a>
+              </button>
             </li>
           </ul>
         </div>
@@ -83,13 +83,12 @@ const scrollTo = (href: string) => {
           <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-widest mb-4">Servicios</h4>
           <ul class="grid sm:grid-cols-2 gap-x-6 gap-y-2.5">
             <li v-for="svc in serviceLinks" :key="svc">
-              <a
-                href="#servicios"
-                @click.prevent="scrollTo('#servicios')"
-                class="text-sm text-slate-500 hover:text-slate-200 transition-colors cursor-pointer"
+              <button
+                @click="router.push('/servicios')"
+                class="text-sm text-slate-500 hover:text-slate-200 transition-colors cursor-pointer text-left"
               >
                 {{ svc }}
-              </a>
+              </button>
             </li>
           </ul>
         </div>
