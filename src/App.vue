@@ -6,8 +6,10 @@ import ThemeSelector from '@/components/ThemeSelector.vue'
 </script>
 
 <template>
-  <div class="relative min-h-screen overflow-x-hidden"
-    style="background-color: var(--bg-base); color: var(--text-primary);">
+  <!-- overflow-x:clip clips horizontal overflow without creating a scroll container,
+       preserving position:sticky and window.scrollY behaviour for all children. -->
+  <div class="relative min-h-screen"
+    style="overflow-x: clip; background-color: var(--bg-base); color: var(--text-primary);">
     <AppNavbar />
     <main>
       <RouterView v-slot="{ Component }">

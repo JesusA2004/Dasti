@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(npm run *)",
-      "PowerShell(Get-ChildItem \"C:\\\\wamp64\\\\www\\\\Dasti\" -Depth 2 | Where-Object {$_.Name -match \"\\(tailwind|vite|main\\)\"})"
+      "PowerShell(Get-ChildItem \"C:\\\\wamp64\\\\www\\\\Dasti\" -Depth 2 | Where-Object {$_.Name -match \"\\(tailwind|vite|main\\)\"})",
+      "Bash(Get-ChildItem -Path \"C:\\\\wamp64\\\\www\\\\Dasti\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(node -e \"const l = require\\('./node_modules/@lucide/vue/dist/esm/lucide-vue.mjs'\\); Object.keys\\(l\\).filter\\(k => /fb|face|insta|linkedin|social|tiktok|whats|twitter|x$/i.test\\(k\\)\\).join\\(', '\\)\")",
+      "Bash(node *)"
     ]
   }
 }

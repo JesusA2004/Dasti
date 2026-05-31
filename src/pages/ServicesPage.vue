@@ -240,6 +240,9 @@ const categories = [
       <div class="relative py-7" style="background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle);">
         <AnimatedParticles density="low" variant="minimal" size="sm" :opacity="0.35" speed="slow" />
         <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p class="text-center text-xs font-medium mb-4" style="color: var(--text-muted);">
+            Selecciona el área que quieres mejorar para ver los servicios relacionados
+          </p>
           <div class="grid grid-cols-3 sm:grid-cols-6 gap-3">
             <button
               v-for="(cat, i) in heroCategories"

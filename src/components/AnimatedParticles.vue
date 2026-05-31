@@ -25,6 +25,9 @@ const canvasRef = ref<HTMLCanvasElement>()
 let rafId = 0
 let mouseX = -1000
 let mouseY = -1000
+// Stored in outer scope so onUnmounted can clean them up
+let ro: ResizeObserver | null = null
+let docMoveHandler: ((e: MouseEvent) => void) | null = null
 
 const densityMap = { low: 35, medium: 65, high: 100, ultra: 140 }
 const speedMap = { slow: 0.22, normal: 0.42, fast: 0.72 }
@@ -156,30 +159,33 @@ onMounted(() => {
   resize()
   draw()
 
-  const ro = new ResizeObserver(resize)
+  ro = new ResizeObserver(resize)
   ro.observe(canvas)
 
   if (props.interactive) {
     canvas.addEventListener('mousemove', handleMouseMove)
     canvas.addEventListener('mouseleave', handleMouseLeave)
-    // Forward parent mousemove if canvas has pointer-events none
-    document.addEventListener('mousemove', (e) => {
+    // Named handler so it can be removed on unmount
+    docMoveHandler = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect()
       if (e.clientX >= rect.left && e.clientX <= rect.right &&
           e.clientY >= rect.top && e.clientY <= rect.bottom) {
         mouseX = e.clientX - rect.left
         mouseY = e.clientY - rect.top
       }
-    })
-  }
-
-  return () => {
-    cancelAnimationFrame(rafId)
-    ro.disconnect()
+    }
+    document.addEventListener('mousemove', docMoveHandler, { passive: true })
   }
 })
 
-onUnmounted(() => cancelAnimationFrame(rafId))
+onUnmounted(() => {
+  cancelAnimationFrame(rafId)
+  ro?.disconnect()
+  if (docMoveHandler) {
+    document.removeEventListener('mousemove', docMoveHandler)
+    docMoveHandler = null
+  }
+})
 </script>
 
 <template>

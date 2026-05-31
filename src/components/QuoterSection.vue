@@ -234,6 +234,37 @@ const categories = computed(() => {
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
+      <!-- 4-step usage guide -->
+      <div
+        v-motion
+        :initial="{ opacity: 0, y: 16 }"
+        :visibleOnce="{ opacity: 1, y: 0, transition: { duration: 500 } }"
+        class="flex flex-wrap items-center justify-center gap-2 mb-12"
+      >
+        <div
+          v-for="(step, i) in [
+            { n: '1', label: 'Selecciona servicios', color: '#3B82F6' },
+            { n: '2', label: 'Ajusta cantidades', color: '#34D399' },
+            { n: '3', label: 'Revisa la inversión', color: '#F472B6' },
+            { n: '4', label: 'Envía por WhatsApp', color: '#FBBF24' },
+          ]"
+          :key="i"
+          class="flex items-center gap-1.5"
+        >
+          <div
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
+            :style="`background: ${step.color}12; color: ${step.color}; border: 1px solid ${step.color}28;`"
+          >
+            <span
+              class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+              :style="`background: ${step.color};`"
+            >{{ step.n }}</span>
+            {{ step.label }}
+          </div>
+          <span v-if="i < 3" class="text-xs" style="color: var(--border-medium);">→</span>
+        </div>
+      </div>
+
       <!-- Header -->
       <div
         v-motion

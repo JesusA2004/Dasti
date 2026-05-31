@@ -17,12 +17,18 @@ const navLinks = [
   { name: 'Contacto', href: '/contacto' },
 ]
 
-const isActive = (href: string) =>
-  href === '/' ? route.path === '/' : route.path.startsWith(href)
+const isActive = (href: string) => (href === '/' ? route.path === '/' : route.path.startsWith(href))
 
-const handleScroll = () => { isScrolled.value = window.scrollY > 20 }
-const closeMenu = () => { isMenuOpen.value = false }
-const navigate = (href: string) => { closeMenu(); router.push(href) }
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 20
+}
+const closeMenu = () => {
+  isMenuOpen.value = false
+}
+const navigate = (href: string) => {
+  closeMenu()
+  router.push(href)
+}
 
 onMounted(() => window.addEventListener('scroll', handleScroll, { passive: true }))
 onUnmounted(() => window.removeEventListener('scroll', handleScroll))
@@ -31,26 +37,24 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 <template>
   <header
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-    :style="isScrolled
-      ? 'background: var(--bg-navbar); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);'
-      : 'background: transparent;'"
+    :style="
+      isScrolled
+        ? 'background: var(--bg-navbar); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);'
+        : 'background: transparent;'
+    "
   >
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-18">
-
         <!-- Logo -->
         <RouterLink to="/" class="flex items-center gap-2.5 group">
           <div class="relative">
+            <img src="/img/favicon.png" alt="DASTI" class="h-12 w-auto object-contain" />
             <div
-              class="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold font-display text-base"
-              style="background: linear-gradient(135deg, var(--accent-light), var(--accent)); box-shadow: 0 0 16px var(--accent-glow);"
-            >
-              D
-            </div>
-            <div class="absolute inset-0 rounded-xl animate-pulse-slow"
-              style="background: var(--accent-glow-sm); filter: blur(4px);"></div>
+              class="absolute inset-0 rounded-xl animate-pulse-slow"
+              style="background: var(--accent-glow-sm); filter: blur(4px)"
+            ></div>
           </div>
-          <span class="font-display font-bold text-xl tracking-wide gradient-text">DASTI</span>
+          <img src="/img/logo.png" alt="DASTI" class="h-12 w-auto object-contain" />
         </RouterLink>
 
         <!-- Desktop nav -->
@@ -60,16 +64,18 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
             :key="link.href"
             @click="navigate(link.href)"
             class="px-3.5 py-2 text-sm font-medium rounded-lg transition-all duration-200 relative"
-            :style="isActive(link.href)
-              ? 'color: var(--text-primary); background: var(--accent-glow-sm); border: 1px solid var(--border-subtle);'
-              : 'color: var(--text-secondary); border: 1px solid transparent;'"
+            :style="
+              isActive(link.href)
+                ? 'color: var(--text-primary); background: var(--accent-glow-sm); border: 1px solid var(--border-subtle);'
+                : 'color: var(--text-secondary); border: 1px solid transparent;'
+            "
           >
             {{ link.name }}
             <!-- Active underline -->
             <div
               v-if="isActive(link.href)"
               class="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
-              style="background: var(--accent-light);"
+              style="background: var(--accent-light)"
             />
           </button>
         </div>
@@ -85,7 +91,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
         <!-- Mobile hamburger -->
         <button
           class="lg:hidden p-2 rounded-xl transition-colors"
-          style="color: var(--text-secondary); border: 1px solid var(--border-subtle);"
+          style="color: var(--text-secondary); border: 1px solid var(--border-subtle)"
           @click="isMenuOpen = !isMenuOpen"
           :aria-expanded="isMenuOpen"
           aria-label="Abrir menú"
@@ -108,7 +114,11 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
       <div
         v-if="isMenuOpen"
         class="lg:hidden"
-        style="background: var(--bg-elevated); backdrop-filter: blur(20px); border-top: 1px solid var(--border-subtle);"
+        style="
+          background: var(--bg-elevated);
+          backdrop-filter: blur(20px);
+          border-top: 1px solid var(--border-subtle);
+        "
       >
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
           <button
@@ -116,14 +126,19 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
             :key="link.href"
             @click="navigate(link.href)"
             class="px-4 py-3 text-sm font-medium rounded-xl transition-all text-left"
-            :style="isActive(link.href)
-              ? 'color: var(--text-primary); background: var(--accent-glow-sm); border: 1px solid var(--border-subtle);'
-              : 'color: var(--text-secondary); border: 1px solid transparent;'"
+            :style="
+              isActive(link.href)
+                ? 'color: var(--text-primary); background: var(--accent-glow-sm); border: 1px solid var(--border-subtle);'
+                : 'color: var(--text-secondary); border: 1px solid transparent;'
+            "
           >
             {{ link.name }}
           </button>
-          <div class="mt-3 pt-3" style="border-top: 1px solid var(--border-subtle);">
-            <button @click="navigate('/cotizador')" class="btn-primary w-full justify-center text-sm">
+          <div class="mt-3 pt-3" style="border-top: 1px solid var(--border-subtle)">
+            <button
+              @click="navigate('/cotizador')"
+              class="btn-primary w-full justify-center text-sm"
+            >
               Cotizar solución
               <ChevronRight :size="15" />
             </button>
