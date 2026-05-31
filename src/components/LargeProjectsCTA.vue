@@ -13,22 +13,18 @@ const openWhatsApp = (type: string) => {
 </script>
 
 <template>
-  <section class="relative py-24 overflow-hidden" style="background: #050D1A;">
-    <div class="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
-
-    <!-- Strong radial glow center -->
-    <div class="absolute inset-0 pointer-events-none"
-      style="background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(37,99,235,0.08) 0%, transparent 70%);" />
+  <section class="relative py-24 overflow-hidden" style="background: var(--bg-base);">
+    <div class="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
+    <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 60% 50% at 50% 50%, var(--accent-glow-sm) 0%, transparent 70%);" />
 
     <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <!-- Main card -->
       <div
         v-motion
         :initial="{ opacity: 0, y: 30 }"
         :visibleOnce="{ opacity: 1, y: 0, transition: { duration: 700 } }"
         class="rounded-3xl p-8 sm:p-12 lg:p-16 text-center relative overflow-hidden"
-        style="background: rgba(13, 30, 54, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(59,130,246,0.2);"
+        style="background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--border-medium);"
       >
         <!-- Inner glow -->
         <div class="absolute inset-0 rounded-3xl pointer-events-none"
@@ -42,19 +38,18 @@ const openWhatsApp = (type: string) => {
           <span class="tag mb-6 inline-block">Proyectos de mayor alcance</span>
 
           <!-- Title -->
-          <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5">
+          <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-5" style="color: var(--text-primary);">
             ¿Tu proyecto requiere una
             <span class="gradient-text block">solución más completa?</span>
           </h2>
 
-          <!-- Description -->
-          <p class="text-slate-400 text-lg max-w-2xl mx-auto mb-4 leading-relaxed">
+          <p class="text-lg max-w-2xl mx-auto mb-4 leading-relaxed" style="color: var(--text-secondary);">
             Para proyectos grandes, integraciones especiales, infraestructura de red, sistemas a medida
             o implementaciones por etapas, DASTI puede coordinar una videollamada o junta presencial
             para revisar necesidades, alcance, tiempos y requerimientos técnicos.
           </p>
 
-          <p class="text-slate-500 text-sm max-w-xl mx-auto mb-10">
+          <p class="text-sm max-w-xl mx-auto mb-10" style="color: var(--text-muted);">
             La modalidad presencial dependerá de ubicación, disponibilidad y alcance del proyecto.
           </p>
 
@@ -96,8 +91,8 @@ const openWhatsApp = (type: string) => {
                 :style="`background: ${option.color}15; border: 1px solid ${option.color}30;`">
                 <component :is="option.icon" :size="20" :style="`color: ${option.color}`" />
               </div>
-              <h4 class="font-semibold text-white text-sm mb-1">{{ option.title }}</h4>
-              <p class="text-xs text-slate-400 leading-relaxed">{{ option.desc }}</p>
+              <h4 class="font-semibold text-sm mb-1" style="color: var(--text-primary);">{{ option.title }}</h4>
+              <p class="text-xs leading-relaxed" style="color: var(--text-muted);">{{ option.desc }}</p>
             </div>
           </div>
 

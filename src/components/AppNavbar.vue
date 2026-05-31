@@ -32,7 +32,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
   <header
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
     :style="isScrolled
-      ? 'background: rgba(var(--bg-base, 5 13 26) / 0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);'
+      ? 'background: var(--bg-navbar); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);'
       : 'background: transparent;'"
   >
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

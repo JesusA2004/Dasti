@@ -12,96 +12,62 @@ const navLinks = [
   { name: 'Nosotros', href: '/nosotros' },
   { name: 'Contacto', href: '/contacto' },
 ]
-
-const serviceLinks = [
-  'Desarrollo web',
-  'Software a medida',
-  'Correos corporativos',
-  'Redes y sistemas mesh',
-  'Soporte técnico',
-  'Equipos de cómputo',
-  'Impresoras y periféricos',
-  'Automatización',
-  'Integración de sistemas',
-  'Chatbots',
-  'Asesoramiento en TI',
-]
 </script>
 
 <template>
-  <footer class="relative overflow-hidden" style="background: #020B18; border-top: 1px solid rgba(59,130,246,0.1);">
-    <div class="orb w-[600px] h-[400px] top-0 left-1/2 -translate-x-1/2"
-      style="background: rgba(37,99,235,0.03);" />
+  <footer class="relative overflow-hidden" style="background: var(--bg-base); border-top: 1px solid var(--border-subtle);">
+    <div class="orb w-[500px] h-[300px] top-0 left-1/2 -translate-x-1/2 opacity-[0.04]" style="background: var(--accent-glow);" />
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <!-- Main footer content -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 py-14">
+      <!-- Main row -->
+      <div class="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-8 py-10">
 
-        <!-- Brand column -->
-        <div class="sm:col-span-2 lg:col-span-1">
-          <div class="flex items-center gap-2 mb-4">
-            <div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold text-lg"
-              style="background: linear-gradient(135deg, #2563EB, #1D4ED8);">
+        <!-- Brand -->
+        <div class="flex flex-col items-center sm:items-start gap-1.5 text-center sm:text-left">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm text-white"
+              style="background: linear-gradient(135deg, var(--accent-light), var(--accent));">
               D
             </div>
-            <span class="font-display font-bold text-xl gradient-text">DASTI</span>
+            <span class="font-display font-bold text-lg gradient-text">DASTI</span>
           </div>
-          <p class="text-xs text-slate-500 leading-relaxed mb-1">
-            Desarrollo y Aplicación de Soluciones en TI
-          </p>
-          <p class="text-xs text-slate-500 italic mb-5">
-            Tecnología aplicada a soluciones reales.
-          </p>
+          <p class="text-xs" style="color: var(--text-muted);">Tecnología aplicada a soluciones reales.</p>
           <a
             href="https://dasti.cloud"
             target="_blank"
             rel="noopener"
-            class="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+            class="text-xs transition-colors"
+            style="color: var(--accent-lighter);"
           >
             dasti.cloud
           </a>
         </div>
 
-        <!-- Navigation -->
-        <div>
-          <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-widest mb-4">Navegación</h4>
-          <ul class="space-y-2.5">
-            <li v-for="link in navLinks" :key="link.name">
-              <button
-                @click="router.push(link.href)"
-                class="text-sm text-slate-500 hover:text-slate-200 transition-colors cursor-pointer text-left"
-              >
-                {{ link.name }}
-              </button>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Services -->
-        <div class="sm:col-span-2 lg:col-span-2">
-          <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-widest mb-4">Servicios</h4>
-          <ul class="grid sm:grid-cols-2 gap-x-6 gap-y-2.5">
-            <li v-for="svc in serviceLinks" :key="svc">
-              <button
-                @click="router.push('/servicios')"
-                class="text-sm text-slate-500 hover:text-slate-200 transition-colors cursor-pointer text-left"
-              >
-                {{ svc }}
-              </button>
-            </li>
-          </ul>
-        </div>
-
+        <!-- Nav links -->
+        <nav class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          <button
+            v-for="link in navLinks"
+            :key="link.name"
+            @click="router.push(link.href)"
+            class="text-sm transition-colors cursor-pointer"
+            style="color: var(--text-muted);"
+            @mouseenter="($event.target as HTMLElement).style.color = 'var(--text-primary)'"
+            @mouseleave="($event.target as HTMLElement).style.color = 'var(--text-muted)'"
+          >
+            {{ link.name }}
+          </button>
+        </nav>
       </div>
 
       <!-- Bottom bar -->
-      <div class="border-t border-white/5 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p class="text-xs text-slate-600">
+      <div class="py-5 flex flex-col sm:flex-row items-center justify-between gap-2"
+        style="border-top: 1px solid var(--border-subtle);">
+        <p class="text-xs" style="color: var(--text-muted);">
           &copy; {{ year }} DASTI. Todos los derechos reservados.
         </p>
-        <p class="text-xs text-slate-600">
-          Tecnología aplicada a soluciones reales.
+        <p class="text-xs" style="color: var(--text-muted);">
+          Morelos, México · Desarrollo y Aplicación de Soluciones en TI
         </p>
       </div>
     </div>

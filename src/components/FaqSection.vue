@@ -87,10 +87,10 @@ const toggle = (i: number) => {
 </script>
 
 <template>
-  <section id="faq" class="relative py-24 overflow-hidden" style="background: #060F1E;">
-    <div class="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
-    <div class="orb w-[500px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-      style="background: rgba(37,99,235,0.04);" />
+  <section id="faq" class="relative py-24 overflow-hidden" style="background: var(--bg-surface);">
+    <div class="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
+    <div class="orb w-[500px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10"
+      style="background: var(--accent-glow);" />
 
     <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -102,10 +102,10 @@ const toggle = (i: number) => {
       >
         <span class="tag mb-4 inline-block">Preguntas frecuentes</span>
         <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-5">
-          <span class="text-white">Respuestas</span>
+          <span style="color: var(--text-primary);">Respuestas</span>
           <span class="gradient-text block">a tus dudas</span>
         </h2>
-        <p class="text-slate-400 text-lg">
+        <p class="text-lg" style="color: var(--text-secondary);">
           Lo que más nos preguntan sobre nuestros servicios, tecnologías y forma de trabajo.
         </p>
       </div>
@@ -125,17 +125,17 @@ const toggle = (i: number) => {
             @click="toggle(i)"
             :aria-expanded="openIndex === i"
           >
-            <span class="font-medium text-white text-sm sm:text-base leading-snug group-hover:text-blue-200 transition-colors">
+            <span class="font-medium text-sm sm:text-base leading-snug transition-colors" style="color: var(--text-primary);">
               {{ faq.q }}
             </span>
             <div class="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200"
               :style="openIndex === i
-                ? 'background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.4);'
-                : 'background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);'"
+                ? 'background: var(--accent-glow-sm); border: 1px solid var(--border-accent);'
+                : 'background: var(--bg-elevated); border: 1px solid var(--border-subtle);'"
             >
               <ChevronDown
                 :size="16"
-                :class="['text-slate-400 transition-transform duration-300', openIndex === i ? 'rotate-180' : '']"
+                class="transition-transform duration-300" :class="openIndex === i ? 'rotate-180' : ''" style="color: var(--text-muted);"
               />
             </div>
           </button>
@@ -147,8 +147,8 @@ const toggle = (i: number) => {
             leave-active-class="transition-all duration-200"
             leave-to-class="opacity-0"
           >
-            <div v-if="openIndex === i" class="px-6 pb-5 border-t" style="border-color: rgba(59,130,246,0.08);">
-              <p class="text-slate-400 text-sm leading-relaxed pt-4">{{ faq.a }}</p>
+            <div v-if="openIndex === i" class="px-6 pb-5 border-t" style="border-color: var(--border-subtle);">
+              <p class="text-sm leading-relaxed pt-4" style="color: var(--text-secondary);">{{ faq.a }}</p>
             </div>
           </Transition>
         </div>
@@ -160,7 +160,7 @@ const toggle = (i: number) => {
         :visibleOnce="{ opacity: 1, y: 0, transition: { duration: 600 } }"
         class="text-center mt-12"
       >
-        <p class="text-slate-400 mb-4">¿Tienes una pregunta que no está aquí?</p>
+        <p class="mb-4" style="color: var(--text-secondary);">¿Tienes una pregunta que no está aquí?</p>
         <button @click="router.push('/contacto')" class="btn-outline">
           Escríbenos directamente
         </button>

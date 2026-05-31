@@ -1,6 +1,6 @@
 import { ref, watchEffect } from 'vue'
 
-export type ThemeId = 'dark-tech' | 'light-corporate' | 'blue-premium' | 'graphite' | 'indigo'
+export type ThemeId = 'dark' | 'light' | 'blue-premium' | 'indigo'
 
 export interface Theme {
   id: ThemeId
@@ -11,28 +11,22 @@ export interface Theme {
 
 export const themes: Theme[] = [
   {
-    id: 'dark-tech',
-    name: 'Dark Tech',
-    label: 'Predeterminado',
+    id: 'dark',
+    name: 'Dark',
+    label: 'Oscuro',
     preview: { bg: '#050D1A', accent: '#3B82F6' },
   },
   {
-    id: 'light-corporate',
-    name: 'Light Corporate',
+    id: 'light',
+    name: 'Light',
     label: 'Claro',
-    preview: { bg: '#F1F5F9', accent: '#2563EB' },
+    preview: { bg: '#F8FAFC', accent: '#2563EB' },
   },
   {
     id: 'blue-premium',
     name: 'Blue Premium',
     label: 'Azul Pro',
     preview: { bg: '#020C1F', accent: '#38BDF8' },
-  },
-  {
-    id: 'graphite',
-    name: 'Graphite',
-    label: 'Grafito',
-    preview: { bg: '#0F0F0F', accent: '#E5E5E5' },
   },
   {
     id: 'indigo',
@@ -42,10 +36,21 @@ export const themes: Theme[] = [
   },
 ]
 
+function migrateThemeId(stored: string | null): ThemeId {
+  if (!stored) return 'dark'
+  const migrations: Record<string, ThemeId> = {
+    'dark-tech': 'dark',
+    'light-corporate': 'light',
+    graphite: 'dark',
+  }
+  if (migrations[stored]) return migrations[stored]
+  if (themes.some(t => t.id === stored)) return stored as ThemeId
+  return 'dark'
+}
+
 function getInitialTheme(): ThemeId {
-  if (typeof localStorage === 'undefined') return 'dark-tech'
-  const stored = localStorage.getItem('dasti-theme') as ThemeId | null
-  return stored && themes.some(t => t.id === stored) ? stored : 'dark-tech'
+  if (typeof localStorage === 'undefined') return 'dark'
+  return migrateThemeId(localStorage.getItem('dasti-theme'))
 }
 
 const currentThemeId = ref<ThemeId>(getInitialTheme())
@@ -65,7 +70,7 @@ if (typeof document !== 'undefined') {
 
 export function useTheme() {
   const setTheme = (id: ThemeId) => { currentThemeId.value = id }
-  const isDark = () => currentThemeId.value !== 'light-corporate'
+  const isDark = () => currentThemeId.value !== 'light'
 
   return { currentThemeId, themes, setTheme, isDark }
 }

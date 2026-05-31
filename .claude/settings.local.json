@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "PowerShell(Get-ChildItem \"C:\\\\wamp64\\\\www\\\\Dasti\" -Depth 2 | Where-Object {$_.Name -match \"\\(tailwind|vite|main\\)\"})"
     ]
   }
 }

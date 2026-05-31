@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router'
 import { MapPin, Wifi, Monitor, Layers, MessageSquare, ArrowRight } from '@lucide/vue'
 import FaqSection from '@/components/FaqSection.vue'
+import AnimatedParticles from '@/components/AnimatedParticles.vue'
 
 const router = useRouter()
 
@@ -41,10 +42,11 @@ const values = [
   <div class="pt-18">
 
     <!-- Hero -->
-    <section class="relative py-20 overflow-hidden" style="background: linear-gradient(160deg, #020B18 0%, #0A1628 60%, #050D1A 100%);">
-      <div class="absolute inset-0 grid-bg opacity-40 pointer-events-none" />
-      <div class="orb w-[600px] h-[400px] top-0 left-1/2 -translate-x-1/2"
-        style="background: rgba(37,99,235,0.06);" />
+    <section class="relative py-20 overflow-hidden" style="background: var(--bg-base);">
+      <div class="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
+      <AnimatedParticles density="low" variant="minimal" :opacity="0.5" speed="slow" />
+      <div class="orb w-[600px] h-[400px] top-0 left-1/2 -translate-x-1/2 opacity-15"
+        style="background: var(--accent-glow);" />
       <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div
           v-motion
@@ -53,10 +55,10 @@ const values = [
         >
           <span class="tag mb-4 inline-block">Quiénes somos</span>
           <h1 class="font-display text-4xl sm:text-5xl font-bold mb-6">
-            <span class="text-white">Desarrollo y Aplicación de</span>
+            <span style="color: var(--text-primary);">Desarrollo y Aplicación de</span>
             <span class="gradient-text block">Soluciones en TI</span>
           </h1>
-          <p class="text-slate-400 text-lg leading-relaxed max-w-2xl mx-auto mb-8">
+          <p class="text-lg leading-relaxed max-w-2xl mx-auto mb-8" style="color: var(--text-secondary);">
             DASTI es una empresa ubicada en Morelos, con atención principal en Cuernavaca y zona metropolitana.
             Desarrollamos, implementamos y administramos soluciones en Tecnologías de la Información para empresas
             que buscan mejorar su operación, infraestructura, comunicación y procesos internos.
@@ -74,57 +76,85 @@ const values = [
       </div>
     </section>
 
-    <!-- What is DASTI -->
-    <section class="py-20" style="background: #050D1A;">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid lg:grid-cols-2 gap-16 items-start">
-          <div
-            v-motion
-            :initial="{ opacity: 0, x: -30 }"
-            :visibleOnce="{ opacity: 1, x: 0, transition: { duration: 700 } }"
-          >
-            <h2 class="font-display text-3xl font-bold text-white mb-6">¿Qué significa DASTI?</h2>
-            <p class="text-slate-400 leading-relaxed mb-5">
-              DASTI significa <strong class="text-white">Desarrollo y Aplicación de Soluciones en TI</strong>.
-              Es el enfoque central de la empresa: desarrollar e implementar soluciones tecnológicas reales
-              y funcionales para negocios y empresas que necesitan tecnología que funcione.
-            </p>
-            <p class="text-slate-400 leading-relaxed mb-5">
-              No nos limitamos a servicios digitales. Integramos software, infraestructura de red, correos
-              corporativos, soporte técnico, equipos de cómputo, impresoras, automatización, integración
-              de sistemas y asesoramiento tecnológico.
-            </p>
-            <p class="text-slate-400 leading-relaxed">
-              Trabajamos con un enfoque práctico: analizamos la necesidad, proponemos una solución viable,
-              la implementamos y acompañamos al cliente durante todo el proceso.
-            </p>
+    <!-- What is DASTI — editorial with large image -->
+    <section class="relative overflow-hidden" style="background: var(--bg-base);">
+      <!-- Large image -->
+      <div class="relative h-64 sm:h-80 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&auto=format&fit=crop&q=80"
+          alt="DASTI equipo"
+          class="w-full h-full object-cover"
+          loading="lazy"
+        />
+        <div class="absolute inset-0" style="background: linear-gradient(to bottom, transparent 30%, var(--bg-base) 100%);" />
+        <div class="absolute bottom-6 left-6">
+          <div class="glass-card rounded-xl px-4 py-2.5 flex items-center gap-2.5">
+            <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span class="text-xs font-semibold" style="color: var(--text-primary);">DASTI · Morelos, México</span>
           </div>
+        </div>
+      </div>
 
-          <div
-            v-motion
-            :initial="{ opacity: 0, x: 30 }"
-            :visibleOnce="{ opacity: 1, x: 0, transition: { duration: 700 } }"
-            class="grid grid-cols-2 gap-4"
-          >
-            <div v-for="v in values" :key="v.title"
-              class="glass-card rounded-xl p-5"
+      <div class="py-16" style="background: var(--bg-base);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="grid lg:grid-cols-2 gap-14 items-center">
+            <div
+              v-motion
+              :initial="{ opacity: 0, x: -30 }"
+              :visibleOnce="{ opacity: 1, x: 0, transition: { duration: 700 } }"
             >
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
-                :style="`background: ${v.color}15; border: 1px solid ${v.color}35;`">
-                <component :is="v.icon" :size="20" :style="`color: ${v.color}`" />
+              <span class="tag mb-4 inline-block">¿Qué significa DASTI?</span>
+              <h2 class="display-text text-3xl sm:text-4xl mb-5" style="color: var(--text-primary);">
+                Desarrollo y Aplicación de
+                <span class="gradient-text block"> Soluciones en TI</span>
+              </h2>
+              <p class="text-base leading-relaxed mb-4" style="color: var(--text-secondary);">
+                DASTI desarrolla e implementa soluciones tecnológicas reales para empresas que necesitan tecnología funcional, no genérica.
+              </p>
+              <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
+                Software, redes, correos corporativos, equipos, automatización, integración de sistemas y asesoramiento — todo en una sola empresa.
+              </p>
+              <div class="flex flex-wrap gap-3">
+                <button @click="router.push('/servicios')" class="btn-primary">
+                  Ver todos los servicios <ArrowRight :size="15" />
+                </button>
+                <button @click="router.push('/contacto')" class="btn-outline">
+                  Consulta sin compromiso
+                </button>
               </div>
-              <h4 class="font-semibold text-white text-sm mb-2">{{ v.title }}</h4>
-              <p class="text-xs text-slate-400 leading-relaxed">{{ v.desc }}</p>
+            </div>
+
+            <div
+              v-motion
+              :initial="{ opacity: 0, x: 30 }"
+              :visibleOnce="{ opacity: 1, x: 0, transition: { duration: 700 } }"
+              class="grid grid-cols-2 gap-4"
+            >
+              <div
+                v-for="v in values"
+                :key="v.title"
+                class="glass-card rounded-xl p-5 group tilt-card"
+              >
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-transform duration-200 group-hover:scale-110"
+                  :style="`background: ${v.color}15; border: 1px solid ${v.color}35;`">
+                  <component :is="v.icon" :size="20" :style="`color: ${v.color}`" />
+                </div>
+                <h4 class="font-semibold text-sm mb-2" style="color: var(--text-primary);">{{ v.title }}</h4>
+                <p class="text-xs leading-relaxed" style="color: var(--text-secondary);">{{ v.desc }}</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="section-line max-w-7xl mx-auto mt-20" />
+      <div class="section-line max-w-7xl mx-auto" />
     </section>
 
-    <!-- How we work -->
-    <section class="py-20" style="background: #060F1E;">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- How we work — visual grid with images -->
+    <section class="relative py-20 overflow-hidden" style="background: var(--bg-surface);">
+      <div class="absolute inset-0 grid-bg opacity-15 pointer-events-none" />
+      <AnimatedParticles density="low" variant="minimal" size="sm" :opacity="0.4" speed="slow" />
+
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           v-motion
           :initial="{ opacity: 0, y: 20 }"
@@ -132,25 +162,32 @@ const values = [
           class="text-center mb-14"
         >
           <span class="tag mb-4 inline-block">Forma de trabajo</span>
-          <h2 class="font-display text-3xl font-bold text-white mb-4">Cómo trabajamos</h2>
-          <p class="text-slate-400">Proceso claro desde la primer consulta hasta la entrega.</p>
+          <h2 class="display-text text-3xl sm:text-4xl mb-4" style="color: var(--text-primary);">Cómo trabajamos</h2>
+          <p class="text-base max-w-lg mx-auto" style="color: var(--text-secondary);">Proceso claro desde la primer consulta hasta la entrega.</p>
         </div>
-        <div class="space-y-6">
-          <div v-for="(step, i) in [
-            { n: '01', title: 'Consulta inicial', desc: 'Escuchamos lo que necesitas. Si no tienes claro el alcance, te ayudamos a definirlo sin compromiso.' },
-            { n: '02', title: 'Propuesta y alcance', desc: 'Documentamos el alcance, plazos y costo estimado. Sin sorpresas en la entrega.' },
-            { n: '03', title: 'Implementación', desc: 'Desarrollamos, configuramos o instalamos la solución con los estándares técnicos adecuados.' },
-            { n: '04', title: 'Entrega y acompañamiento', desc: 'Entregamos documentado y acompañamos al cliente durante la adopción y uso de la solución.' },
-          ]" :key="i"
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div
+            v-for="(step, i) in [
+              { n: '01', color: '#3B82F6', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&auto=format&fit=crop&q=80', title: 'Consulta inicial', desc: 'Escuchamos lo que necesitas sin compromiso.' },
+              { n: '02', color: '#34D399', img: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&auto=format&fit=crop&q=80', title: 'Propuesta y alcance', desc: 'Documentamos alcance, plazos y costo estimado.' },
+              { n: '03', color: '#F472B6', img: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&auto=format&fit=crop&q=80', title: 'Implementación', desc: 'Desarrollamos e instalamos con estándares técnicos.' },
+              { n: '04', color: '#FBBF24', img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&auto=format&fit=crop&q=80', title: 'Entrega y soporte', desc: 'Acompañamos durante la adopción y uso de la solución.' },
+            ]"
+            :key="i"
             v-motion
-            :initial="{ opacity: 0, x: -20 }"
-            :visibleOnce="{ opacity: 1, x: 0, transition: { delay: i * 80, duration: 500 } }"
-            class="flex items-start gap-5 glass-card rounded-xl p-5"
+            :initial="{ opacity: 0, y: 30 }"
+            :visibleOnce="{ opacity: 1, y: 0, transition: { delay: i * 100, duration: 550 } }"
+            class="glass-card rounded-2xl overflow-hidden group tilt-card"
           >
-            <div class="text-2xl font-bold font-display flex-shrink-0 gradient-text">{{ step.n }}</div>
-            <div>
-              <h4 class="font-semibold text-white mb-1">{{ step.title }}</h4>
-              <p class="text-sm text-slate-400 leading-relaxed">{{ step.desc }}</p>
+            <div class="relative overflow-hidden" style="aspect-ratio: 16/10;">
+              <img :src="step.img" :alt="step.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+              <div class="absolute inset-0" :style="`background: linear-gradient(to bottom, ${step.color}22 0%, transparent 50%, rgba(0,0,0,0.3) 100%);`" />
+              <div class="absolute top-3 left-3 font-display font-black text-4xl leading-none" :style="`color: ${step.color}; text-shadow: 0 2px 8px rgba(0,0,0,0.3); opacity: 0.9;`">{{ step.n }}</div>
+            </div>
+            <div class="p-4">
+              <h4 class="font-semibold text-sm mb-1.5" style="color: var(--text-primary);">{{ step.title }}</h4>
+              <p class="text-xs leading-relaxed" style="color: var(--text-secondary);">{{ step.desc }}</p>
             </div>
           </div>
         </div>
@@ -159,21 +196,53 @@ const values = [
     </section>
 
     <!-- Coverage -->
-    <section class="py-20" style="background: #050D1A;">
+    <section class="py-20 relative overflow-hidden" style="background: var(--bg-base);">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div
-          v-motion
-          :initial="{ opacity: 0, y: 20 }"
-          :visibleOnce="{ opacity: 1, y: 0, transition: { duration: 600 } }"
-          class="text-center mb-12"
-        >
-          <span class="tag mb-4 inline-block">Cobertura geográfica</span>
-          <h2 class="font-display text-3xl font-bold text-white mb-4">¿Dónde atendemos?</h2>
-          <p class="text-slate-400 max-w-xl mx-auto">
-            La mayoría de servicios pueden realizarse de forma remota. Para servicios que requieren
-            presencia física, atendemos Morelos y zonas cercanas.
-          </p>
+        <div class="grid lg:grid-cols-2 gap-14 items-center mb-14">
+          <!-- Left: image of Cuernavaca / Mexico -->
+          <div
+            v-motion
+            :initial="{ opacity: 0, x: -30 }"
+            :visibleOnce="{ opacity: 1, x: 0, transition: { duration: 700 } }"
+          >
+            <div class="relative rounded-2xl overflow-hidden img-zoom" style="aspect-ratio: 4/3; box-shadow: var(--shadow-lg);">
+              <img
+                src="https://images.unsplash.com/photo-1602940659805-770d1b3b9911?w=900&auto=format&fit=crop&q=80"
+                alt="Cobertura DASTI - Morelos"
+                class="w-full h-full object-cover"
+                loading="lazy"
+              />
+              <div class="absolute inset-0 pointer-events-none" style="background: linear-gradient(135deg, var(--accent-glow-sm) 0%, transparent 60%);" />
+              <div class="absolute bottom-4 left-4 glass-card rounded-xl px-3 py-2 flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span class="text-xs font-semibold" style="color: var(--text-primary);">Morelos · México</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: coverage text -->
+          <div
+            v-motion
+            :initial="{ opacity: 0, x: 30 }"
+            :visibleOnce="{ opacity: 1, x: 0, transition: { duration: 700, delay: 100 } }"
+          >
+            <span class="tag mb-4 inline-block">Cobertura geográfica</span>
+            <h2 class="display-text text-3xl sm:text-4xl mb-5" style="color: var(--text-primary);">¿Dónde atendemos?</h2>
+            <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
+              La mayoría de servicios pueden realizarse de forma remota o por videollamada. Para servicios que requieren presencia física, atendemos Morelos y zonas cercanas.
+            </p>
+            <div class="flex flex-wrap gap-3">
+              <button @click="router.push('/contacto')" class="btn-primary">
+                Consultar disponibilidad
+              </button>
+              <button @click="router.push('/contacto')" class="btn-outline">
+                Agendar videollamada
+              </button>
+            </div>
+          </div>
         </div>
+
+        <!-- Zone cards -->
         <div class="grid sm:grid-cols-3 gap-5 mb-12">
           <div
             v-for="(zone, i) in zones"
@@ -193,23 +262,18 @@ const values = [
                   :style="`background: ${zone.color}12; color: ${zone.color}; border: 1px solid ${zone.color}25;`">
                   {{ zone.label }}
                 </span>
-                <h3 class="font-semibold text-white text-base">{{ zone.name }}</h3>
+                <h3 class="font-semibold text-base" style="color: var(--text-primary);">{{ zone.name }}</h3>
               </div>
             </div>
-            <p class="text-sm text-slate-400 leading-relaxed">{{ zone.desc }}</p>
+            <p class="text-sm leading-relaxed" style="color: var(--text-secondary);">{{ zone.desc }}</p>
             <div class="mt-4 flex items-center gap-2">
               <div class="w-2 h-2 rounded-full" :style="`background: ${zone.presential ? '#4ade80' : zone.color};`" />
-              <span class="text-xs text-slate-500">{{ zone.presential ? 'Presencial y remoto' : 'Principalmente remoto' }}</span>
+              <span class="text-xs" style="color: var(--text-muted);">{{ zone.presential ? 'Presencial y remoto' : 'Principalmente remoto' }}</span>
             </div>
           </div>
         </div>
-        <div class="text-center">
-          <button @click="router.push('/contacto')" class="btn-primary">
-            Consultar disponibilidad
-          </button>
-        </div>
       </div>
-      <div class="section-line max-w-7xl mx-auto mt-20" />
+      <div class="section-line max-w-7xl mx-auto mt-16" />
     </section>
 
     <!-- FAQ -->
