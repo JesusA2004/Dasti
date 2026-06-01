@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { Video, Users, MessageCircle, ArrowRight } from '@lucide/vue'
 import { useRouter } from 'vue-router'
+import { buildWhatsAppUrl } from '@/config/contact'
 
-const WHATSAPP_NUMBER = '521XXXXXXXXXX'
 const router = useRouter()
 
 const openWhatsApp = (type: string) => {
-  const lines = [`Hola, me interesa coordinar una ${type} con DASTI para revisar un proyecto.`]
-  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank')
+  const msg = `Hola, me interesa coordinar una ${type} con DASTI para revisar un proyecto.`
+  window.open(buildWhatsAppUrl(msg), '_blank')
 }
 
 </script>

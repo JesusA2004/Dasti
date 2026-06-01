@@ -2,8 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Calculator, MessageCircle } from '@lucide/vue'
-
-const WHATSAPP_NUMBER = '521XXXXXXXXXX'
+import { buildWhatsAppUrl } from '@/config/contact'
 
 const router = useRouter()
 const scrolled = ref(false)
@@ -21,7 +20,7 @@ const goToQuoter = () => {
 
 const openWhatsApp = () => {
   const msg = 'Hola, me interesa recibir asesoría de DASTI para una solución en TI.'
-  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank')
+  window.open(buildWhatsAppUrl(msg), '_blank')
 }
 </script>
 

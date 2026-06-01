@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { Wifi, Video, MapPin, ArrowRight, MessageCircle } from '@lucide/vue'
+import { buildWhatsAppUrl } from '@/config/contact'
 
 const router = useRouter()
+const meetingWhatsAppUrl = buildWhatsAppUrl('Hola, me interesa una consulta con DASTI.')
 
 const modes = [
   {
@@ -142,7 +144,7 @@ const modes = [
                   Solicitar reunión presencial
                 </button>
                 <a
-                  href="https://wa.me/527771234567?text=Hola%2C%20me%20interesa%20una%20consulta%20con%20DASTI"
+                  :href="meetingWhatsAppUrl"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="btn-ghost w-full justify-center"

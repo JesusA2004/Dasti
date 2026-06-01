@@ -2,8 +2,8 @@
 import { ref } from 'vue'
 import { Send, MessageCircle, Mail, Phone, Clock, MapPin, Video, CalendarCheck, ChevronRight } from '@lucide/vue'
 import AnimatedParticles from '@/components/AnimatedParticles.vue'
+import { buildWhatsAppUrl } from '@/config/contact'
 
-const WHATSAPP_NUMBER = '5217774428209'
 const CONTACT_EMAIL = 'direcciondasti@gmail.com'
 const CONTACT_PHONE = '+52 777 442 8209'
 const BUSINESS_HOURS = 'Lunes a Viernes, 9:00 – 18:00 hrs'
@@ -79,7 +79,7 @@ const openWhatsApp = () => {
   if (form.value.company) lines.push(`Empresa: ${form.value.company}`)
   if (form.value.service) lines.push(`Servicio de interés: ${form.value.service}`)
   if (form.value.message) lines.push(`Mensaje: ${form.value.message}`)
-  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener,noreferrer')
+  window.open(buildWhatsAppUrl(lines.join('\n')), '_blank', 'noopener,noreferrer')
 }
 
 const selectMode = (mode: ContactMode) => {

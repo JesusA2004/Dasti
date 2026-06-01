@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { buildWhatsAppUrl } from '@/config/contact'
 
 const router = useRouter()
 const year = new Date().getFullYear()
 
-const WHATSAPP_NUMBER = '527774428209'
-const whatsappMessage = 'Hola, me interesa recibir asesoría de DASTI para una solución en TI.'
-
 const whatsappUrl = computed(() =>
-  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`
+  buildWhatsAppUrl('Hola, me interesa recibir asesoría de DASTI para una solución en TI.')
 )
 
 const navLinks = [

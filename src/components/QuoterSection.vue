@@ -2,20 +2,21 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {
-  Globe, Code2, Zap, Bot, Mail, Monitor, Wrench, Wifi, GitMerge, Printer,
+  Globe, Code2, Zap, Bot, Mail, Monitor, Wrench, Wifi, Printer,
   Plus, Minus, CheckSquare, Square, MessageCircle, ChevronDown, ChevronUp, Info, Tag,
 } from '@lucide/vue'
 import AnimatedParticles from '@/components/AnimatedParticles.vue'
+import { buildWhatsAppUrl } from '@/config/contact'
 
-const WHATSAPP_NUMBER = '521XXXXXXXXXX'
 const router = useRouter()
 
 interface Tier { name: string; price: number; custom?: boolean; note?: string }
+interface MonthlyOption { name: string; price: number }
 
 interface ServiceDef {
   id: string; icon: any; name: string; color: string; category: string
-  tiers: Tier[]; hasQuantity?: boolean; hasMonthly?: boolean
-  monthlyPrice?: number; monthlyLabel?: string; note?: string
+  tiers: Tier[]; hasQuantity?: boolean; note?: string
+  mandatoryMonthly?: MonthlyOption[]
 }
 
 const servicesDef: ServiceDef[] = [
@@ -39,19 +40,24 @@ const servicesDef: ServiceDef[] = [
   },
   {
     id: 'email', icon: Mail, name: 'Correos corporativos', color: '#F472B6', category: 'Correos corporativos',
-    hasMonthly: true, monthlyPrice: 7500, monthlyLabel: 'Administración mensual estándar',
-    tiers: [
-      { name: 'Implementación inicial (hasta 100 cuentas)', price: 20000, note: 'Incluye configuración técnica, cuentas por área y soporte de arranque' },
+    mandatoryMonthly: [
+      { name: 'Administración mensual estándar', price: 7500 },
+      { name: 'Administración mensual prioritaria', price: 9000 },
     ],
-    note: 'Administración mensual prioritaria desde $9,000/mes. Cuenta adicional: $70/mes. 10 GB adicionales: $150/mes.',
+    tiers: [
+      { name: 'Implementación inicial (hasta 100 cuentas)', price: 20000, note: 'Incluye configuración técnica, cuentas por área, SPF/DKIM/DMARC y soporte de arranque' },
+    ],
+    note: 'La administración mensual es obligatoria e incluye soporte continuo, gestión de cuentas y renovaciones. Cuenta adicional: $70/mes. 10 GB adicionales: $150/mes.',
   },
   {
     id: 'network', icon: Wifi, name: 'Redes e infraestructura', color: '#60A5FA', category: 'Redes e infraestructura',
     tiers: [
       { name: 'Diagnóstico de red', price: 1500 },
       { name: 'Configuración básica de red', price: 3500 },
-      { name: 'Sistema mesh básico (2–3 puntos de acceso)', price: 7500, note: 'Incluye instalación y configuración de roaming' },
-      { name: 'Sistema mesh empresarial (4+ puntos)', price: 15000, note: 'Red unificada con cobertura total y roaming automático' },
+      { name: 'Sistema mesh básico (2 puntos de acceso)', price: 9500, note: 'Incluye instalación y configuración de roaming automático' },
+      { name: 'Sistema mesh oficina (3 puntos de acceso)', price: 14500, note: 'Cobertura ampliada con roaming automático' },
+      { name: 'Sistema mesh empresarial (4+ puntos)', price: 22000, note: 'Red unificada con cobertura total y roaming automático' },
+      { name: 'Nodo adicional instalado y configurado', price: 4500 },
       { name: 'Proyecto de red por alcance', price: 0, custom: true },
     ],
     note: 'Los sistemas mesh permiten cubrir toda la empresa con una sola red WiFi inteligente y roaming automático.',
@@ -110,7 +116,7 @@ const servicesDef: ServiceDef[] = [
   },
 ]
 
-interface Selection { tierIndex: number; quantity: number; includeMonthly: boolean }
+interface Selection { tierIndex: number; quantity: number; monthlyOptionIndex: number }
 
 const selections = ref<Record<string, Selection>>({})
 const expandedId = ref<string | null>(null)
@@ -123,7 +129,7 @@ const toggleService = (svc: ServiceDef) => {
     selections.value = rest
     if (expandedId.value === svc.id) expandedId.value = null
   } else {
-    selections.value = { ...selections.value, [svc.id]: { tierIndex: 0, quantity: 1, includeMonthly: false } }
+    selections.value = { ...selections.value, [svc.id]: { tierIndex: 0, quantity: 1, monthlyOptionIndex: 0 } }
     expandedId.value = svc.id
   }
 }
@@ -134,16 +140,16 @@ const setTier = (id: string, idx: number) => {
   selections.value[id] = { ...s, tierIndex: idx }
 }
 
+const setMonthlyOption = (id: string, idx: number) => {
+  const s = selections.value[id]
+  if (!s) return
+  selections.value[id] = { ...s, monthlyOptionIndex: idx }
+}
+
 const adjustQty = (id: string, delta: number) => {
   const s = selections.value[id]
   if (!s) return
   selections.value[id] = { ...s, quantity: Math.max(1, s.quantity + delta) }
-}
-
-const toggleMonthly = (id: string) => {
-  const s = selections.value[id]
-  if (!s) return
-  selections.value[id] = { ...s, includeMonthly: !s.includeMonthly }
 }
 
 const getEquipmentDiscount = (qty: number): number => {
@@ -174,8 +180,8 @@ const getOneTimeTotal = (svc: ServiceDef): number => {
 
 const getMonthlyAmount = (svc: ServiceDef): number => {
   const sel = selections.value[svc.id]
-  if (!sel || !svc.hasMonthly || !sel.includeMonthly) return 0
-  return svc.monthlyPrice || 0
+  if (!sel || !svc.mandatoryMonthly) return 0
+  return svc.mandatoryMonthly[sel.monthlyOptionIndex ?? 0].price
 }
 
 const getLineTotal = (svc: ServiceDef): number => getOneTimeTotal(svc) + getMonthlyAmount(svc)
@@ -184,35 +190,59 @@ const oneTimeTotal = computed(() => servicesDef.reduce((sum, svc) => sum + getOn
 const monthlyTotal = computed(() => servicesDef.reduce((sum, svc) => sum + getMonthlyAmount(svc), 0))
 const hasCustom = computed(() => servicesDef.some(svc => { const sel = selections.value[svc.id]; if (!sel) return false; return !!(svc.tiers[sel.tierIndex]?.custom) }))
 const customServices = computed(() => servicesDef.filter(svc => { const sel = selections.value[svc.id]; if (!sel) return false; return !!(svc.tiers[sel.tierIndex]?.custom) }))
-const pricedServices = computed(() => servicesDef.filter(svc => { const sel = selections.value[svc.id]; if (!sel) return false; return !(svc.tiers[sel.tierIndex]?.custom) }))
+const oneTimeServices = computed(() => servicesDef.filter(svc => { const sel = selections.value[svc.id]; if (!sel) return false; return !(svc.tiers[sel.tierIndex]?.custom) && getOneTimeTotal(svc) > 0 }))
+const monthlyServices = computed(() => servicesDef.filter(svc => { const sel = selections.value[svc.id]; if (!sel) return false; return !!svc.mandatoryMonthly }))
 const selectedCount = computed(() => Object.keys(selections.value).length)
 
 const formatMXN = (n: number) =>
   new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', minimumFractionDigits: 0 }).format(n)
 
 const buildWhatsAppMessage = () => {
-  const lines = ['Hola, me interesa una cotización formal de DASTI:']
-  servicesDef.forEach(svc => {
-    const sel = selections.value[svc.id]
-    if (!sel) return
-    const tier = svc.tiers[sel.tierIndex]
-    if (!tier) return
-    const qty = svc.hasQuantity ? ` (x${sel.quantity})` : ''
-    const monthly = svc.hasMonthly && sel.includeMonthly ? ' + Administración mensual' : ''
-    const discount = svc.hasQuantity ? getEquipmentDiscount(sel.quantity) : 0
-    const discountStr = discount > 0 ? ` [${(discount * 100).toFixed(0)}% desc. volumen]` : ''
-    const priceStr = tier.custom ? ' → A cotizar' : ` → ${formatMXN(getOneTimeTotal(svc))} MXN`
-    lines.push(`• ${svc.name}: ${tier.name}${qty}${monthly}${discountStr}${priceStr}`)
-  })
-  if (oneTimeTotal.value > 0) lines.push(`\nPago único estimado: ${formatMXN(oneTimeTotal.value)} MXN`)
-  if (monthlyTotal.value > 0) lines.push(`Mensualidad estimada: ${formatMXN(monthlyTotal.value)} MXN/mes`)
-  if (hasCustom.value) lines.push('(Más servicios que requieren cotización formal)')
+  const lines: string[] = ['Hola, me interesa una cotización formal de DASTI:']
+
+  const otItems = servicesDef.filter(svc => { const sel = selections.value[svc.id]; if (!sel) return false; return !(svc.tiers[sel.tierIndex]?.custom) && getOneTimeTotal(svc) > 0 })
+  const moItems = servicesDef.filter(svc => { const sel = selections.value[svc.id]; if (!sel) return false; return !!svc.mandatoryMonthly })
+  const cuItems = servicesDef.filter(svc => { const sel = selections.value[svc.id]; if (!sel) return false; return !!(svc.tiers[sel.tierIndex]?.custom) })
+
+  if (otItems.length > 0) {
+    lines.push('\n— PAGO ÚNICO —')
+    otItems.forEach(svc => {
+      const sel = selections.value[svc.id]
+      const tier = svc.tiers[sel.tierIndex]
+      const qty = svc.hasQuantity ? ` (x${sel.quantity})` : ''
+      const discount = svc.hasQuantity ? getEquipmentDiscount(sel.quantity) : 0
+      const discountStr = discount > 0 ? ` [${(discount * 100).toFixed(0)}% desc. volumen]` : ''
+      lines.push(`• ${svc.name}: ${tier.name}${qty}${discountStr} → ${formatMXN(getOneTimeTotal(svc))} MXN`)
+    })
+    lines.push(`Subtotal pago único: ${formatMXN(oneTimeTotal.value)} MXN`)
+  }
+
+  if (moItems.length > 0) {
+    lines.push('\n— MENSUALIDAD —')
+    moItems.forEach(svc => {
+      const sel = selections.value[svc.id]
+      const opt = svc.mandatoryMonthly![sel.monthlyOptionIndex ?? 0]
+      lines.push(`• ${svc.name}: ${opt.name} → ${formatMXN(opt.price)} MXN/mes`)
+    })
+    lines.push(`Subtotal mensual: ${formatMXN(monthlyTotal.value)} MXN/mes`)
+  }
+
+  if (cuItems.length > 0) {
+    lines.push('\n— A COTIZAR —')
+    cuItems.forEach(svc => {
+      const sel = selections.value[svc.id]
+      const tier = svc.tiers[sel.tierIndex]
+      lines.push(`• ${svc.name}: ${tier.name} → requiere cotización formal`)
+    })
+    lines.push('(El precio de estos servicios depende del alcance y requerimientos específicos)')
+  }
+
   lines.push('\n¿Pueden enviarme una propuesta formal?')
-  return encodeURIComponent(lines.join('\n'))
+  return lines.join('\n')
 }
 
 const openWhatsApp = () => {
-  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${buildWhatsAppMessage()}`, '_blank', 'noopener,noreferrer')
+  window.open(buildWhatsAppUrl(buildWhatsAppMessage()), '_blank', 'noopener,noreferrer')
 }
 
 const categories = computed(() => {
@@ -325,7 +355,10 @@ const categories = computed(() => {
                   <div class="text-right flex-shrink-0">
                     <template v-if="isSelected(svc.id) && !svc.tiers[selections[svc.id].tierIndex]?.custom">
                       <div class="text-sm font-semibold transition-all duration-300" :style="`color: ${svc.color}`">
-                        {{ formatMXN(getLineTotal(svc)) }}
+                        {{ formatMXN(getOneTimeTotal(svc)) }}
+                      </div>
+                      <div v-if="svc.mandatoryMonthly" class="text-xs" :style="`color: ${svc.color}99`">
+                        + {{ formatMXN(getMonthlyAmount(svc)) }}/mes
                       </div>
                       <div v-if="svc.hasQuantity && getEquipmentDiscount(selections[svc.id].quantity) > 0"
                         class="text-xs" style="color: #34D399;">
@@ -468,28 +501,45 @@ const categories = computed(() => {
                       </div>
                     </div>
 
-                    <!-- Monthly toggle -->
-                    <div v-if="svc.hasMonthly" class="mt-3">
-                      <div
-                        class="flex items-center gap-3 cursor-pointer group/monthly"
-                        @click="toggleMonthly(svc.id)"
-                      >
+                    <!-- Mandatory monthly options -->
+                    <div v-if="svc.mandatoryMonthly" class="mt-4">
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg mb-3"
+                        :style="`background: ${svc.color}0A; border: 1px solid ${svc.color}25;`">
+                        <Info :size="13" class="flex-shrink-0 mt-0.5" :style="`color: ${svc.color};`" />
+                        <p class="text-xs" style="color: var(--text-secondary);">
+                          La administración mensual es <strong>obligatoria</strong> con correos corporativos. Selecciona el plan que mejor se adapte.
+                        </p>
+                      </div>
+
+                      <p class="text-xs font-medium uppercase tracking-wider mb-2" style="color: var(--text-muted);">
+                        Administración mensual (obligatoria)
+                      </p>
+
+                      <div class="space-y-2">
                         <div
-                          class="w-4 h-4 rounded flex items-center justify-center border flex-shrink-0 transition-all"
-                          :style="selections[svc.id]?.includeMonthly
-                            ? `background: ${svc.color}; border-color: ${svc.color};`
-                            : `background: transparent; border-color: var(--border-medium);`"
+                          v-for="(opt, idx) in svc.mandatoryMonthly"
+                          :key="opt.name"
+                          class="flex items-center justify-between gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200"
+                          :style="(selections[svc.id]?.monthlyOptionIndex ?? 0) === idx
+                            ? `background: ${svc.color}10; border: 1px solid ${svc.color}35;`
+                            : `background: var(--bg-elevated); border: 1px solid var(--border-subtle);`"
+                          @click="setMonthlyOption(svc.id, idx)"
                         >
-                          <svg v-if="selections[svc.id]?.includeMonthly" width="10" height="8" viewBox="0 0 10 8" fill="none">
-                            <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                          </svg>
-                        </div>
-                        <span class="text-sm transition-colors" style="color: var(--text-secondary);">
-                          Incluir {{ svc.monthlyLabel || 'administración mensual' }}
-                          <span class="ml-1 font-semibold" :style="`color: ${svc.color}`">
-                            ({{ formatMXN(svc.monthlyPrice || 0) }}/mes)
+                          <div class="flex items-center gap-2.5">
+                            <div
+                              class="w-4 h-4 rounded-full flex items-center justify-center border-2 flex-shrink-0 transition-all"
+                              :style="(selections[svc.id]?.monthlyOptionIndex ?? 0) === idx
+                                ? `border-color: ${svc.color}; background: ${svc.color};`
+                                : `border-color: var(--border-medium); background: transparent;`"
+                            >
+                              <div v-if="(selections[svc.id]?.monthlyOptionIndex ?? 0) === idx" class="w-1.5 h-1.5 rounded-full bg-white" />
+                            </div>
+                            <span class="text-sm" style="color: var(--text-primary);">{{ opt.name }}</span>
+                          </div>
+                          <span class="text-sm font-semibold flex-shrink-0" :style="`color: ${svc.color}`">
+                            {{ formatMXN(opt.price) }}/mes
                           </span>
-                        </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -521,36 +571,65 @@ const categories = computed(() => {
               </p>
             </div>
 
-            <!-- Priced services list -->
-            <div v-else>
-              <div v-if="pricedServices.length > 0" class="space-y-3 mb-4 max-h-52 overflow-y-auto pr-1">
-                <div v-for="svc in pricedServices" :key="svc.id" class="flex items-start justify-between gap-3">
-                  <div class="flex items-center gap-2 min-w-0">
-                    <div class="w-6 h-6 rounded flex-shrink-0 flex items-center justify-center"
-                      :style="`background: ${svc.color}15;`">
-                      <component :is="svc.icon" :size="11" :style="`color: ${svc.color}`" />
-                    </div>
-                    <div class="min-w-0">
-                      <div class="text-xs truncate" style="color: var(--text-primary);">{{ svc.name }}</div>
-                      <div class="text-xs truncate" style="color: var(--text-muted);">
-                        {{ svc.tiers[selections[svc.id]?.tierIndex ?? 0]?.name }}
-                        <span v-if="svc.hasQuantity"> × {{ selections[svc.id]?.quantity }}</span>
+            <!-- Summary sections -->
+            <div v-else class="space-y-4 max-h-72 overflow-y-auto pr-1">
+
+              <!-- Pago único -->
+              <div v-if="oneTimeServices.length > 0">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-2" style="color: var(--text-muted);">Pago único</p>
+                <div class="space-y-2.5">
+                  <div v-for="svc in oneTimeServices" :key="svc.id" class="flex items-start justify-between gap-3">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <div class="w-6 h-6 rounded flex-shrink-0 flex items-center justify-center"
+                        :style="`background: ${svc.color}15;`">
+                        <component :is="svc.icon" :size="11" :style="`color: ${svc.color}`" />
                       </div>
-                      <div v-if="svc.hasQuantity && getEquipmentDiscount(selections[svc.id]?.quantity ?? 1) > 0"
-                        class="text-xs" style="color: #34D399;">
-                        {{ getDiscountLabel(selections[svc.id]?.quantity ?? 1) }}
+                      <div class="min-w-0">
+                        <div class="text-xs truncate" style="color: var(--text-primary);">{{ svc.name }}</div>
+                        <div class="text-xs truncate" style="color: var(--text-muted);">
+                          {{ svc.tiers[selections[svc.id]?.tierIndex ?? 0]?.name }}
+                          <span v-if="svc.hasQuantity"> × {{ selections[svc.id]?.quantity }}</span>
+                        </div>
+                        <div v-if="svc.hasQuantity && getEquipmentDiscount(selections[svc.id]?.quantity ?? 1) > 0"
+                          class="text-xs" style="color: #34D399;">
+                          {{ getDiscountLabel(selections[svc.id]?.quantity ?? 1) }}
+                        </div>
                       </div>
                     </div>
+                    <span class="text-xs font-semibold flex-shrink-0" :style="`color: ${svc.color}`">
+                      {{ formatMXN(getOneTimeTotal(svc)) }}
+                    </span>
                   </div>
-                  <span class="text-xs font-semibold flex-shrink-0" :style="`color: ${svc.color}`">
-                    {{ formatMXN(getLineTotal(svc)) }}
-                  </span>
                 </div>
               </div>
 
-              <!-- "A cotizar" services -->
-              <div v-if="customServices.length > 0" class="mb-4">
-                <p class="text-xs font-semibold uppercase tracking-wider mb-2" style="color: var(--text-muted);">A cotizar</p>
+              <!-- Mensualidad -->
+              <div v-if="monthlyServices.length > 0">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-2 mt-1" style="color: var(--text-muted);">Mensualidad</p>
+                <div class="space-y-2.5">
+                  <div v-for="svc in monthlyServices" :key="svc.id" class="flex items-start justify-between gap-3">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <div class="w-6 h-6 rounded flex-shrink-0 flex items-center justify-center"
+                        :style="`background: ${svc.color}15;`">
+                        <component :is="svc.icon" :size="11" :style="`color: ${svc.color}`" />
+                      </div>
+                      <div class="min-w-0">
+                        <div class="text-xs truncate" style="color: var(--text-primary);">{{ svc.name }}</div>
+                        <div class="text-xs truncate" style="color: var(--text-muted);">
+                          {{ svc.mandatoryMonthly![selections[svc.id]?.monthlyOptionIndex ?? 0]?.name }}
+                        </div>
+                      </div>
+                    </div>
+                    <span class="text-xs font-semibold flex-shrink-0" :style="`color: ${svc.color}`">
+                      {{ formatMXN(getMonthlyAmount(svc)) }}/mes
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- A cotizar -->
+              <div v-if="customServices.length > 0">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-2 mt-1" style="color: var(--text-muted);">A cotizar</p>
                 <div class="space-y-2">
                   <div
                     v-for="svc in customServices"
@@ -566,9 +645,10 @@ const categories = computed(() => {
                   </div>
                 </div>
               </div>
+
             </div>
 
-            <div v-if="selectedCount > 0" class="section-line mb-5" />
+            <div v-if="selectedCount > 0" class="section-line my-5" />
 
             <!-- Totals -->
             <div v-if="selectedCount > 0" class="mb-5 space-y-4">
@@ -580,7 +660,7 @@ const categories = computed(() => {
                 <p class="text-xs mt-1" style="color: var(--text-muted);">MXN (referencia aproximada)</p>
               </div>
 
-              <div v-if="monthlyTotal > 0" class="pt-3 border-t" style="border-color: var(--border-subtle);">
+              <div v-if="monthlyTotal > 0" :class="oneTimeTotal > 0 ? 'pt-3 border-t' : ''" style="border-color: var(--border-subtle);">
                 <p class="text-xs uppercase tracking-wider mb-1" style="color: var(--text-muted);">Mensualidad estimada</p>
                 <div class="text-2xl font-bold leading-tight" style="color: var(--accent-lighter);">
                   {{ formatMXN(monthlyTotal) }}
