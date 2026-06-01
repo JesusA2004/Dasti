@@ -220,9 +220,10 @@ const categories = [
           <img
             :key="heroActive"
             :src="heroCategories[heroActive].image"
-            alt="DASTI servicios"
+            :alt="`Servicios de ${heroCategories[heroActive].label} - DASTI soluciones en TI`"
             class="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
+            loading="eager"
+            decoding="async"
           />
         </Transition>
         <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.25), var(--bg-base) 88%);" />
@@ -230,7 +231,7 @@ const categories = [
         <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4 pt-8">
           <span class="tag mb-3">Servicios y soluciones</span>
           <h1 class="display-text text-3xl sm:text-4xl lg:text-5xl" style="color: var(--text-primary);">
-            Soluciones integrales en
+            Servicios en
             <span class="gradient-text block"> Tecnologías de la Información</span>
           </h1>
         </div>
@@ -330,9 +331,10 @@ const categories = [
               <div class="relative overflow-hidden" style="aspect-ratio: 16/7; flex-shrink: 0;">
                 <img
                   :src="svc.image"
-                  :alt="svc.title"
+                  :alt="`${svc.title} - DASTI servicios en TI`"
                   class="w-full h-full object-cover transition-transform duration-600 group-hover:scale-105"
                   loading="lazy"
+                  decoding="async"
                 />
                 <!-- Overlay -->
                 <div
@@ -421,6 +423,7 @@ const categories = [
                 <div class="flex gap-2 pt-4 mt-auto border-t" style="border-color: var(--border-subtle);">
                   <button
                     @click="router.push('/contacto')"
+                    :aria-label="`Solicitar asesoría sobre ${svc.title}`"
                     class="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-xl transition-all duration-200"
                     :style="`background: ${svc.color}14; color: ${svc.color}; border: 1px solid ${svc.color}28;`"
                     @mouseenter="($event.target as HTMLElement).style.background = svc.color + '22'"
@@ -431,6 +434,7 @@ const categories = [
                   </button>
                   <button
                     @click="router.push('/cotizador')"
+                    :aria-label="`Cotizar ${svc.title}`"
                     class="flex items-center gap-1.5 text-xs font-medium px-3 py-2.5 rounded-xl transition-all duration-200"
                     style="background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border-subtle);"
                   >

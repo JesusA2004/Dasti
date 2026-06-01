@@ -113,8 +113,8 @@ const filtered = computed(() =>
         >
           <span class="tag mb-4 inline-block">Portfolio</span>
           <h1 class="font-display text-4xl sm:text-5xl font-bold mb-6" style="color: var(--text-primary);">
-            Proyectos en
-            <span class="gradient-text block">preparación</span>
+            Proyectos
+            <span class="gradient-text block">DASTI</span>
           </h1>
           <p class="text-lg max-w-2xl mx-auto" style="color: var(--text-secondary);">
             Los casos de proyectos desarrollados e implementados por DASTI se publicarán próximamente. Por ahora, aquí está la estructura lista para mostrar el trabajo real.

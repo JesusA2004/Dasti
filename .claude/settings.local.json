@@ -7,7 +7,13 @@
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(Sort-Object)",
       "Bash(node -e \"const l = require\\('./node_modules/@lucide/vue/dist/esm/lucide-vue.mjs'\\); Object.keys\\(l\\).filter\\(k => /fb|face|insta|linkedin|social|tiktok|whats|twitter|x$/i.test\\(k\\)\\).join\\(', '\\)\")",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\wamp64\\\\www\\\\Dasti\" -Recurse -Force)",
+      "Bash(Select-Object FullName)",
+      "Bash(ConvertTo-Csv -NoTypeInformation)",
+      "Bash(Out-String)",
+      "Bash(grep -v \"^C:\\\\\\\\\\\\wamp64\\\\\\\\www\\\\\\\\Dasti\\\\\\\\\\\\.git\")",
+      "Bash(dir C:wamp64wwwDastipublic *)"
     ]
   }
 }

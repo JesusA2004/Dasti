@@ -48,13 +48,13 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
         <!-- Logo -->
         <RouterLink to="/" class="flex items-center gap-2.5 group">
           <div class="relative">
-            <img src="/img/favicon.png" alt="DASTI" class="h-12 w-auto object-contain" />
+            <img src="/img/favicon.png" alt="Ícono DASTI" class="h-12 w-auto object-contain" width="48" height="48" />
             <div
               class="absolute inset-0 rounded-xl animate-pulse-slow"
               style="background: var(--accent-glow-sm); filter: blur(4px)"
             ></div>
           </div>
-          <img src="/img/logo.png" alt="DASTI" class="h-12 w-auto object-contain" />
+          <img src="/img/logo.png" alt="DASTI - Soluciones en Tecnologías de la Información" class="h-12 w-auto object-contain" />
         </RouterLink>
 
         <!-- Desktop nav -->

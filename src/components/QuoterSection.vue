@@ -212,7 +212,7 @@ const buildWhatsAppMessage = () => {
 }
 
 const openWhatsApp = () => {
-  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${buildWhatsAppMessage()}`, '_blank')
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${buildWhatsAppMessage()}`, '_blank', 'noopener,noreferrer')
 }
 
 const categories = computed(() => {
@@ -273,10 +273,10 @@ const categories = computed(() => {
         class="text-center mb-16"
       >
         <span class="tag mb-4 inline-block">Cotizador aproximado</span>
-        <h2 class="display-text text-3xl sm:text-4xl lg:text-5xl mb-5" style="color: var(--text-primary);">
-          Estima la inversión
-          <span class="gradient-text block">para tu proyecto</span>
-        </h2>
+        <h1 class="display-text text-3xl sm:text-4xl lg:text-5xl mb-5" style="color: var(--text-primary);">
+          Cotizador aproximado
+          <span class="gradient-text block">de servicios TI</span>
+        </h1>
         <p class="text-lg max-w-2xl mx-auto" style="color: var(--text-secondary);">
           Calcula una referencia aproximada. Para una propuesta formal, revisamos el alcance, condiciones técnicas,
           licencias, equipos, ubicación y tiempos de entrega.
@@ -426,6 +426,7 @@ const categories = computed(() => {
                       <div class="flex items-center gap-3">
                         <button
                           @click="adjustQty(svc.id, -1)"
+                          aria-label="Reducir cantidad"
                           class="w-8 h-8 rounded-md flex items-center justify-center transition-colors"
                           style="border: 1px solid var(--border-medium); background: var(--bg-elevated); color: var(--text-muted);"
                         >
@@ -436,6 +437,7 @@ const categories = computed(() => {
                         </span>
                         <button
                           @click="adjustQty(svc.id, 1)"
+                          aria-label="Aumentar cantidad"
                           class="w-8 h-8 rounded-md flex items-center justify-center transition-colors"
                           style="border: 1px solid var(--border-medium); background: var(--bg-elevated); color: var(--text-muted);"
                         >

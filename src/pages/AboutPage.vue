@@ -81,10 +81,13 @@ const values = [
       <!-- Large image -->
       <div class="relative h-64 sm:h-80 overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&auto=format&fit=crop&q=80"
-          alt="DASTI equipo"
+          src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&auto=format&fit=crop&q=75"
+          alt="Equipo de trabajo DASTI revisando soluciones en Tecnologías de la Información en Morelos"
           class="w-full h-full object-cover"
-          loading="lazy"
+          loading="eager"
+          decoding="async"
+          width="1400"
+          height="560"
         />
         <div class="absolute inset-0" style="background: linear-gradient(to bottom, transparent 30%, var(--bg-base) 100%);" />
         <div class="absolute bottom-6 left-6">
@@ -169,10 +172,10 @@ const values = [
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <div
             v-for="(step, i) in [
-              { n: '01', color: '#3B82F6', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&auto=format&fit=crop&q=80', title: 'Consulta inicial', desc: 'Escuchamos lo que necesitas sin compromiso.' },
-              { n: '02', color: '#34D399', img: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&auto=format&fit=crop&q=80', title: 'Propuesta y alcance', desc: 'Documentamos alcance, plazos y costo estimado.' },
-              { n: '03', color: '#F472B6', img: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&auto=format&fit=crop&q=80', title: 'Implementación', desc: 'Desarrollamos e instalamos con estándares técnicos.' },
-              { n: '04', color: '#FBBF24', img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&auto=format&fit=crop&q=80', title: 'Entrega y soporte', desc: 'Acompañamos durante la adopción y uso de la solución.' },
+              { n: '01', color: '#3B82F6', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&auto=format&fit=crop&q=75', title: 'Consulta inicial', desc: 'Escuchamos lo que necesitas sin compromiso.' },
+              { n: '02', color: '#34D399', img: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&auto=format&fit=crop&q=75', title: 'Propuesta y alcance', desc: 'Documentamos alcance, plazos y costo estimado.' },
+              { n: '03', color: '#F472B6', img: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&auto=format&fit=crop&q=75', title: 'Implementación', desc: 'Desarrollamos e instalamos con estándares técnicos.' },
+              { n: '04', color: '#FBBF24', img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&auto=format&fit=crop&q=75', title: 'Entrega y soporte', desc: 'Acompañamos durante la adopción y uso de la solución.' },
             ]"
             :key="i"
             v-motion
@@ -181,7 +184,7 @@ const values = [
             class="glass-card rounded-2xl overflow-hidden group tilt-card"
           >
             <div class="relative overflow-hidden" style="aspect-ratio: 16/10;">
-              <img :src="step.img" :alt="step.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+              <img :src="step.img" :alt="`Paso ${step.n}: ${step.title} - proceso de trabajo DASTI`" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async" />
               <div class="absolute inset-0" :style="`background: linear-gradient(to bottom, ${step.color}22 0%, transparent 50%, rgba(0,0,0,0.3) 100%);`" />
               <div class="absolute top-3 left-3 font-display font-black text-4xl leading-none" :style="`color: ${step.color}; text-shadow: 0 2px 8px rgba(0,0,0,0.3); opacity: 0.9;`">{{ step.n }}</div>
             </div>
@@ -207,10 +210,11 @@ const values = [
           >
             <div class="relative rounded-2xl overflow-hidden img-zoom" style="aspect-ratio: 4/3; box-shadow: var(--shadow-lg);">
               <img
-                src="https://images.unsplash.com/photo-1602940659805-770d1b3b9911?w=900&auto=format&fit=crop&q=80"
-                alt="Cobertura DASTI - Morelos"
+                src="https://images.unsplash.com/photo-1602940659805-770d1b3b9911?w=900&auto=format&fit=crop&q=75"
+                alt="Cobertura geográfica de DASTI en Morelos, Cuernavaca y zonas cercanas"
                 class="w-full h-full object-cover"
                 loading="lazy"
+                decoding="async"
               />
               <div class="absolute inset-0 pointer-events-none" style="background: linear-gradient(135deg, var(--accent-glow-sm) 0%, transparent 60%);" />
               <div class="absolute bottom-4 left-4 glass-card rounded-xl px-3 py-2 flex items-center gap-2">

@@ -1,20 +1,192 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
   <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="DASTI – Desarrollo y Aplicación de Soluciones en TI. Desarrollamos e implementamos soluciones tecnológicas para empresas: software a medida, desarrollo web, correos corporativos, redes, sistemas mesh, soporte técnico, equipos de cómputo, automatización e integración de sistemas.">
-    <meta name="keywords" content="DASTI, soluciones TI, desarrollo web, software a medida, correos corporativos, sistemas mesh, redes empresariales, soporte técnico, equipos de cómputo, automatización, integración de sistemas, impresoras, tecnología para empresas">
-    <meta name="robots" content="index, follow">
-    <meta property="og:title" content="DASTI – Tecnología aplicada a soluciones reales">
-    <meta property="og:description" content="Soluciones en Tecnologías de la Información para empresas: software a medida, desarrollo web, correos corporativos, redes, sistemas mesh, soporte técnico, equipos de cómputo e integración de sistemas.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://dasti.cloud">
-    <title>DASTI – Tecnología aplicada a soluciones reales</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/img/favicon.png" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Primary SEO -->
+    <title>DASTI | Soluciones en TI, Desarrollo Web, Software, Redes y Soporte en Morelos</title>
+    <meta name="description" content="DASTI desarrolla e implementa soluciones en Tecnologías de la Información para empresas: software a medida, desarrollo web, correos corporativos, redes, sistemas mesh, soporte técnico, equipos de cómputo, automatización e integración de sistemas en Morelos, Cuernavaca y zonas cercanas." />
+    <meta name="keywords" content="DASTI, soluciones TI Morelos, soluciones TI Cuernavaca, desarrollo web Morelos, desarrollo web Cuernavaca, software a medida Morelos, software empresarial, correos corporativos, correos empresariales, redes empresariales, sistemas mesh, soporte técnico Morelos, soporte técnico Cuernavaca, equipos de cómputo, automatización de procesos, integración de sistemas, chatbots empresariales, asesoramiento en TI" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="DASTI" />
+    <meta name="theme-color" content="#0F172A" />
+    <link rel="canonical" href="https://dasti.cloud" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dasti.cloud" />
+    <meta property="og:title" content="DASTI | Tecnología aplicada a soluciones reales" />
+    <meta property="og:description" content="Soluciones en Tecnologías de la Información para empresas: software a medida, desarrollo web, correos corporativos, redes, soporte técnico, equipos de cómputo, automatización e integración de sistemas." />
+    <meta property="og:image" content="https://dasti.cloud/img/logo.png" />
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:site_name" content="DASTI" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DASTI | Soluciones en Tecnologías de la Información" />
+    <meta name="twitter:description" content="Desarrollo web, software a medida, correos corporativos, redes, soporte técnico, equipos de cómputo, automatización e integración de sistemas." />
+    <meta name="twitter:image" content="https://dasti.cloud/img/og-dasti.jpg" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- JSON-LD: Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://dasti.cloud/#organization",
+      "name": "DASTI",
+      "legalName": "Desarrollo y Aplicación de Soluciones en TI",
+      "url": "https://dasti.cloud",
+      "logo": "https://dasti.cloud/img/logo.png",
+      "image": "https://dasti.cloud/img/og-dasti.jpg",
+      "description": "DASTI desarrolla e implementa soluciones en Tecnologías de la Información para empresas: software a medida, desarrollo web, correos corporativos, redes, sistemas mesh, soporte técnico, equipos de cómputo, automatización e integración de sistemas en Morelos, Cuernavaca y zonas cercanas.",
+      "slogan": "Tecnología aplicada a soluciones reales.",
+      "email": "contacto@dasti.cloud",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Cuernavaca",
+        "addressRegion": "Morelos",
+        "addressCountry": "MX"
+      },
+      "areaServed": [
+        { "@type": "City", "name": "Cuernavaca" },
+        { "@type": "City", "name": "Jiutepec" },
+        { "@type": "City", "name": "Temixco" },
+        { "@type": "City", "name": "Emiliano Zapata" },
+        { "@type": "State", "name": "Morelos" },
+        { "@type": "City", "name": "Ciudad de México" },
+        { "@type": "State", "name": "Estado de México" },
+        { "@type": "State", "name": "Puebla" }
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "email": "contacto@dasti.cloud",
+        "areaServed": "MX",
+        "availableLanguage": "Spanish"
+      },
+      "knowsAbout": [
+        "Desarrollo de software a medida",
+        "Desarrollo web",
+        "Correos corporativos administrados",
+        "Redes e infraestructura",
+        "Sistemas mesh con roaming",
+        "Soporte técnico",
+        "Equipos de cómputo",
+        "Impresoras y periféricos",
+        "Automatización de procesos",
+        "Integración de sistemas",
+        "Chatbots y asistentes digitales",
+        "Asesoramiento en TI",
+        "Presencia digital y redes sociales"
+      ]
+    }
+    </script>
+
+    <!-- JSON-LD: WebSite -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://dasti.cloud/#website",
+      "name": "DASTI",
+      "url": "https://dasti.cloud",
+      "inLanguage": "es-MX",
+      "publisher": { "@id": "https://dasti.cloud/#organization" }
+    }
+    </script>
+
+    <!-- JSON-LD: Services -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Servicios DASTI en Tecnologías de la Información",
+      "itemListElement": [
+        { "@type": "Service", "position": 1, "name": "Desarrollo de software a medida", "provider": { "@id": "https://dasti.cloud/#organization" }, "areaServed": "MX", "description": "Sistemas propios para empresas: paneles administrativos, gestión de usuarios, reportes automáticos e integración con otras herramientas." },
+        { "@type": "Service", "position": 2, "name": "Desarrollo web", "provider": { "@id": "https://dasti.cloud/#organization" }, "areaServed": "MX", "description": "Sitios web modernos, responsivos y optimizados para empresas en Morelos y Cuernavaca." },
+        { "@type": "Service", "position": 3, "name": "Correos corporativos administrados", "provider": { "@id": "https://dasti.cloud/#organization" }, "areaServed": "MX", "description": "Correos con dominio propio, seguridad técnica avanzada (SPF, DKIM, DMARC) y administración continua." },
+        { "@type": "Service", "position": 4, "name": "Redes e infraestructura", "provider": { "@id": "https://dasti.cloud/#organization" }, "areaServed": "MX", "description": "Redes empresariales estables y seguras con switches, routers y puntos de acceso." },
+        { "@type": "Service", "position": 5, "name": "Sistemas mesh con roaming", "provider": { "@id": "https://dasti.cloud/#organization" }, "areaServed": "MX", "description": "WiFi de cobertura total con roaming automático para empresas con múltiples espacios." },
+        { "@type": "Service", "position": 6, "name": "Soporte técnico", "provider": { "@id": "https://dasti.cloud/#organization" }, "areaServed": "MX", "description": "Diagnóstico, mantenimiento preventivo, optimización y resolución de fallas en equipos y sistemas." },
+        { "@type": "Service", "position": 7, "name": "Equipos de cómputo y periféricos", "provider": { "@id": "https://dasti.cloud/#organization" }, "areaServed": "MX", "description": "Suministro, actualización y configuración de equipos nuevos o existentes para empresas." },
+        { "@type": "Service", "position": 8, "name": "Automatización de procesos", "provider": { "@id": "https://dasti.cloud/#organization" }, "areaServed": "MX", "description": "Reducción de tareas repetitivas, reportes automáticos y optimización de flujos de trabajo internos." },
+        { "@type": "Service", "position": 9, "name": "Integración de sistemas", "provider": { "@id": "https://dasti.cloud/#organization" }, "areaServed": "MX", "description": "Conexión de plataformas y bases de datos para que la información fluya entre áreas sin trabajo manual." },
+        { "@type": "Service", "position": 10, "name": "Chatbots y asistentes digitales", "provider": { "@id": "https://dasti.cloud/#organization" }, "areaServed": "MX", "description": "Chatbots para atención inicial, respuestas frecuentes y captación de prospectos en WhatsApp y web." },
+        { "@type": "Service", "position": 11, "name": "Asesoramiento en TI", "provider": { "@id": "https://dasti.cloud/#organization" }, "areaServed": "MX", "description": "Orientación tecnológica para tomar mejores decisiones sobre infraestructura, herramientas y proveedores." },
+        { "@type": "Service", "position": 12, "name": "Presencia digital y redes sociales", "provider": { "@id": "https://dasti.cloud/#organization" }, "areaServed": "MX", "description": "Estructura de comunicación digital y recursos para mejorar la imagen en línea de tu empresa." }
+      ]
+    }
+    </script>
+
+    <!-- JSON-LD: FAQPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Qué significa DASTI?",
+          "acceptedAnswer": { "@type": "Answer", "text": "DASTI significa Desarrollo y Aplicación de Soluciones en TI. Es el enfoque central de la empresa: desarrollar e implementar soluciones tecnológicas reales y funcionales para negocios y empresas." }
+        },
+        {
+          "@type": "Question",
+          "name": "¿DASTI solo desarrolla páginas web?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. DASTI desarrolla e implementa soluciones en Tecnologías de la Información: software a medida, correos corporativos, redes, sistemas mesh, soporte técnico, equipos de cómputo, automatización, integración de sistemas y presencia digital. El desarrollo web es solo una parte del portafolio." }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Atienden en Morelos y Cuernavaca?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Sí. DASTI opera principalmente en Morelos, con enfoque en Cuernavaca y la zona metropolitana cercana. Desde ahí atendemos proyectos locales de forma presencial o remota." }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Pueden atender proyectos fuera de Morelos?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Sí. También atendemos proyectos en la Ciudad de México, Estado de México, Puebla y estados cercanos. La mayoría de servicios de software, correo, automatización e integración se realizan de forma remota sin restricción geográfica." }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Ofrecen correos corporativos?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Sí. Implementamos y administramos correos con dominio propio, configuramos cuentas por área, aplicamos configuración técnica de seguridad (SPF, DKIM, DMARC) y brindamos soporte continuo." }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Pueden apoyar con redes y sistemas mesh?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Sí. Podemos revisar cobertura actual, configurar routers y puntos de acceso, implementar sistemas mesh para ampliar señal y habilitar roaming automático entre puntos." }
+        },
+        {
+          "@type": "Question",
+          "name": "¿También suministran equipos de cómputo?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Sí. Podemos evaluar si conviene actualizar equipos existentes con SSD, RAM u optimización, o adquirir equipos nuevos configurados según el perfil de uso de cada área." }
+        },
+        {
+          "@type": "Question",
+          "name": "¿El cotizador muestra precios finales?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. El cotizador muestra una referencia aproximada orientativa. El precio final se confirma después de revisar el alcance real, requerimientos técnicos, licencias, equipos, ubicación y tiempos de entrega en una propuesta formal." }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Pueden emitir factura?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Sí. DASTI puede emitir CFDI (Comprobante Fiscal Digital por Internet) en caso de ser requerido por el cliente o la empresa contratante." }
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="app"></div>

@@ -3,9 +3,9 @@ import { ref } from 'vue'
 import { Send, MessageCircle, Mail, Phone, Clock, MapPin, Video, CalendarCheck, ChevronRight } from '@lucide/vue'
 import AnimatedParticles from '@/components/AnimatedParticles.vue'
 
-const WHATSAPP_NUMBER = '521XXXXXXXXXX'
-const CONTACT_EMAIL = 'contacto@dasti.cloud'
-const CONTACT_PHONE = '+52 1 XXX XXX XXXX'
+const WHATSAPP_NUMBER = '5217774428209'
+const CONTACT_EMAIL = 'direcciondasti@gmail.com'
+const CONTACT_PHONE = '+52 777 442 8209'
 const BUSINESS_HOURS = 'Lunes a Viernes, 9:00 – 18:00 hrs'
 
 const services = [
@@ -79,7 +79,7 @@ const openWhatsApp = () => {
   if (form.value.company) lines.push(`Empresa: ${form.value.company}`)
   if (form.value.service) lines.push(`Servicio de interés: ${form.value.service}`)
   if (form.value.message) lines.push(`Mensaje: ${form.value.message}`)
-  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank')
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener,noreferrer')
 }
 
 const selectMode = (mode: ContactMode) => {
@@ -97,20 +97,23 @@ const selectMode = (mode: ContactMode) => {
     <!-- Hero image area -->
     <div class="relative h-72 sm:h-80 overflow-hidden">
       <img
-        src="https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=1600&auto=format&fit=crop&q=80"
-        alt="Contacto DASTI"
+        src="https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=1600&auto=format&fit=crop&q=75"
+        alt="Contacta a DASTI para asesoría en soluciones de Tecnologías de la Información en Morelos"
         class="w-full h-full object-cover"
-        loading="lazy"
+        loading="eager"
+        decoding="async"
+        width="1600"
+        height="640"
       />
       <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.35), var(--bg-base) 88%);" />
       <div class="absolute inset-0" style="background: linear-gradient(to right, var(--bg-base) 0%, transparent 25%, transparent 75%, var(--bg-base) 100%);" />
 
       <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
         <span class="tag mb-4">Contacto</span>
-        <h2 class="display-text text-3xl sm:text-4xl lg:text-5xl" style="color: var(--text-primary);">
-          ¿Cómo prefieres
-          <span class="gradient-text"> hablar con DASTI?</span>
-        </h2>
+        <h1 class="display-text text-3xl sm:text-4xl lg:text-5xl" style="color: var(--text-primary);">
+          Hablemos de tu solución
+          <span class="gradient-text"> en TI</span>
+        </h1>
       </div>
     </div>
 
@@ -131,6 +134,8 @@ const selectMode = (mode: ContactMode) => {
             v-for="mode in contactModes"
             :key="mode.id"
             @click="selectMode(mode.id)"
+            :aria-label="`Contactar por ${mode.title}`"
+            :aria-pressed="selectedMode === mode.id"
             class="group relative flex flex-col items-center text-center p-5 sm:p-7 rounded-2xl transition-all duration-300"
             :style="`
               background: ${selectedMode === mode.id ? mode.color + '12' : 'var(--bg-card)'};
