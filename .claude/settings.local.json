@@ -13,7 +13,9 @@
       "Bash(ConvertTo-Csv -NoTypeInformation)",
       "Bash(Out-String)",
       "Bash(grep -v \"^C:\\\\\\\\\\\\wamp64\\\\\\\\www\\\\\\\\Dasti\\\\\\\\\\\\.git\")",
-      "Bash(dir C:wamp64wwwDastipublic *)"
+      "Bash(dir C:wamp64wwwDastipublic *)",
+      "Bash(npm install *)",
+      "Bash(npm *)"
     ]
   }
 }

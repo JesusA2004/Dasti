@@ -57,20 +57,37 @@ const contactModes: Array<{ id: ContactMode; icon: any; title: string; sub: stri
   },
 ]
 
-const form = ref({ name: '', company: '', phone: '', email: '', service: '', message: '' })
+const form = ref({ name: '', company: '', phone: '', email: '', service: '', message: '', website_url: '' })
 const submitted = ref(false)
 const sending = ref(false)
+const sendError = ref('')
 
 const handleSubmit = async () => {
   sending.value = true
-  await new Promise(r => setTimeout(r, 1000))
-  sending.value = false
-  submitted.value = true
+  sendError.value = ''
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form.value),
+    })
+    const data = await res.json()
+    if (data.ok) {
+      submitted.value = true
+    } else {
+      sendError.value = data.message || 'No se pudo enviar el mensaje.'
+    }
+  } catch {
+    sendError.value = 'Error de conexión. Intenta de nuevo o contáctanos por WhatsApp.'
+  } finally {
+    sending.value = false
+  }
 }
 
 const resetForm = () => {
-  form.value = { name: '', company: '', phone: '', email: '', service: '', message: '' }
+  form.value = { name: '', company: '', phone: '', email: '', service: '', message: '', website_url: '' }
   submitted.value = false
+  sendError.value = ''
 }
 
 const openWhatsApp = () => {
@@ -311,12 +328,15 @@ const selectMode = (mode: ContactMode) => {
                       </svg>
                     </div>
                     <h3 class="font-display font-bold text-xl mb-2" style="color: var(--text-primary);">Mensaje enviado</h3>
-                    <p class="text-sm mb-6" style="color: var(--text-secondary);">Gracias por contactarnos. Te responderemos a la brevedad.</p>
+                    <p class="text-sm mb-6" style="color: var(--text-secondary);">Gracias por contactarnos. Te responderemos a la brevedad a <strong>{{ form.email || 'la brevedad' }}</strong>.</p>
                     <button @click="resetForm" class="btn-outline text-sm">Enviar otro mensaje</button>
                   </div>
 
                   <!-- Form -->
                   <form v-else @submit.prevent="handleSubmit" class="space-y-4">
+                    <!-- Honeypot: hidden from users, bots fill it and get rejected -->
+                    <input v-model="form.website_url" type="text" name="website_url" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;" aria-hidden="true" />
+
                     <div class="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label class="block text-xs font-medium mb-1.5" style="color: var(--text-secondary);">Nombre *</label>
@@ -352,9 +372,18 @@ const selectMode = (mode: ContactMode) => {
                       <textarea v-model="form.message" required rows="4" placeholder="Cuéntanos brevemente qué necesita tu empresa..." class="input-theme resize-none" />
                     </div>
 
+                    <!-- Error message -->
+                    <div v-if="sendError" class="flex items-start gap-2.5 p-3 rounded-xl text-sm" style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #f87171;">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="flex-shrink-0 mt-0.5"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 5zm0 7.5a.875.875 0 1 1 0-1.75.875.875 0 0 1 0 1.75z"/></svg>
+                      <span>{{ sendError }}</span>
+                    </div>
+
                     <div class="flex flex-wrap gap-3">
                       <button type="submit" :disabled="sending" class="btn-primary flex-1 justify-center">
-                        <span v-if="sending">Enviando...</span>
+                        <span v-if="sending" class="flex items-center gap-2">
+                          <svg class="animate-spin" width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="32" stroke-dashoffset="12"/></svg>
+                          Enviando...
+                        </span>
                         <span v-else class="flex items-center gap-2 justify-center w-full">
                           Enviar mensaje <Send :size="15" />
                         </span>
@@ -364,6 +393,10 @@ const selectMode = (mode: ContactMode) => {
                         WhatsApp
                       </button>
                     </div>
+
+                    <p class="text-xs text-center" style="color: var(--text-muted);">
+                      También puedes contactarnos directamente por WhatsApp si prefieres atención inmediata.
+                    </p>
                   </form>
                 </div>
               </div>
