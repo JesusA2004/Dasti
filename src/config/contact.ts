@@ -1,11 +1,16 @@
+/**
+ * Contacto oficial de DASTI: +52 777 877 9239 · https://wa.me/527778779239
+ * No usar aquí números de aliados: Nexora tiene su propio WhatsApp en
+ * src/data/alliances.ts (+52 777 417 8753).
+ */
 export const CONTACT_CONFIG = {
-  whatsappNumber: '527774428209',
-  whatsappDisplay: '+52 777 442 8209',
+  whatsappNumber: '527778779239',
+  whatsappDisplay: '+52 777 877 9239',
   email: 'contacto@dasti.cloud',
   website: 'https://dasti.cloud',
   // Datos mostrados públicamente en contacto y footer (valores existentes del sitio)
   displayEmail: 'direcciondasti@gmail.com',
-  phoneDisplay: '+52 777 442 8209',
+  phoneDisplay: '+52 777 877 9239',
   businessHours: 'Lunes a Viernes, 9:00 – 18:00 hrs',
   location: 'Morelos · Cuernavaca, México',
 }

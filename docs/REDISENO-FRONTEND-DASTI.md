@@ -153,16 +153,15 @@ Todo vive en **`src/data/nfc.ts`**. Las vistas (`NfcCardsPage.vue`, `HomeNfc.vue
 |---|---|
 | Tipos de tarjeta | `nfcCardTypes` (presentación digital, redes sociales, reseñas de Google, enlaces personalizados) |
 | Pasos del proceso | `nfcSteps` (5 pasos) |
-| Paquetes | `nfcPackages` |
-| Galería | `nfcGallery` |
+| Tarjeta individual | `nfcIndividual` (ver sección J) |
+| Combos | `nfcCombos`, `NFC_COMBOS_FROM`, `NFC_COMBOS_NOTE` |
+| Extras y Smart | `nfcExtras`, `NFC_EXTRAS_FROM`, `NFC_EXTRAS_MESSAGE` |
+| Envíos y cobertura | `nfcShipping` |
+| Diseños genéricos (sustituye a la galería) | `nfcGenericDesigns` |
 | Preguntas frecuentes | `nfcFaq` |
 | Política de precios | `NFC_PRICING` |
 
-**Modificar paquetes:** edita, agrega o quita objetos en `nfcPackages`. Campos disponibles: `name`, `summary`, `quantity`, `customization`, `features`, `conditions`, `price`, `featured` (resalta el paquete en oscuro) e `image`.
-
-> ⚠️ Los tres paquetes incluidos ("Tarjeta individual", "Paquete para equipos", "Paquete empresarial") son una **estructura provisional**. Confirma o sustituye nombres, cantidades y características antes de publicar.
-
-**Actualizar precios:** en el proyecto **no existían precios NFC**, por lo que `price: null` en todos los paquetes y la interfaz muestra **"Solicitar cotización"**. Para publicar un precio, escribe el importe **final con IVA incluido** como número, por ejemplo `price: 450`. Se mostrará como "$450 · MXN · IVA incluido".
+> ℹ️ Los paquetes provisionales (`nfcPackages`) y la galería de placeholders (`nfcGallery`) se sustituyeron por el catálogo oficial con precios. Consulta la **sección J**.
 
 **Cambiar imágenes:**
 1. Coloca las fotografías en **`public/img/products/nfc/`**. Nombres sugeridos: `frontal.jpg`, `posterior.jpg`, `escritorio.jpg`, `en-mano.jpg`, `smartphone.jpg`, `acabados.jpg` y `paquete-*.jpg`.
@@ -222,7 +221,7 @@ Los grupos y sus descripciones están en `serviceGroups`. Las tarifas y condicio
   - Selección, cálculo, totales y el **mensaje de WhatsApp** son idénticos a la versión anterior.
 - **Formulario de contacto:** campos, `required`, honeypot `website_url`, `POST /api/contact`, estados de envío, éxito y error, y los modos WhatsApp, Videollamada y Presencial (abren WhatsApp con el mismo mensaje).
 - **Backend:** `server/` no se tocó.
-- **Datos de contacto:** WhatsApp `+52 777 442 8209`, correo mostrado `direcciondasti@gmail.com`, horario, ubicación, redes (Facebook, Instagram, TikTok) y zonas de cobertura.
+- **Datos de contacto:** WhatsApp `+52 777 877 9239` (actualizado en la sección J), correo mostrado `direcciondasti@gmail.com`, horario, ubicación, redes (Facebook, Instagram, TikTok) y zonas de cobertura.
 - **Contenido:** servicios (14), "qué incluye", "ideal para", preguntas frecuentes, proyectos en preparación (no se presentan como terminados) y textos de Nosotros. No se añadieron cifras, años, clientes ni certificaciones.
 
 **Reorganizado:**
@@ -236,8 +235,8 @@ Los grupos y sus descripciones están en `serviceGroups`. Las tarifas y condicio
 
 ## H. Pendientes (recursos o datos por proporcionar)
 
-1. **Precios oficiales NFC** con IVA incluido, y confirmación de nombres, cantidades y características de los paquetes.
-2. **Fotografías oficiales NFC**: frontal, posterior, escritorio, en mano, junto a smartphone, acabados e imágenes de paquetes.
+1. ~~Precios oficiales NFC~~ — cargados (sección J).
+2. **Fotografías oficiales NFC**: frontal, posterior, escritorio, en mano, junto a smartphone y acabados; y fotos recortadas de los diseños genéricos (sección J).
 3. **Logotipo oficial de Nexora** (SVG o PNG con transparencia) y, de preferencia, fotografías propias de Nexora.
 4. **Imagen Open Graph**: `index.html` referencia `https://dasti.cloud/img/og-dasti.jpg`, pero el archivo no existe en `public/img/`. Es un pendiente anterior al rediseño.
 5. **Correo de contacto**: el sitio muestra `direcciondasti@gmail.com`, mientras que el JSON-LD y `CONTACT_CONFIG.email` usan `contacto@dasti.cloud`. Ambos se conservaron; conviene unificarlos.
@@ -266,3 +265,71 @@ No se ejecutaron `npm run build`, `npm run dev`, `type-check`, `lint`, pruebas, 
 - Tema claro y oscuro, y modo de movimiento reducido del sistema.
 - Envío real del formulario contra `/api/contact` (con el backend en `localhost:3001`).
 - Los mensajes y números de WhatsApp de DASTI, de NFC y de Nexora.
+
+## J. Actualización de información (número oficial, NFC, envíos)
+
+Ajuste de contenido sobre el rediseño existente; no se modificó la línea visual, la navegación ni el backend.
+
+### Archivos
+
+| Archivo | Cambio |
+|---|---|
+| `src/config/contact.ts` | Nuevo número oficial de DASTI (`whatsappNumber`, `whatsappDisplay`, `phoneDisplay`) y comentario que lo separa del de Nexora. |
+| `index.html` | `telephone` agregado al `contactPoint` del JSON-LD de la organización. |
+| `src/data/nfc.ts` | Catálogo oficial: tarjeta individual, combos, extras, envíos, diseños genéricos, FAQ ampliada y helper `nfcMessageUrl()`. Se eliminaron `nfcPackages`/`NfcPackage` y `nfcGallery`. |
+| `src/pages/NfcCardsPage.vue` | Sección **Precios** (individual + combos + nota general + extras), franja **Envíos y cobertura** y sección **Diseños genéricos listos para usar** (en lugar de la galería de placeholders). |
+| `src/components/products/NfcDesignMock.vue` | **Nuevo.** Recreación CSS de los diseños genéricos impresos (frente y reverso). |
+| `src/components/home/HomeNfc.vue`, `src/pages/ProductsPage.vue` | Línea "Desde $399 MXN · IVA incluido · envíos a toda la República". |
+
+### Número oficial de DASTI
+
+- **+52 777 877 9239** · `https://wa.me/527778779239`.
+- Se define en un solo lugar: `CONTACT_CONFIG` (`src/config/contact.ts`). Desde ahí lo toman `buildWhatsAppUrl()` (botón flotante, contacto, hero, CTAs, NFC, cotizador), el footer (`tel:+527778779239` y texto visible) y la página de contacto.
+- JSON-LD: `"telephone": "+52-777-877-9239"`.
+- El número anterior (`+52 777 442 8209`) ya no aparece en el frontend.
+- **Nexora** sigue usando solo su número `+52 777 417 8753` (`src/data/alliances.ts` → `allianceWhatsAppUrl()`); no se modificó.
+
+### Precios NFC cargados (MXN, IVA incluido)
+
+**Tarjeta individual** — desde $399 MXN. Incluye NFC + QR funcional, diseño genérico listo para usar y configuración inicial.
+- Diseño genérico: $399 · Tu diseño: $429 · Personalizada por nosotros: $499.
+
+**Combos más vendidos** — desde $699 MXN.
+| Combo | Tarjetas | Precio | Incluye | Nota |
+|---|---|---|---|---|
+| Reputación | 2 | $699 | Google Maps, Facebook o Instagram | Ahorro de $99 |
+| Conecta | 4 | $1,199 | Facebook, Instagram, TikTok, WhatsApp | $299.75 por tarjeta; ahorro de $397 |
+| Restaurante Digital | 4 | $1,249 | Menú digital, sitio web, Google Maps, WhatsApp | Ahorro de $347 |
+| Presencia Total | 6 | $1,699 | Facebook, Instagram, TikTok, WhatsApp, Google Maps, página web o menú | Ahorro de $695 (se muestra resaltado en oscuro) |
+
+Nota general visible bajo los combos: *"Todos los combos incluyen IVA, NFC, QR, configuración inicial y diseños genéricos. La creación de un menú digital o página web no está incluida."*
+
+**Extras y Smart** — desde $49/mes: personalización de combo +$299, soporte acrílico +$79, protector acrílico +$149, Smart individual $49/mes.
+
+**Envíos y cobertura:** Jiutepec y Cuernavaca · envíos a toda la República · costo de envío cotizado por separado según ciudad o destino · facturación disponible. También se agregaron tres preguntas a la FAQ NFC (envíos, factura, qué no incluyen los combos).
+
+Los paquetes provisionales "Paquete para equipos" y "Paquete empresarial" (sin precio) se sustituyeron por los combos; se dejó una línea "¿Necesitas más tarjetas para tu equipo o empresa? Escríbenos y cotizamos según cantidad."
+
+### WhatsApp de NFC
+
+Cada opción tiene su mensaje en `src/data/nfc.ts` (`message`) y se abre con `nfcMessageUrl(message)` → `buildWhatsAppUrl()` → `https://wa.me/527778779239?text=…` con `encodeURIComponent`. Mensajes: tarjeta individual (genérica, con tu diseño, personalizada por DASTI), cada uno de los cuatro combos y extras, con los textos indicados en la solicitud. El hero, la pestaña de tipos y el CTA final siguen usando `nfcWhatsAppUrl()`.
+
+### Imágenes reales de las tarjetas
+
+Las fotografías no estaban en el repositorio, así que no se publicó ninguna foto. Se tomó la descripción de los diseños como referencia y se resolvió así:
+- Sección **"Ejemplos reales · Diseños genéricos listos para usar"** con tres modelos (Google Maps / Reseñas, Instagram, Facebook), cada uno con **frente y reverso**, con los textos reales de las tarjetas (título, subtítulo, botón y los tres pasos "Desbloquea tu teléfono / Acércalo a la tarjeta / Se abre automáticamente").
+- Mientras no haya foto, `NfcDesignMock.vue` dibuja una **recreación limpia** del diseño (tarjeta vertical, colores de cada red, íconos genéricos, no logotipos oficiales). Una nota indica que son vistas recreadas a partir de las tarjetas impresas.
+- **Para usar las fotos:** recórtalas para quitar mano, escritorio y laptop, en formato vertical 54 × 85.6 (≈ 0.63:1). Colócalas en `public/img/products/nfc/` (nombres sugeridos: `google-maps-frente.jpg`, `google-maps-reverso.jpg`, `instagram-frente.jpg`, `instagram-reverso.jpg`, `facebook-frente.jpg`, `facebook-reverso.jpg`) y asigna `image.src` en `nfcGenericDesigns`. La foto reemplaza a la recreación y la etiqueta cambia a "Foto real".
+- Siguen como placeholders/ilustraciones: hero NFC (`nfcImages.hero`), ilustraciones CSS de tarjeta horizontal y teléfono.
+
+### Qué revisar manualmente
+
+- Abrir cada botón de WhatsApp de `/productos/tarjetas-nfc` y confirmar el número `527778779239` y el mensaje.
+- Footer, contacto y botón flotante con el nuevo número; páginas de Nexora con el `+52 777 417 8753`.
+- Formato de precios (`$1,199 MXN`, `+$299 MXN`, `$49 MXN/mes`) en es-MX.
+- Rejilla de combos en 2 columnas (tablet) y 4 (≥1280 px); tarjetas de diseños en 320–430 px (texto de la recreación es pequeño a propósito).
+- Tema oscuro: las recreaciones de los diseños conservan sus colores de marca.
+- El texto de la franja de envíos ("Atención local en Jiutepec y Cuernavaca", "Emitimos factura si la necesitas") por si prefieres otra redacción.
+- `npm run type-check` (no ejecutado).
+
+No se ejecutaron build, pruebas ni type-check. No se hizo commit, push ni se crearon ramas.

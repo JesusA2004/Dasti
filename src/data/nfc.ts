@@ -6,14 +6,17 @@ import { buildWhatsAppUrl } from '@/config/contact'
  * Configuración editable del catálogo. Todo el contenido de la página
  * /productos/tarjetas-nfc y de la sección de la home se lee de aquí.
  *
- * PRECIOS: aún no hay precios oficiales confirmados. Mientras `price`
- * sea `null`, la interfaz muestra "Solicitar cotización".
- * Cuando existan precios, captura el importe FINAL CON IVA INCLUIDO
- * (política de precios de productos DASTI) como número, p. ej. 450.
+ * PRECIOS: importes oficiales FINALES CON IVA INCLUIDO, en MXN
+ * (política de precios de productos DASTI). Se capturan como número,
+ * p. ej. 399, y la interfaz les da formato.
+ *
+ * WHATSAPP: todos los botones usan el WhatsApp oficial de DASTI
+ * (src/config/contact.ts) con un mensaje precargado por producto.
  *
  * IMÁGENES: coloca las fotografías oficiales en public/img/products/nfc/
  * y asigna la ruta en `src`, p. ej. `${NFC_IMAGE_BASE}/frontal.jpg`.
- * Con `src: null` se muestra un placeholder editorial.
+ * Con `src: null` se muestra un placeholder editorial (o, en los diseños
+ * genéricos, una recreación limpia del diseño impreso).
  */
 
 export const NFC_IMAGE_BASE = '/img/products/nfc'
@@ -28,7 +31,7 @@ export const NFC_PRICING = {
   currency: 'MXN',
   pricesIncludeVat: true,
   vatLabel: 'IVA incluido',
-  policyNote: 'Todos los precios publicados de productos DASTI incluyen IVA.',
+  policyNote: 'Precios finales con IVA incluido.',
   pendingLabel: 'Solicitar cotización',
 }
 
@@ -104,68 +107,225 @@ export const nfcSteps = [
   { n: '05', title: 'Acercas y compartes', desc: 'La tarjeta se acerca a un smartphone compatible o se escanea su QR.' },
 ]
 
-export interface NfcPackage {
+/* ── Catálogo comercial ─────────────────────────────────────────── */
+
+export interface NfcPriceOption {
   id: string
-  name: string
-  summary: string
-  quantity: string
-  customization: string
-  features: string[]
-  conditions: string[]
-  /** Precio final con IVA incluido. `null` = mostrar "Solicitar cotización". */
-  price: number | null
-  featured?: boolean
-  image: ProductImage
+  label: string
+  /** Precio final con IVA incluido, MXN. */
+  price: number
+  /** Mensaje de WhatsApp precargado para esta opción. */
+  message: string
 }
 
-/**
- * Estructura de paquetes lista para recibir la información comercial oficial.
- * Nombres, cantidades y precios deben confirmarse antes de publicar importes.
- */
-export const nfcPackages: NfcPackage[] = [
+/** Tarjeta individual: precio base + variantes de diseño. */
+export const nfcIndividual = {
+  name: 'Tarjeta individual',
+  fromPrice: 399,
+  subtitle: 'Precios finales con IVA incluido',
+  includes: ['NFC + QR funcional', 'Diseño genérico listo para usar', 'Configuración inicial incluida'],
+  options: [
+    {
+      id: 'generico',
+      label: 'Diseño genérico listo para usar',
+      price: 399,
+      message: 'Hola, me interesa la tarjeta NFC individual de DASTI. Quiero recibir información y cotización.',
+    },
+    {
+      id: 'tu-diseno',
+      label: 'Tu diseño',
+      price: 429,
+      message: 'Hola, me interesa la tarjeta NFC individual con mi propio diseño. Quiero recibir información y cotización.',
+    },
+    {
+      id: 'personalizada',
+      label: 'Personalizada por nosotros',
+      price: 499,
+      message: 'Hola, me interesa la tarjeta NFC personalizada por DASTI. Quiero recibir información y cotización.',
+    },
+  ] as NfcPriceOption[],
+}
+
+export interface NfcCombo {
+  id: string
+  name: string
+  cards: number
+  /** Precio final con IVA incluido, MXN. */
+  price: number
+  includes: string[]
+  notes: string[]
+  message: string
+  featured?: boolean
+}
+
+export const NFC_COMBOS_FROM = 699
+
+export const nfcCombos: NfcCombo[] = [
   {
-    id: 'individual',
-    name: 'Tarjeta individual',
-    summary: 'Para profesionistas y personas que quieren su propia tarjeta inteligente.',
-    quantity: '1 tarjeta',
-    customization: 'Diseño personalizado',
-    features: ['Tecnología NFC y código QR', 'Programación del destino digital', 'Elección del tipo de tarjeta'],
-    conditions: ['Precio, diseño y tiempos se confirman al cotizar'],
-    price: null,
-    image: { src: null, alt: 'Paquete de tarjeta individual NFC', caption: 'Paquete individual' },
+    id: 'reputacion',
+    name: 'Combo Reputación',
+    cards: 2,
+    price: 699,
+    includes: ['Google Maps', 'Facebook o Instagram'],
+    notes: ['Ahorro de $99 MXN frente a dos tarjetas individuales.'],
+    message: 'Hola, me interesa el Combo Reputación de tarjetas NFC de DASTI. Quiero recibir información y cotización.',
   },
   {
-    id: 'equipos',
-    name: 'Paquete para equipos',
-    summary: 'Para equipos comerciales o áreas que comparten una misma identidad visual.',
-    quantity: 'Varias tarjetas · cantidad a definir',
-    customization: 'Diseño de marca con datos por integrante',
-    features: ['Tecnología NFC y código QR', 'Programación individual de cada tarjeta', 'Diseño homologado para el equipo'],
-    conditions: ['Precio según cantidad y personalización', 'Precio, diseño y tiempos se confirman al cotizar'],
-    price: null,
+    id: 'conecta',
+    name: 'Combo Conecta',
+    cards: 4,
+    price: 1199,
+    includes: ['Facebook', 'Instagram', 'TikTok', 'WhatsApp'],
+    notes: ['Equivale a $299.75 MXN por tarjeta.', 'Ahorro de $397 MXN frente a comprarlas individualmente.'],
+    message: 'Hola, me interesa el Combo Conecta de tarjetas NFC de DASTI. Quiero recibir información y cotización.',
+  },
+  {
+    id: 'restaurante-digital',
+    name: 'Combo Restaurante Digital',
+    cards: 4,
+    price: 1249,
+    includes: ['Menú digital', 'Sitio web', 'Google Maps', 'WhatsApp'],
+    notes: ['Ahorro de $347 MXN frente a cuatro tarjetas individuales.'],
+    message: 'Hola, me interesa el Combo Restaurante Digital de tarjetas NFC de DASTI. Quiero recibir información y cotización.',
+  },
+  {
+    id: 'presencia-total',
+    name: 'Combo Presencia Total',
+    cards: 6,
+    price: 1699,
+    includes: ['Facebook', 'Instagram', 'TikTok', 'WhatsApp', 'Google Maps', 'Página web o menú'],
+    notes: ['Ahorro de $695 MXN frente a seis tarjetas individuales.'],
+    message: 'Hola, me interesa el Combo Presencia Total de tarjetas NFC de DASTI. Quiero recibir información y cotización.',
     featured: true,
-    image: { src: null, alt: 'Paquete de tarjetas NFC para equipos', caption: 'Paquete para equipos' },
-  },
-  {
-    id: 'empresarial',
-    name: 'Paquete empresarial',
-    summary: 'Para empresas y negocios que requieren volumen o varios tipos de tarjeta.',
-    quantity: 'Volumen · cantidad a definir',
-    customization: 'Diseño corporativo y combinación de tipos de tarjeta',
-    features: ['Tecnología NFC y código QR', 'Combinación de tipos de tarjeta', 'Atención directa con DASTI'],
-    conditions: ['Precio según volumen y requerimientos', 'Precio, diseño y tiempos se confirman al cotizar'],
-    price: null,
-    image: { src: null, alt: 'Paquete empresarial de tarjetas NFC', caption: 'Paquete empresarial' },
   },
 ]
 
-export const nfcGallery: ProductImage[] = [
-  nfcImages.front,
-  nfcImages.back,
-  nfcImages.desk,
-  nfcImages.hand,
-  nfcImages.phone,
-  { src: null, alt: 'Acabados y diseños de tarjetas NFC', caption: 'Acabados y diseños' },
+/** Condición general obligatoria de todos los combos. */
+export const NFC_COMBOS_NOTE = {
+  included: 'Todos los combos incluyen IVA, NFC, QR, configuración inicial y diseños genéricos.',
+  excluded: 'La creación de un menú digital o página web no está incluida.',
+}
+
+export interface NfcExtra {
+  id: string
+  name: string
+  /** Precio final con IVA incluido, MXN. */
+  price: number
+  /** `addon` se muestra como "+$X MXN"; `monthly` como "$X MXN/mes". */
+  kind: 'addon' | 'monthly'
+}
+
+export const NFC_EXTRAS_FROM = 49
+
+export const nfcExtras: NfcExtra[] = [
+  { id: 'personalizacion-combo', name: 'Personalización de combo', price: 299, kind: 'addon' },
+  { id: 'soporte-acrilico', name: 'Soporte acrílico', price: 79, kind: 'addon' },
+  { id: 'protector-acrilico', name: 'Protector acrílico', price: 149, kind: 'addon' },
+  { id: 'smart-individual', name: 'Smart individual', price: 49, kind: 'monthly' },
+]
+
+export const NFC_EXTRAS_MESSAGE = 'Hola, me interesa agregar extras a mis tarjetas NFC de DASTI. Quiero recibir información.'
+
+/** Envíos y cobertura (información oficial; no agregar políticas no confirmadas). */
+export const nfcShipping = [
+  { id: 'local', title: 'Jiutepec y Cuernavaca', desc: 'Atención local en Jiutepec y Cuernavaca.' },
+  { id: 'nacional', title: 'Envíos a toda la República', desc: 'Enviamos tus tarjetas a cualquier destino de México.' },
+  { id: 'costo', title: 'Costo de envío por separado', desc: 'Se cotiza según la ciudad o destino.' },
+  { id: 'factura', title: 'Facturación disponible', desc: 'Emitimos factura si la necesitas.' },
+] as const
+
+/* ── Diseños genéricos (ejemplos reales impresos) ───────────────── */
+
+export type NfcDesignTheme = 'maps' | 'instagram' | 'facebook'
+
+export interface NfcDesignFront {
+  title: string
+  text: string
+  button: string
+  image: ProductImage
+}
+
+export interface NfcDesignBack {
+  title: string
+  text: string
+  steps: string[]
+  image: ProductImage
+}
+
+export interface NfcGenericDesign {
+  id: NfcDesignTheme
+  name: string
+  category: string
+  front: NfcDesignFront
+  back: NfcDesignBack
+}
+
+const TAP_STEPS = ['Desbloquea tu teléfono', 'Acércalo a la tarjeta', 'Se abre automáticamente']
+
+/**
+ * Diseños genéricos que DASTI ya produce. Los textos replican los de las
+ * tarjetas impresas. Cuando haya fotografías recortadas y limpias, asigna
+ * `image.src` (sugerencia de nombres en el comentario de cada una); mientras
+ * tanto la interfaz muestra una recreación del diseño.
+ */
+export const nfcGenericDesigns: NfcGenericDesign[] = [
+  {
+    id: 'maps',
+    name: 'Google Maps · Reseñas',
+    category: 'Reputación',
+    front: {
+      title: '¡Tu opinión es muy importante!',
+      text: 'Acerca tu teléfono y comparte tu experiencia en Google Maps.',
+      button: 'Dejar reseña',
+      // `${NFC_IMAGE_BASE}/google-maps-frente.jpg`
+      image: { src: null, alt: 'Tarjeta NFC de reseñas en Google Maps, frente', caption: 'Frente' },
+    },
+    back: {
+      title: 'Tu opinión hace la diferencia',
+      text: 'Acerca tu teléfono y comparte tu experiencia en segundos.',
+      steps: TAP_STEPS,
+      // `${NFC_IMAGE_BASE}/google-maps-reverso.jpg`
+      image: { src: null, alt: 'Tarjeta NFC de reseñas en Google Maps, reverso con instrucciones', caption: 'Reverso' },
+    },
+  },
+  {
+    id: 'instagram',
+    name: 'Instagram',
+    category: 'Redes sociales',
+    front: {
+      title: '¡Inspírate con nuestro contenido!',
+      text: 'Acerca tu teléfono y descubre fotos, ideas y novedades pensadas para ti.',
+      button: 'Ver Instagram',
+      // `${NFC_IMAGE_BASE}/instagram-frente.jpg`
+      image: { src: null, alt: 'Tarjeta NFC para Instagram, frente', caption: 'Frente' },
+    },
+    back: {
+      title: 'Encuentra inspiración cada día',
+      text: 'Acerca tu teléfono y descubre ideas, fotos, novedades y promociones al instante.',
+      steps: TAP_STEPS,
+      // `${NFC_IMAGE_BASE}/instagram-reverso.jpg`
+      image: { src: null, alt: 'Tarjeta NFC para Instagram, reverso con instrucciones', caption: 'Reverso' },
+    },
+  },
+  {
+    id: 'facebook',
+    name: 'Facebook',
+    category: 'Comunidad',
+    front: {
+      title: '¡Únete a nuestra comunidad!',
+      text: 'Acerca tu teléfono y descubre novedades, promociones y contenido pensado para ti.',
+      button: 'Ir a Facebook',
+      // `${NFC_IMAGE_BASE}/facebook-frente.jpg`
+      image: { src: null, alt: 'Tarjeta NFC para Facebook, frente', caption: 'Frente' },
+    },
+    back: {
+      title: 'Descubre más en un solo toque',
+      text: 'Acerca tu teléfono y conoce novedades, promociones y contenido pensado para ti.',
+      steps: TAP_STEPS,
+      // `${NFC_IMAGE_BASE}/facebook-reverso.jpg`
+      image: { src: null, alt: 'Tarjeta NFC para Facebook, reverso con instrucciones', caption: 'Reverso' },
+    },
+  },
 ]
 
 export const nfcFaq = [
@@ -187,11 +347,23 @@ export const nfcFaq = [
   },
   {
     q: '¿Puedo personalizar el diseño?',
-    a: 'Sí. El diseño y la información o enlaces de la tarjeta se definen contigo antes de prepararla. Las opciones de acabado y personalización disponibles se confirman al cotizar.',
+    a: 'Sí. Puedes elegir un diseño genérico listo para usar (desde $399 MXN), enviarnos tu propio diseño ($429 MXN) o pedir que lo personalicemos por ti ($499 MXN). Precios finales con IVA incluido. La información o enlaces de la tarjeta se definen contigo antes de prepararla.',
   },
   {
     q: '¿Cómo solicito mis tarjetas?',
-    a: 'Escríbenos por WhatsApp indicando el tipo de tarjeta o paquete que te interesa. Revisamos contigo cantidad, diseño y destino digital, y te compartimos la cotización.',
+    a: 'Escríbenos por WhatsApp indicando la tarjeta o el combo que te interesa. Revisamos contigo cantidad, diseño y destino digital, y te compartimos la cotización.',
+  },
+  {
+    q: '¿Hacen envíos?',
+    a: 'Sí. Atendemos en Jiutepec y Cuernavaca y hacemos envíos a toda la República. El costo de envío se cotiza por separado según la ciudad o destino.',
+  },
+  {
+    q: '¿Puedo solicitar factura?',
+    a: 'Sí, la facturación está disponible.',
+  },
+  {
+    q: '¿Los combos incluyen menú digital o página web?',
+    a: 'No. Todos los combos incluyen IVA, NFC, QR, configuración inicial y diseños genéricos, pero la creación de un menú digital o página web no está incluida.',
   },
   {
     q: '¿Cómo se usa en el día a día?',
@@ -208,5 +380,10 @@ export function nfcWhatsAppUrl(option?: string): string {
   const message = option
     ? `Hola, me interesa cotizar tarjetas inteligentes NFC de DASTI. Opción seleccionada: ${option}.`
     : 'Hola, me interesa recibir información sobre las tarjetas inteligentes NFC de DASTI.'
+  return buildWhatsAppUrl(message)
+}
+
+/** Enlace al WhatsApp oficial de DASTI con un mensaje precargado del catálogo. */
+export function nfcMessageUrl(message: string): string {
   return buildWhatsAppUrl(message)
 }

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ArrowUpRight } from '@lucide/vue'
 import NfcCardVisual from '@/components/products/NfcCardVisual.vue'
-import { nfcCardTypes } from '@/data/nfc'
+import { NFC_PRICING, nfcCardTypes, nfcIndividual } from '@/data/nfc'
+import { formatMXN } from '@/utils/format'
 </script>
 
 <template>
@@ -35,7 +36,11 @@ import { nfcCardTypes } from '@/data/nfc'
             <div class="mt-8 flex flex-wrap gap-2">
               <span v-for="t in nfcCardTypes" :key="t.id" class="chip chip-ink">{{ t.short }}</span>
             </div>
-            <span class="btn btn-light mt-10">
+            <p class="mt-8 text-sm text-on-ink-3">
+              Desde <span class="font-semibold text-on-ink">{{ formatMXN(nfcIndividual.fromPrice) }} {{ NFC_PRICING.currency }}</span>
+              · {{ NFC_PRICING.vatLabel }} · Envíos a toda la República
+            </p>
+            <span class="btn btn-light mt-8">
               Descubrir tarjetas NFC
               <span class="btn-orb"><ArrowUpRight :size="16" /></span>
             </span>

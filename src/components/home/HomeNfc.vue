@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ArrowUpRight, QrCode, Palette, Smartphone } from '@lucide/vue'
 import NfcCardVisual from '@/components/products/NfcCardVisual.vue'
-import { nfcCardTypes } from '@/data/nfc'
+import { NFC_PRICING, nfcCardTypes, nfcIndividual } from '@/data/nfc'
+import { formatMXN } from '@/utils/format'
 
 const points = [
   { icon: Smartphone, title: 'Con un toque', desc: 'Acércala a un smartphone compatible con NFC.' },
@@ -58,7 +59,12 @@ const points = [
             <span v-for="t in nfcCardTypes" :key="t.id" class="chip chip-ink">{{ t.short }}</span>
           </div>
 
-          <RouterLink v-reveal="{ variant: 'up', delay: 320 }" to="/productos/tarjetas-nfc" class="btn btn-light mt-10">
+          <p v-reveal="{ variant: 'up', delay: 300 }" class="mt-8 text-sm text-on-ink-3">
+            Desde <span class="font-semibold text-on-ink">{{ formatMXN(nfcIndividual.fromPrice) }} {{ NFC_PRICING.currency }}</span>
+            · {{ NFC_PRICING.vatLabel }} · Combos y envíos a toda la República
+          </p>
+
+          <RouterLink v-reveal="{ variant: 'up', delay: 320 }" to="/productos/tarjetas-nfc" class="btn btn-light mt-8">
             Descubrir tarjetas NFC
             <span class="btn-orb"><ArrowUpRight :size="16" /></span>
           </RouterLink>

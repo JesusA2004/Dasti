@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
-import { ArrowDown, ArrowUpRight, Check, QrCode, Palette, Smartphone } from '@lucide/vue'
+import { ArrowDown, ArrowUpRight, Check, Info, MapPin, Palette, QrCode, ReceiptText, Smartphone, Truck, Wallet } from '@lucide/vue'
 import NfcCardVisual from '@/components/products/NfcCardVisual.vue'
+import NfcDesignMock from '@/components/products/NfcDesignMock.vue'
 import NfcPhoneMock from '@/components/products/NfcPhoneMock.vue'
 import MediaFrame from '@/components/ui/MediaFrame.vue'
 import FaqList from '@/components/ui/FaqList.vue'
@@ -9,15 +10,23 @@ import WhatsAppIcon from '@/components/ui/WhatsAppIcon.vue'
 import { useSectionProgress } from '@/composables/useSectionProgress'
 import { formatMXN } from '@/utils/format'
 import {
+  NFC_COMBOS_FROM,
+  NFC_COMBOS_NOTE,
+  NFC_EXTRAS_FROM,
+  NFC_EXTRAS_MESSAGE,
   NFC_PRICING,
   nfcCardTypes,
+  nfcCombos,
+  nfcExtras,
   nfcFaq,
-  nfcGallery,
+  nfcGenericDesigns,
   nfcImages,
-  nfcPackages,
+  nfcIndividual,
+  nfcMessageUrl,
+  nfcShipping,
   nfcSteps,
   nfcWhatsAppUrl,
-  type NfcPackage,
+  type NfcExtra,
 } from '@/data/nfc'
 
 /* ── Tipos de tarjeta (pestañas accesibles) ── */
@@ -43,12 +52,16 @@ const onTabKeydown = async (e: KeyboardEvent) => {
 const stepsRef = ref<HTMLElement>()
 const stepsProgress = useSectionProgress(stepsRef, 0.8, 0.5)
 
-/* ── Precios ── */
-const priceLabel = (pkg: NfcPackage) => (pkg.price === null ? NFC_PRICING.pendingLabel : formatMXN(pkg.price))
+/* ── Precios (MXN, IVA incluido) ── */
+const mxn = (n: number) => `${formatMXN(n)} ${NFC_PRICING.currency}`
+const extraPrice = (e: NfcExtra) => (e.kind === 'monthly' ? `${mxn(e.price)}/mes` : `+${mxn(e.price)}`)
 
 const generalWhatsApp = nfcWhatsAppUrl()
+const individualWhatsApp = nfcMessageUrl(nfcIndividual.options[0].message)
+const extrasWhatsApp = nfcMessageUrl(NFC_EXTRAS_MESSAGE)
 
-const gallerySpans = ['lg:col-span-7 lg:row-span-2', 'lg:col-span-5', 'lg:col-span-5', 'lg:col-span-4', 'lg:col-span-4', 'lg:col-span-4']
+const shippingIcons = { local: MapPin, nacional: Truck, costo: Wallet, factura: ReceiptText } as const
+const designSides = ['front', 'back'] as const
 
 const highlights = [
   { icon: Smartphone, title: 'Un toque', desc: 'Lectura por NFC en smartphones compatibles.' },
@@ -257,105 +270,251 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
       </div>
     </section>
 
-    <!-- ─── Paquetes ─── -->
+    <!-- ─── Precios: tarjeta individual, combos, extras ─── -->
     <section id="paquetes" class="section" aria-labelledby="packages-title">
       <div class="shell">
         <div class="grid gap-8 lg:grid-cols-12 lg:items-end">
           <div class="lg:col-span-7">
-            <p v-reveal="'fade'" class="eyebrow">Paquetes</p>
+            <p v-reveal="'fade'" class="eyebrow">Precios</p>
             <h2 id="packages-title" v-reveal="'clip'" class="display-2 mt-5 text-fg">
               Elige cómo <span class="serif">empezar.</span>
             </h2>
           </div>
           <p v-reveal="{ variant: 'up', delay: 100 }" class="lead lg:col-span-5">
-            Cotizamos según cantidad, tipo de tarjeta y personalización. {{ NFC_PRICING.policyNote }}
+            Una tarjeta, un combo o extras para complementarlos. {{ NFC_PRICING.policyNote }} Precios en {{ NFC_PRICING.currency }}.
           </p>
         </div>
 
-        <div class="mt-14 grid gap-5 lg:grid-cols-3">
+        <!-- Tarjeta individual -->
+        <article
+          v-reveal="'up'"
+          class="card mt-14 grid gap-10 rounded-[30px] p-7 sm:p-10 lg:grid-cols-12 lg:gap-12"
+          aria-labelledby="individual-title"
+        >
+          <div class="lg:col-span-5">
+            <span class="rounded-full bg-paper-2 px-2.5 py-1 text-[0.68rem] font-semibold text-fg-2">1 tarjeta</span>
+            <h3 id="individual-title" class="display-3 mt-5 text-fg">{{ nfcIndividual.name }}</h3>
+            <p class="mt-6 text-sm text-fg-3">Desde</p>
+            <p class="font-display text-[2.4rem] font-semibold leading-none tracking-tight text-fg">
+              {{ mxn(nfcIndividual.fromPrice) }}
+            </p>
+            <p class="mt-2 text-xs text-fg-3">{{ nfcIndividual.subtitle }}</p>
+            <ul class="mt-7 space-y-2.5">
+              <li v-for="f in nfcIndividual.includes" :key="f" class="flex items-start gap-2.5 text-sm">
+                <Check :size="16" class="mt-0.5 shrink-0 text-accent" />
+                <span class="text-fg-2">{{ f }}</span>
+              </li>
+            </ul>
+            <a :href="individualWhatsApp" target="_blank" rel="noopener noreferrer" class="btn btn-ink mt-8">
+              Solicitar cotización
+              <span class="btn-orb"><WhatsAppIcon :size="15" /></span>
+            </a>
+          </div>
+
+          <div class="lg:col-span-7">
+            <p class="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-fg-3">Elige tu diseño</p>
+            <ul class="mt-4 space-y-3">
+              <li
+                v-for="opt in nfcIndividual.options"
+                :key="opt.id"
+                class="flex flex-col gap-4 rounded-[22px] border border-line p-5 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p class="font-semibold text-fg">{{ opt.label }}</p>
+                  <p class="mt-0.5 font-display text-xl font-semibold tracking-tight text-fg">{{ mxn(opt.price) }}</p>
+                </div>
+                <a
+                  :href="nfcMessageUrl(opt.message)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-line btn-sm shrink-0"
+                  :aria-label="`Cotizar tarjeta individual: ${opt.label} por WhatsApp`"
+                >
+                  Cotizar
+                  <span class="btn-orb"><WhatsAppIcon :size="14" /></span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Combos más vendidos -->
+        <div class="mt-20 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <h3 v-reveal="'clip'" class="display-3 text-fg">Combos más vendidos</h3>
+          <p v-reveal="'fade'" class="text-sm text-fg-3">
+            Desde <span class="font-semibold text-fg">{{ mxn(NFC_COMBOS_FROM) }}</span> · {{ NFC_PRICING.vatLabel }}
+          </p>
+        </div>
+
+        <div class="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
           <article
-            v-for="(pkg, i) in nfcPackages"
-            :key="pkg.id"
-            v-reveal="{ variant: 'up', delay: i * 100 }"
-            class="relative flex flex-col overflow-hidden rounded-[30px] p-7 sm:p-8"
-            :class="pkg.featured ? 'on-ink grain shadow-[var(--shadow-deep)]' : 'card'"
+            v-for="(combo, i) in nfcCombos"
+            :key="combo.id"
+            v-reveal="{ variant: 'up', delay: i * 90 }"
+            class="relative flex flex-col overflow-hidden rounded-[30px] p-7"
+            :class="combo.featured ? 'on-ink grain shadow-[var(--shadow-deep)]' : 'card'"
           >
-            <div v-if="pkg.featured" class="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_50%_at_100%_0%,rgba(37,99,235,0.4),transparent_70%)]" aria-hidden="true" />
+            <div v-if="combo.featured" class="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_50%_at_100%_0%,rgba(37,99,235,0.4),transparent_70%)]" aria-hidden="true" />
             <div class="relative flex h-full flex-col">
               <div class="flex items-start justify-between gap-3">
-                <h3 class="title-4" :class="pkg.featured ? 'text-on-ink' : 'text-fg'">{{ pkg.name }}</h3>
+                <h4 class="title-4" :class="combo.featured ? 'text-on-ink' : 'text-fg'">{{ combo.name }}</h4>
                 <span
                   class="shrink-0 rounded-full px-2.5 py-1 text-[0.68rem] font-semibold"
-                  :class="pkg.featured ? 'bg-white/10 text-on-ink-2' : 'bg-paper-2 text-fg-2'"
+                  :class="combo.featured ? 'bg-white/10 text-on-ink-2' : 'bg-paper-2 text-fg-2'"
                 >
-                  {{ pkg.quantity }}
+                  {{ combo.cards }} tarjetas
                 </span>
               </div>
-              <p class="mt-3 text-[0.93rem] leading-relaxed" :class="pkg.featured ? 'text-on-ink-2' : 'text-fg-2'">{{ pkg.summary }}</p>
 
-              <div class="mt-8 border-y py-6" :class="pkg.featured ? 'border-ink-line' : 'border-line'">
-                <p class="font-display text-[1.75rem] font-semibold tracking-tight" :class="pkg.featured ? 'text-on-ink' : 'text-fg'">
-                  {{ priceLabel(pkg) }}
+              <div class="mt-6 border-y py-5" :class="combo.featured ? 'border-ink-line' : 'border-line'">
+                <p class="font-display text-[1.75rem] font-semibold tracking-tight" :class="combo.featured ? 'text-on-ink' : 'text-fg'">
+                  {{ mxn(combo.price) }}
                 </p>
-                <p class="mt-1 text-xs" :class="pkg.featured ? 'text-on-ink-3' : 'text-fg-3'">
-                  {{ pkg.price === null ? 'Precio final con IVA incluido al cotizar' : `${NFC_PRICING.currency} · ${NFC_PRICING.vatLabel}` }}
-                </p>
+                <p class="mt-1 text-xs" :class="combo.featured ? 'text-on-ink-3' : 'text-fg-3'">{{ NFC_PRICING.vatLabel }}</p>
               </div>
 
-              <p class="mt-6 text-[0.7rem] font-semibold uppercase tracking-[0.16em]" :class="pkg.featured ? 'text-on-ink-3' : 'text-fg-3'">
-                Personalización
+              <p class="mt-5 text-[0.7rem] font-semibold uppercase tracking-[0.16em]" :class="combo.featured ? 'text-on-ink-3' : 'text-fg-3'">
+                Incluye
               </p>
-              <p class="mt-1 text-sm" :class="pkg.featured ? 'text-on-ink' : 'text-fg'">{{ pkg.customization }}</p>
-
-              <ul class="mt-6 space-y-2.5">
-                <li v-for="f in pkg.features" :key="f" class="flex items-start gap-2.5 text-sm">
-                  <Check :size="16" class="mt-0.5 shrink-0" :class="pkg.featured ? 'text-signal' : 'text-accent'" />
-                  <span :class="pkg.featured ? 'text-on-ink-2' : 'text-fg-2'">{{ f }}</span>
+              <ul class="mt-3 space-y-2">
+                <li v-for="f in combo.includes" :key="f" class="flex items-start gap-2.5 text-sm">
+                  <Check :size="16" class="mt-0.5 shrink-0" :class="combo.featured ? 'text-signal' : 'text-accent'" />
+                  <span :class="combo.featured ? 'text-on-ink-2' : 'text-fg-2'">{{ f }}</span>
                 </li>
               </ul>
 
-              <ul class="mt-6 space-y-1">
-                <li v-for="c in pkg.conditions" :key="c" class="text-xs" :class="pkg.featured ? 'text-on-ink-3' : 'text-fg-3'">· {{ c }}</li>
+              <ul class="mt-5 space-y-1">
+                <li v-for="n in combo.notes" :key="n" class="text-xs" :class="combo.featured ? 'text-on-ink-3' : 'text-fg-3'">· {{ n }}</li>
               </ul>
 
-              <div class="mt-auto pt-8">
+              <div class="mt-auto pt-7">
                 <a
-                  :href="nfcWhatsAppUrl(pkg.name)"
+                  :href="nfcMessageUrl(combo.message)"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="btn btn-block"
-                  :class="pkg.featured ? 'btn-light' : 'btn-ink'"
+                  :class="combo.featured ? 'btn-light' : 'btn-ink'"
                 >
-                  Solicitar cotización
+                  Cotizar combo
                   <span class="btn-orb"><WhatsAppIcon :size="15" /></span>
                 </a>
               </div>
             </div>
           </article>
         </div>
+
+        <!-- Condición general de los combos -->
+        <div v-reveal="'up'" class="mt-6 flex items-start gap-3 rounded-[22px] border border-line bg-paper-2 p-5 sm:p-6">
+          <Info :size="18" class="mt-0.5 shrink-0 text-accent" />
+          <p class="text-sm leading-relaxed text-fg-2">
+            <span class="font-semibold text-fg">{{ NFC_COMBOS_NOTE.included }}</span>
+            {{ NFC_COMBOS_NOTE.excluded }}
+          </p>
+        </div>
+        <p class="mt-4 text-sm text-fg-3">
+          ¿Necesitas más tarjetas para tu equipo o empresa?
+          <a :href="generalWhatsApp" target="_blank" rel="noopener noreferrer" class="link-u font-medium text-fg">Escríbenos y cotizamos según cantidad.</a>
+        </p>
+
+        <!-- Extras y Smart -->
+        <div class="mt-20 grid gap-8 lg:grid-cols-12 lg:items-start">
+          <div class="lg:col-span-4">
+            <h3 v-reveal="'clip'" class="display-3 text-fg">Extras y Smart</h3>
+            <p v-reveal="'fade'" class="mt-3 text-sm text-fg-3">
+              Desde <span class="font-semibold text-fg">{{ mxn(NFC_EXTRAS_FROM) }}/mes</span> · {{ NFC_PRICING.vatLabel }}
+            </p>
+            <a :href="extrasWhatsApp" target="_blank" rel="noopener noreferrer" class="btn btn-ink mt-7">
+              Agregar extras
+              <span class="btn-orb"><WhatsAppIcon :size="15" /></span>
+            </a>
+          </div>
+          <ul v-reveal="'up'" class="grid gap-px overflow-hidden rounded-[24px] border border-line bg-line sm:grid-cols-2 lg:col-span-8">
+            <li v-for="e in nfcExtras" :key="e.id" class="flex items-center justify-between gap-4 bg-surface p-5 sm:p-6">
+              <span class="font-medium text-fg">{{ e.name }}</span>
+              <span class="shrink-0 font-display font-semibold tracking-tight text-fg">{{ extraPrice(e) }}</span>
+            </li>
+          </ul>
+        </div>
       </div>
     </section>
 
-    <!-- ─── Galería ─── -->
-    <section class="section pt-0" aria-labelledby="gallery-title">
+    <!-- ─── Envíos y cobertura ─── -->
+    <section class="stage bg-sky" aria-labelledby="shipping-title">
+      <div class="shell section-sm">
+        <p v-reveal="'fade'" class="eyebrow">Envíos y cobertura</p>
+        <h2 id="shipping-title" v-reveal="'clip'" class="display-3 mt-4 text-fg">
+          Te las llevamos <span class="serif">a donde estés.</span>
+        </h2>
+        <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <li
+            v-for="(item, i) in nfcShipping"
+            :key="item.id"
+            v-reveal="{ variant: 'up', delay: i * 80 }"
+            class="flex items-start gap-4 rounded-[22px] bg-surface/80 p-5"
+          >
+            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-white">
+              <component :is="shippingIcons[item.id]" :size="17" />
+            </span>
+            <span>
+              <span class="block text-sm font-semibold text-fg">{{ item.title }}</span>
+              <span class="mt-0.5 block text-[0.82rem] leading-snug text-fg-2">{{ item.desc }}</span>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ─── Diseños genéricos (ejemplos reales) ─── -->
+    <section class="section" aria-labelledby="designs-title">
       <div class="shell">
-        <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <h2 id="gallery-title" v-reveal="'clip'" class="display-2 text-fg">Galería</h2>
-          <p v-reveal="'fade'" class="max-w-sm text-sm text-fg-3">
-            Fotografías oficiales de nuestras tarjetas, acabados y presentaciones.
+        <div class="grid gap-8 lg:grid-cols-12 lg:items-end">
+          <div class="lg:col-span-7">
+            <p v-reveal="'fade'" class="eyebrow">Ejemplos reales</p>
+            <h2 id="designs-title" v-reveal="'clip'" class="display-2 mt-5 text-fg">
+              Diseños genéricos <span class="serif">listos para usar.</span>
+            </h2>
+          </div>
+          <p v-reveal="{ variant: 'up', delay: 100 }" class="lead lg:col-span-5">
+            Así lucen los modelos que ya producimos en DASTI, por frente y reverso. Son los diseños genéricos incluidos en la
+            tarjeta individual y en los combos.
           </p>
         </div>
-        <div class="mt-12 grid auto-rows-[220px] gap-4 sm:grid-cols-2 sm:auto-rows-[260px] lg:grid-cols-12">
-          <figure
-            v-for="(img, i) in nfcGallery"
-            :key="img.caption"
-            v-reveal="{ variant: 'image', delay: (i % 3) * 80 }"
-            class="overflow-hidden rounded-[26px]"
-            :class="gallerySpans[i] ?? 'lg:col-span-4'"
+
+        <div class="mt-12 grid gap-5 md:grid-cols-3">
+          <article
+            v-for="(d, i) in nfcGenericDesigns"
+            :key="d.id"
+            v-reveal="{ variant: 'up', delay: i * 90 }"
+            class="card flex flex-col rounded-[30px] p-4 sm:p-5"
           >
-            <MediaFrame :src="img.src" :alt="img.alt" :caption="img.caption" :tone="i % 3 === 1 ? 'light' : 'ink'" />
-          </figure>
+            <div class="grid grid-cols-2 gap-3 rounded-[22px] bg-sky p-4 sm:gap-4 sm:p-5">
+              <figure v-for="side in designSides" :key="side">
+                <div v-if="d[side].image.src" class="aspect-[54/85.6] overflow-hidden rounded-[0.9em] shadow-[var(--shadow-float)]">
+                  <MediaFrame :src="d[side].image.src" :alt="d[side].image.alt" :show-caption="false" />
+                </div>
+                <div v-else role="img" :aria-label="`${d[side].image.alt} (recreación del diseño impreso)`">
+                  <NfcDesignMock :theme="d.id" :side="side" :front="d.front" :back="d.back" />
+                </div>
+                <figcaption class="mt-2.5 text-center text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-fg-3">
+                  {{ d[side].image.caption }}
+                </figcaption>
+              </figure>
+            </div>
+            <div class="flex items-end justify-between gap-3 px-2 pb-1 pt-5">
+              <div>
+                <p class="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-fg-3">{{ d.category }}</p>
+                <h3 class="title-4 mt-1 text-fg">{{ d.name }}</h3>
+              </div>
+              <span class="shrink-0 rounded-full bg-paper-2 px-2.5 py-1 text-[0.66rem] font-semibold text-fg-2">
+                {{ d.front.image.src ? 'Foto real' : 'Diseño impreso' }}
+              </span>
+            </div>
+          </article>
         </div>
+        <p class="mt-6 text-xs text-fg-3">
+          Vistas recreadas a partir de las tarjetas impresas reales. ¿Prefieres otro diseño? Envíanos el tuyo o pide que lo
+          personalicemos por ti.
+        </p>
       </div>
     </section>
 
@@ -384,7 +543,7 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
               Diseñemos tus <span class="serif text-signal">tarjetas inteligentes.</span>
             </h2>
             <p v-reveal="{ variant: 'up', delay: 100 }" class="lead mt-6 max-w-xl !text-on-ink-2">
-              Escríbenos por WhatsApp con el tipo de tarjeta o paquete que te interesa y te compartimos la cotización.
+              Escríbenos por WhatsApp con la tarjeta o el combo que te interesa y te compartimos la cotización. Envíos a toda la República.
             </p>
             <div v-reveal="{ variant: 'up', delay: 160 }" class="mt-9 flex flex-wrap gap-3">
               <a :href="generalWhatsApp" target="_blank" rel="noopener noreferrer" class="btn btn-wa">
