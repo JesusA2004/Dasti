@@ -2,16 +2,20 @@
 import AppNavbar from '@/components/AppNavbar.vue'
 import FooterSection from '@/components/FooterSection.vue'
 import FloatingCTA from '@/components/FloatingCTA.vue'
-import ThemeSelector from '@/components/ThemeSelector.vue'
 </script>
 
 <template>
-  <!-- overflow-x:clip clips horizontal overflow without creating a scroll container,
-       preserving position:sticky and window.scrollY behaviour for all children. -->
-  <div class="relative min-h-screen"
-    style="overflow-x: clip; background-color: var(--bg-base); color: var(--text-primary);">
+  <!-- overflow-x:clip recorta el desbordamiento horizontal sin crear un contenedor
+       de scroll, preservando position:sticky y window.scrollY en los hijos. -->
+  <div class="relative min-h-screen bg-paper text-fg" style="overflow-x: clip;">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-on-ink"
+    >
+      Saltar al contenido
+    </a>
     <AppNavbar />
-    <main>
+    <main id="contenido">
       <RouterView v-slot="{ Component }">
         <Transition name="page" mode="out-in">
           <component :is="Component" :key="$route.path" />
@@ -20,17 +24,28 @@ import ThemeSelector from '@/components/ThemeSelector.vue'
     </main>
     <FooterSection />
     <FloatingCTA />
-    <ThemeSelector />
   </div>
 </template>
 
 <style>
-.page-enter-active,
-.page-leave-active {
-  transition: opacity 0.18s ease;
+.page-enter-active {
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.page-enter-from,
+.page-leave-active {
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.page-enter-from {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+}
 .page-leave-to {
   opacity: 0;
+  transform: translate3d(0, -8px, 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-from,
+  .page-leave-to {
+    transform: none;
+  }
 }
 </style>

@@ -1,6 +1,11 @@
-import { ref, watchEffect } from 'vue'
+import { ref, watch } from 'vue'
 
-export type ThemeId = 'dark' | 'light' | 'blue-premium' | 'indigo'
+/**
+ * Sistema de temas DASTI.
+ * El rediseño consolida los 4 temas anteriores en dos variantes (claro / oscuro).
+ * Los valores guardados previamente en localStorage se migran automáticamente.
+ */
+export type ThemeId = 'light' | 'dark'
 
 export interface Theme {
   id: ThemeId
@@ -10,67 +15,64 @@ export interface Theme {
 }
 
 export const themes: Theme[] = [
-  {
-    id: 'dark',
-    name: 'Dark',
-    label: 'Oscuro',
-    preview: { bg: '#050D1A', accent: '#3B82F6' },
-  },
-  {
-    id: 'light',
-    name: 'Light',
-    label: 'Claro',
-    preview: { bg: '#F8FAFC', accent: '#2563EB' },
-  },
-  {
-    id: 'blue-premium',
-    name: 'Blue Premium',
-    label: 'Azul Pro',
-    preview: { bg: '#020C1F', accent: '#38BDF8' },
-  },
-  {
-    id: 'indigo',
-    name: 'Indigo',
-    label: 'Índigo',
-    preview: { bg: '#0D0B1E', accent: '#818CF8' },
-  },
+  { id: 'light', name: 'Light', label: 'Claro', preview: { bg: '#F3F6FA', accent: '#2563EB' } },
+  { id: 'dark', name: 'Dark', label: 'Oscuro', preview: { bg: '#060D19', accent: '#3B82F6' } },
 ]
 
-function migrateThemeId(stored: string | null): ThemeId {
-  if (!stored) return 'dark'
+const STORAGE_KEY = 'dasti-theme'
+
+function migrateThemeId(stored: string | null): ThemeId | null {
+  if (!stored) return null
   const migrations: Record<string, ThemeId> = {
+    dark: 'dark',
     'dark-tech': 'dark',
-    'light-corporate': 'light',
     graphite: 'dark',
+    'blue-premium': 'dark',
+    indigo: 'dark',
+    light: 'light',
+    'light-corporate': 'light',
   }
-  if (migrations[stored]) return migrations[stored]
-  if (themes.some(t => t.id === stored)) return stored as ThemeId
-  return 'dark'
+  return migrations[stored] ?? null
 }
 
-function getInitialTheme(): ThemeId {
-  if (typeof localStorage === 'undefined') return 'dark'
-  return migrateThemeId(localStorage.getItem('dasti-theme'))
+function readStored(): string | null {
+  try {
+    return typeof localStorage === 'undefined' ? null : localStorage.getItem(STORAGE_KEY)
+  } catch {
+    return null
+  }
 }
 
-const currentThemeId = ref<ThemeId>(getInitialTheme())
+function systemTheme(): ThemeId {
+  if (typeof window === 'undefined' || !window.matchMedia) return 'light'
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+const currentThemeId = ref<ThemeId>(migrateThemeId(readStored()) ?? systemTheme())
 
 if (typeof document !== 'undefined') {
   document.documentElement.setAttribute('data-theme', currentThemeId.value)
 
-  watchEffect(() => {
+  watch(currentThemeId, (id) => {
     document.body.classList.add('theme-transitioning')
-    document.documentElement.setAttribute('data-theme', currentThemeId.value)
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('dasti-theme', currentThemeId.value)
+    document.documentElement.setAttribute('data-theme', id)
+    try {
+      localStorage.setItem(STORAGE_KEY, id)
+    } catch {
+      /* almacenamiento no disponible: el tema solo dura la sesión */
     }
-    setTimeout(() => document.body.classList.remove('theme-transitioning'), 500)
+    window.setTimeout(() => document.body.classList.remove('theme-transitioning'), 450)
   })
 }
 
 export function useTheme() {
-  const setTheme = (id: ThemeId) => { currentThemeId.value = id }
-  const isDark = () => currentThemeId.value !== 'light'
+  const setTheme = (id: ThemeId) => {
+    currentThemeId.value = id
+  }
+  const toggleTheme = () => {
+    currentThemeId.value = currentThemeId.value === 'dark' ? 'light' : 'dark'
+  }
+  const isDark = () => currentThemeId.value === 'dark'
 
-  return { currentThemeId, themes, setTheme, isDark }
+  return { currentThemeId, themes, setTheme, toggleTheme, isDark }
 }

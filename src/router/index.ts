@@ -5,6 +5,7 @@ import ProjectsPage from '@/pages/ProjectsPage.vue'
 import QuoterPage from '@/pages/QuoterPage.vue'
 import AboutPage from '@/pages/AboutPage.vue'
 import ContactPage from '@/pages/ContactPage.vue'
+import { alliances } from '@/data/alliances'
 
 interface RouteSEO {
   title: string
@@ -96,11 +97,66 @@ const router = createRouter({
           'Contacta a DASTI para asesoría en TI: desarrollo web, software a medida, correos corporativos, redes, soporte técnico y automatización.',
       },
     },
+    {
+      path: '/productos',
+      component: () => import('@/pages/ProductsPage.vue'),
+      meta: {
+        title: 'Productos - DASTI',
+        description:
+          'Productos tecnológicos desarrollados por DASTI, comenzando con tarjetas inteligentes NFC para compartir información digital con un toque o mediante código QR.',
+        canonical: 'https://dasti.cloud/productos',
+        ogTitle: 'Productos DASTI | Tecnología para compartir y conectar',
+        ogDesc: 'Productos tecnológicos DASTI: tarjetas inteligentes NFC con código QR.',
+      },
+    },
+    {
+      path: '/productos/tarjetas-nfc',
+      component: () => import('@/pages/NfcCardsPage.vue'),
+      meta: {
+        title: 'Tarjetas inteligentes NFC - DASTI',
+        description:
+          'Tarjetas inteligentes NFC de DASTI: presentación digital, redes sociales, reseñas de Google y enlaces personalizados. Comparte información con un toque o con su código QR. Solicita tu cotización por WhatsApp.',
+        canonical: 'https://dasti.cloud/productos/tarjetas-nfc',
+        ogTitle: 'Tarjetas inteligentes NFC | DASTI',
+        ogDesc: 'Tarjetas inteligentes. Conexiones inmediatas. Comparte información digital con un toque o un QR.',
+      },
+    },
+    {
+      path: '/alianzas',
+      component: () => import('@/pages/AlliancesPage.vue'),
+      meta: {
+        title: 'Alianzas estratégicas - DASTI',
+        description:
+          'DASTI colabora con especialistas independientes que complementan las necesidades de las empresas. Conoce a nuestros aliados estratégicos.',
+        canonical: 'https://dasti.cloud/alianzas',
+        ogTitle: 'Alianzas estratégicas | DASTI',
+        ogDesc: 'Especialistas independientes que complementan las necesidades de las empresas.',
+      },
+    },
+    // Una ruta por aliado, generada desde src/data/alliances.ts
+    ...alliances.map((alliance) => ({
+      path: alliance.route,
+      component: () => import('@/pages/AllianceDetailPage.vue'),
+      props: { slug: alliance.slug },
+      meta: {
+        title: alliance.seo.title,
+        description: alliance.seo.description,
+        canonical: `https://dasti.cloud${alliance.route}`,
+        ogTitle: alliance.seo.ogTitle,
+        ogDesc: alliance.seo.ogDesc,
+      },
+    })),
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
-  scrollBehavior(_to, _from, savedPosition) {
+  scrollBehavior(to, _from, savedPosition) {
     if (savedPosition) return savedPosition
-    return { top: 0, behavior: 'smooth' }
+    // Espera la transición de página antes de buscar el ancla
+    if (to.hash) {
+      return new Promise((resolve) => {
+        window.setTimeout(() => resolve({ el: to.hash, top: 160, behavior: 'smooth' }), 420)
+      })
+    }
+    return { top: 0 }
   },
 })
 
@@ -124,6 +180,8 @@ router.afterEach((to) => {
   }
   if (meta.ogTitle) setMeta('meta[property="og:title"]', meta.ogTitle)
   if (meta.ogDesc) setMeta('meta[property="og:description"]', meta.ogDesc)
+  if (meta.ogTitle) setMeta('meta[name="twitter:title"]', meta.ogTitle)
+  if (meta.ogDesc) setMeta('meta[name="twitter:description"]', meta.ogDesc)
 })
 
 export default router

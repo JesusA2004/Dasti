@@ -1,261 +1,160 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { ArrowRight, Clock, ExternalLink, Code2, Wifi, Mail, Monitor, Globe, GitMerge, Zap, ShoppingBag } from '@lucide/vue'
+import { computed, ref } from 'vue'
+import { ArrowUpRight, Clock, ExternalLink } from '@lucide/vue'
 import LargeProjectsCTA from '@/components/LargeProjectsCTA.vue'
+import MediaFrame from '@/components/ui/MediaFrame.vue'
+import { projectCategories, projects } from '@/data/projects'
 
-const router = useRouter()
-
-const categories = ['Todos', 'Desarrollo', 'Infraestructura', 'Correos', 'Equipos', 'Automatización', 'Web']
+/**
+ * Proyectos. Los casos con status 'pending' se muestran como espacios
+ * reservados; no se presentan como proyectos terminados.
+ */
 const activeCategory = ref('Todos')
 
-// Placeholder projects — ready to replace with real data
-const projects = [
-  {
-    id: 1,
-    slug: 'proyecto-software-interno',
-    name: 'Proyecto en preparación',
-    description: 'Sistema interno personalizado. Detalles próximamente.',
-    category: 'Desarrollo',
-    icon: Code2,
-    color: '#3B82F6',
-    tags: ['Software', 'Panel', 'Automatización'],
-    image: null,
-    link: null,
-    status: 'pending',
-  },
-  {
-    id: 2,
-    slug: 'proyecto-red-empresarial',
-    name: 'Proyecto en preparación',
-    description: 'Infraestructura de red empresarial. Detalles próximamente.',
-    category: 'Infraestructura',
-    icon: Wifi,
-    color: '#60A5FA',
-    tags: ['Redes', 'Mesh', 'WiFi'],
-    image: null,
-    link: null,
-    status: 'pending',
-  },
-  {
-    id: 3,
-    slug: 'proyecto-correo-corporativo',
-    name: 'Proyecto en preparación',
-    description: 'Implementación de correos corporativos. Detalles próximamente.',
-    category: 'Correos',
-    icon: Mail,
-    color: '#F472B6',
-    tags: ['Correos', 'Dominio', 'Seguridad'],
-    image: null,
-    link: null,
-    status: 'pending',
-  },
-  {
-    id: 4,
-    slug: 'proyecto-web-corporativo',
-    name: 'Proyecto en preparación',
-    description: 'Sitio web corporativo moderno. Detalles próximamente.',
-    category: 'Web',
-    icon: Globe,
-    color: '#818CF8',
-    tags: ['Web', 'Diseño', 'Responsivo'],
-    image: null,
-    link: null,
-    status: 'pending',
-  },
-  {
-    id: 5,
-    slug: 'proyecto-equipos',
-    name: 'Proyecto en preparación',
-    description: 'Suministro y configuración de equipos. Detalles próximamente.',
-    category: 'Equipos',
-    icon: Monitor,
-    color: '#FB923C',
-    tags: ['Equipos', 'Configuración', 'Soporte'],
-    image: null,
-    link: null,
-    status: 'pending',
-  },
-  {
-    id: 6,
-    slug: 'proyecto-automatizacion',
-    name: 'Proyecto en preparación',
-    description: 'Automatización de procesos empresariales. Detalles próximamente.',
-    category: 'Automatización',
-    icon: Zap,
-    color: '#34D399',
-    tags: ['Automatización', 'Integración', 'APIs'],
-    image: null,
-    link: null,
-    status: 'pending',
-  },
-]
-
 const filtered = computed(() =>
-  activeCategory.value === 'Todos'
-    ? projects
-    : projects.filter(p => p.category === activeCategory.value)
+  activeCategory.value === 'Todos' ? projects : projects.filter((p) => p.category === activeCategory.value),
 )
+
+const capabilities = [
+  { title: 'Sistemas y software', desc: 'Paneles administrativos, gestión de usuarios, reportes y módulos a medida.' },
+  { title: 'Sitios web', desc: 'Sitios corporativos responsivos, formularios funcionales y paneles básicos.' },
+  { title: 'Infraestructura', desc: 'Redes empresariales, sistemas mesh con roaming y segmentación por área.' },
+  { title: 'Integración y automatización', desc: 'Conexión entre plataformas, APIs, chatbots y reportes automáticos.' },
+]
 </script>
 
 <template>
-  <div class="pt-18">
-
-    <!-- Header -->
-    <section class="relative py-20 overflow-hidden" style="background: var(--bg-base);">
-      <div class="absolute inset-0 grid-bg opacity-35 pointer-events-none" />
-      <div class="orb w-[600px] h-[400px] top-0 right-0" style="background: var(--accent-glow-sm);" />
-      <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div
-          v-motion
-          :initial="{ opacity: 0, y: 20 }"
-          :enter="{ opacity: 1, y: 0, transition: { duration: 600 } }"
-        >
-          <span class="tag mb-4 inline-block">Portfolio</span>
-          <h1 class="font-display text-4xl sm:text-5xl font-bold mb-6" style="color: var(--text-primary);">
-            Proyectos
-            <span class="gradient-text block">DASTI</span>
+  <div class="pt-[96px]">
+    <!-- ─── Encabezado ─── -->
+    <section class="shell pb-16 pt-10 sm:pt-16" aria-labelledby="projects-title">
+      <div class="grid gap-10 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-7">
+          <p class="eyebrow animate-fade" style="--d: 80ms">Portafolio</p>
+          <h1 id="projects-title" class="display-1 mt-6 text-fg">
+            <span class="line-mask"><span style="--d: 120ms">Proyectos</span></span>
+            <span class="line-mask"><span style="--d: 220ms" class="serif text-accent">DASTI.</span></span>
           </h1>
-          <p class="text-lg max-w-2xl mx-auto" style="color: var(--text-secondary);">
-            Los casos de proyectos desarrollados e implementados por DASTI se publicarán próximamente. Por ahora, aquí está la estructura lista para mostrar el trabajo real.
+        </div>
+        <div class="animate-rise lg:col-span-5" style="--d: 360ms">
+          <p class="lead">
+            Los casos de proyectos desarrollados e implementados por DASTI se publicarán próximamente. Por ahora, aquí está
+            la estructura lista para mostrar el trabajo real.
+          </p>
+          <p class="mt-4 flex items-center gap-2 text-sm text-fg-3">
+            <Clock :size="15" /> Publicación sujeta a la autorización de cada cliente.
           </p>
         </div>
       </div>
     </section>
 
-    <!-- Portfolio grid -->
-    <section class="py-16" style="background: var(--bg-surface);">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <!-- Category filters -->
-        <div
-          v-motion
-          :initial="{ opacity: 0, y: 12 }"
-          :visibleOnce="{ opacity: 1, y: 0, transition: { duration: 500 } }"
-          class="flex flex-wrap gap-2 justify-center mb-12"
-        >
-          <button
-            v-for="cat in categories"
-            :key="cat"
-            @click="activeCategory = cat"
-            class="px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200"
-            :style="activeCategory === cat
-              ? `background: var(--accent-glow-sm); color: var(--accent-lighter); border: 1px solid var(--border-accent);`
-              : `background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-subtle);`"
-          >
-            {{ cat }}
-          </button>
+    <!-- ─── Capacidades ─── -->
+    <section class="shell" aria-label="Áreas de trabajo">
+      <div class="grid gap-px overflow-hidden rounded-[28px] border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+        <div v-for="(c, i) in capabilities" :key="c.title" v-reveal="{ variant: 'up', delay: i * 80 }" class="bg-paper p-7">
+          <span class="tabular text-sm text-fg-3">0{{ i + 1 }}</span>
+          <h2 class="title-4 mt-10 text-fg">{{ c.title }}</h2>
+          <p class="mt-2 text-sm leading-relaxed text-fg-2">{{ c.desc }}</p>
         </div>
+      </div>
+    </section>
 
-        <!-- Project grid -->
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          <div
-            v-for="(proj, i) in filtered"
-            :key="proj.id"
-            v-motion
-            :initial="{ opacity: 0, y: 28 }"
-            :visibleOnce="{ opacity: 1, y: 0, transition: { delay: (i % 3) * 80, duration: 580 } }"
-            class="glass-card rounded-2xl overflow-hidden flex flex-col group shimmer-card"
-            style="box-shadow: var(--shadow-sm);"
-          >
-            <!-- Visual header (image placeholder) -->
-            <div
-              class="relative flex items-center justify-center flex-col gap-3"
-              style="height: 200px;"
-              :style="`background: linear-gradient(135deg, ${proj.color}18 0%, ${proj.color}06 100%);`"
+    <!-- ─── Casos ─── -->
+    <section class="section" aria-labelledby="cases-title">
+      <div class="shell">
+        <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <h2 id="cases-title" v-reveal="'clip'" class="display-3 text-fg">Casos de estudio</h2>
+          <div class="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0" role="group" aria-label="Filtrar por categoría">
+            <button
+              v-for="cat in projectCategories"
+              :key="cat"
+              type="button"
+              class="shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition-colors duration-300"
+              :class="activeCategory === cat ? 'border-ink bg-ink text-on-ink dark:border-on-ink dark:bg-on-ink dark:text-ink' : 'border-line-2 text-fg-2 hover:text-fg'"
+              :aria-pressed="activeCategory === cat"
+              @click="activeCategory = cat"
             >
-              <div class="absolute inset-0 pointer-events-none"
-                style="background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.012) 20px, rgba(255,255,255,0.012) 40px);" />
-              <!-- Large watermark icon -->
-              <component
-                :is="proj.icon" :size="80"
-                class="opacity-[0.07] transition-opacity duration-300 group-hover:opacity-[0.12]"
-                :style="`color: ${proj.color};`"
-              />
-              <!-- "Coming soon" overlay -->
-              <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                <span class="text-xs font-medium px-2.5 py-1 rounded-full"
-                  :style="`background: ${proj.color}18; color: ${proj.color}; border: 1px solid ${proj.color}30;`">
-                  {{ proj.category }}
-                </span>
-                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full"
-                  style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);">
-                  <Clock :size="11" style="color: #94A3B8;" />
-                  <span class="text-xs" style="color: #94A3B8;">Próximamente</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card body -->
-            <div class="p-6 flex-1 flex flex-col">
-              <h3 class="font-semibold text-lg mb-2" style="color: var(--text-primary);">{{ proj.name }}</h3>
-              <p class="text-sm leading-relaxed mb-4 flex-1" style="color: var(--text-muted);">
-                {{ proj.description }}
-              </p>
-
-              <!-- Tags -->
-              <div class="flex flex-wrap gap-1.5 mb-5">
-                <span
-                  v-for="tag in proj.tags"
-                  :key="tag"
-                  class="text-xs px-2 py-0.5 rounded-full"
-                  :style="`background: ${proj.color}10; color: ${proj.color}; border: 1px solid ${proj.color}20;`"
-                >
-                  {{ tag }}
-                </span>
-              </div>
-
-              <!-- CTAs -->
-              <div class="flex gap-2">
-                <button
-                  @click="router.push('/contacto')"
-                  class="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition-all duration-200"
-                  :style="`background: ${proj.color}15; color: ${proj.color}; border: 1px solid ${proj.color}30;`"
-                >
-                  Solicitar proyecto similar
-                  <ArrowRight :size="11" />
-                </button>
-                <button
-                  disabled
-                  class="flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg cursor-not-allowed opacity-40"
-                  style="background: var(--bg-elevated); border: 1px solid var(--border-subtle); color: var(--text-muted);"
-                  title="Enlace pendiente"
-                >
-                  <ExternalLink :size="11" />
-                </button>
-              </div>
-            </div>
+              {{ cat }}
+            </button>
           </div>
         </div>
 
-        <!-- Empty state notice -->
-        <div
-          v-motion
-          :initial="{ opacity: 0 }"
-          :visibleOnce="{ opacity: 1, transition: { duration: 600 } }"
-          class="text-center py-8"
+        <TransitionGroup
+          tag="div"
+          class="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3"
+          enter-active-class="transition duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          enter-from-class="opacity-0 translate-y-4"
+          leave-active-class="hidden"
         >
-          <div class="glass-card rounded-2xl p-8 max-w-lg mx-auto"
-            style="background: linear-gradient(135deg, var(--accent-glow-sm) 0%, var(--bg-card) 100%);">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4"
-              style="background: var(--accent-glow-sm); border: 1px solid var(--border-medium);">
-              <Clock :size="22" style="color: var(--accent-lighter);" />
+          <article
+            v-for="(proj, i) in filtered"
+            :key="proj.id"
+            class="group flex flex-col"
+            :class="i % 3 === 1 ? 'lg:translate-y-12' : ''"
+          >
+            <div class="relative aspect-[4/5] overflow-hidden rounded-[28px]">
+              <MediaFrame :src="proj.image" :alt="proj.name" :tone="i % 2 === 0 ? 'ink' : 'light'" :show-caption="false">
+                <template #placeholder>
+                  <span class="relative flex items-center justify-between text-[0.7rem] font-medium uppercase tracking-[0.18em]">
+                    {{ proj.category }}
+                    <span class="flex items-center gap-1.5 rounded-full border border-current/20 px-2.5 py-1 normal-case tracking-normal">
+                      <Clock :size="12" /> Próximamente
+                    </span>
+                  </span>
+                  <span class="relative">
+                    <span class="block font-serif text-2xl italic leading-tight opacity-90">Espacio reservado para caso de estudio</span>
+                    <span class="mt-3 block text-xs opacity-70">Imágenes, contexto y resultados se publicarán con autorización.</span>
+                  </span>
+                </template>
+              </MediaFrame>
             </div>
-            <h3 class="font-semibold text-lg mb-2" style="color: var(--text-primary);">
-              Casos en preparación
-            </h3>
-            <p class="text-sm mb-4" style="color: var(--text-secondary);">
-              Los proyectos reales de DASTI se publicarán aquí con nombre, descripción, imágenes y referencias una vez que los clientes lo autoricen.
+
+            <div class="mt-5 flex flex-1 flex-col px-1">
+              <h3 class="title-4 text-fg">{{ proj.name }}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-fg-2">{{ proj.description }}</p>
+              <div class="mt-4 flex flex-wrap gap-1.5">
+                <span v-for="tag in proj.tags" :key="tag" class="chip !py-1 !text-[0.72rem]">{{ tag }}</span>
+              </div>
+              <div class="mt-6 flex items-center gap-2">
+                <RouterLink to="/contacto" class="btn btn-ink btn-sm">
+                  Solicitar proyecto similar
+                  <span class="btn-orb"><ArrowUpRight :size="14" /></span>
+                </RouterLink>
+                <a
+                  v-if="proj.link"
+                  :href="proj.link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="icon-btn h-10 w-10"
+                  :aria-label="`Ver ${proj.name}`"
+                >
+                  <ExternalLink :size="15" />
+                </a>
+                <span v-else class="icon-btn h-10 w-10 cursor-not-allowed opacity-40" title="Enlace pendiente" aria-hidden="true">
+                  <ExternalLink :size="15" />
+                </span>
+              </div>
+            </div>
+          </article>
+        </TransitionGroup>
+
+        <div v-reveal="'up'" class="mt-24 grid gap-6 rounded-[28px] border border-dashed border-line-2 p-8 sm:p-10 lg:grid-cols-12 lg:items-center">
+          <div class="lg:col-span-8">
+            <h3 class="title-4 text-fg">Casos en preparación</h3>
+            <p class="mt-2 text-sm leading-relaxed text-fg-2">
+              Los proyectos reales de DASTI se publicarán aquí con nombre, descripción, imágenes y referencias una vez que
+              los clientes lo autoricen. Si quieres ver en qué tipo de proyectos trabajamos, visita la sección de servicios.
             </p>
-            <p class="text-xs" style="color: var(--text-muted);">
-              Si quieres ver en qué tipo de proyectos trabajamos, visita la sección de servicios.
-            </p>
+          </div>
+          <div class="lg:col-span-4 lg:text-right">
+            <RouterLink to="/servicios" class="btn btn-line">
+              Ver servicios
+              <span class="btn-orb"><ArrowUpRight :size="16" /></span>
+            </RouterLink>
           </div>
         </div>
       </div>
     </section>
 
     <LargeProjectsCTA />
-
   </div>
 </template>

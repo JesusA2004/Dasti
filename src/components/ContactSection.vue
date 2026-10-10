@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Send, MessageCircle, Mail, Phone, Clock, MapPin, Video, CalendarCheck, ChevronRight } from '@lucide/vue'
-import AnimatedParticles from '@/components/AnimatedParticles.vue'
-import { buildWhatsAppUrl } from '@/config/contact'
+import { ArrowUpRight, Send, MessageCircle, Mail, Phone, Clock, MapPin, Video, CalendarCheck } from '@lucide/vue'
+import WhatsAppIcon from '@/components/ui/WhatsAppIcon.vue'
+import { buildWhatsAppUrl, CONTACT_CONFIG } from '@/config/contact'
 
-const CONTACT_EMAIL = 'direcciondasti@gmail.com'
-const CONTACT_PHONE = '+52 777 442 8209'
-const BUSINESS_HOURS = 'Lunes a Viernes, 9:00 – 18:00 hrs'
+/*
+ * Contacto DASTI. La lógica del formulario (campos, honeypot, envío a
+ * /api/contact, estados de carga/error) y de los modos de contacto se
+ * conserva sin cambios; el rediseño sólo afecta la interfaz.
+ */
+const CONTACT_EMAIL = CONTACT_CONFIG.displayEmail
+const CONTACT_PHONE = CONTACT_CONFIG.phoneDisplay
+const BUSINESS_HOURS = CONTACT_CONFIG.businessHours
 
 const services = [
   'Desarrollo web', 'Software a medida', 'Correos corporativos',
@@ -106,304 +111,263 @@ const selectMode = (mode: ContactMode) => {
   }
   selectedMode.value = mode
 }
+
+const activeMode = () => contactModes.find(m => m.id === selectedMode.value)
 </script>
 
 <template>
-  <section id="contacto" class="relative overflow-hidden" style="background: var(--bg-base);">
+  <section id="contacto" class="pb-24 pt-[96px]" aria-labelledby="contact-title">
+    <!-- ─── Encabezado ─── -->
+    <div class="shell grid gap-10 pb-12 pt-10 sm:pt-16 lg:grid-cols-12 lg:items-end lg:pb-16">
+      <div class="lg:col-span-7">
+        <p class="eyebrow animate-fade" style="--d: 80ms">Contacto</p>
+        <h1 id="contact-title" class="display-1 mt-6 text-fg">
+          <span class="line-mask"><span style="--d: 120ms">Hablemos de tu</span></span>
+          <span class="line-mask"><span style="--d: 220ms">solución <em class="serif font-normal text-accent">en TI.</em></span></span>
+        </h1>
+      </div>
+      <p class="lead animate-rise lg:col-span-5" style="--d: 360ms">
+        Elige cómo prefieres comunicarte. Escuchamos lo que necesitas y te orientamos sin compromiso.
+      </p>
+    </div>
 
-    <!-- Hero image area -->
-    <div class="relative h-72 sm:h-80 overflow-hidden">
+    <!-- ─── Imagen ─── -->
+    <div class="stage animate-fade relative h-56 sm:h-72 lg:h-80" style="--d: 300ms">
       <img
-        src="https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=1600&auto=format&fit=crop&q=75"
+        src="https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=1800&auto=format&fit=crop&q=75"
         alt="Contacta a DASTI para asesoría en soluciones de Tecnologías de la Información en Morelos"
-        class="w-full h-full object-cover"
+        class="h-full w-full object-cover"
         loading="eager"
         decoding="async"
-        width="1600"
+        width="1800"
         height="640"
       />
-      <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.35), var(--bg-base) 88%);" />
-      <div class="absolute inset-0" style="background: linear-gradient(to right, var(--bg-base) 0%, transparent 25%, transparent 75%, var(--bg-base) 100%);" />
-
-      <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-        <span class="tag mb-4">Contacto</span>
-        <h1 class="display-text text-3xl sm:text-4xl lg:text-5xl" style="color: var(--text-primary);">
-          Hablemos de tu solución
-          <span class="gradient-text"> en TI</span>
-        </h1>
+      <div class="absolute inset-0 bg-gradient-to-r from-[#071426]/70 via-[#071426]/20 to-transparent" />
+      <div class="glass-light absolute bottom-4 left-4 flex items-center gap-3 rounded-full py-2 pl-2 pr-5 sm:bottom-6 sm:left-6">
+        <span class="grid h-9 w-9 place-items-center rounded-full bg-[#071426] text-white"><Clock :size="15" /></span>
+        <span class="text-xs font-medium sm:text-sm">{{ BUSINESS_HOURS }}</span>
       </div>
     </div>
 
-    <!-- Contact modes selection -->
-    <div class="relative py-16" style="background: var(--bg-base);">
-      <AnimatedParticles density="low" variant="dots" size="sm" :opacity="0.55" speed="slow" />
-      <div class="orb w-[500px] h-[400px] top-0 right-0 opacity-12" style="background: var(--accent-glow);" />
-
-      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <p class="text-center text-base mb-8" style="color: var(--text-secondary);">
-          Selecciona cómo quieres contactarnos:
-        </p>
-
-        <!-- 4 large mode cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-          <button
-            v-for="mode in contactModes"
-            :key="mode.id"
-            @click="selectMode(mode.id)"
-            :aria-label="`Contactar por ${mode.title}`"
-            :aria-pressed="selectedMode === mode.id"
-            class="group relative flex flex-col items-center text-center p-5 sm:p-7 rounded-2xl transition-all duration-300"
-            :style="`
-              background: ${selectedMode === mode.id ? mode.color + '12' : 'var(--bg-card)'};
-              border: 1.5px solid ${selectedMode === mode.id ? mode.color + '55' : 'var(--border-subtle)'};
-              box-shadow: ${selectedMode === mode.id ? `0 0 32px ${mode.color}18, 0 4px 20px rgba(0,0,0,0.15)` : 'var(--shadow-sm)'};
-              transform: ${selectedMode === mode.id ? 'translateY(-4px)' : 'translateY(0)'};
-              backdrop-filter: blur(12px);
-            `"
+    <!-- ─── Modalidades ─── -->
+    <div class="shell mt-14">
+      <p class="mb-5 text-sm text-fg-2">Selecciona cómo quieres contactarnos:</p>
+      <div class="grid grid-cols-2 gap-3 lg:grid-cols-4" role="group" aria-label="Modalidad de contacto">
+        <button
+          v-for="mode in contactModes"
+          :key="mode.id"
+          type="button"
+          class="group relative flex flex-col items-start rounded-[24px] border p-5 text-left transition-all duration-300 sm:p-6"
+          :class="selectedMode === mode.id ? 'border-ink bg-ink text-on-ink shadow-[var(--shadow-float)] dark:border-on-ink dark:bg-on-ink dark:text-ink' : 'border-line bg-surface text-fg hover:border-line-2'"
+          :aria-label="`Contactar por ${mode.title}`"
+          :aria-pressed="selectedMode === mode.id"
+          @click="selectMode(mode.id)"
+        >
+          <span
+            class="grid h-11 w-11 place-items-center rounded-full transition-colors duration-300"
+            :class="selectedMode === mode.id ? 'bg-white/15 dark:bg-ink/10' : 'bg-accent-soft text-accent'"
           >
-            <!-- Icon -->
-            <div
-              class="w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 group-hover:scale-110"
-              :style="`
-                background: ${mode.color}18;
-                border: 1.5px solid ${mode.color}${selectedMode === mode.id ? '50' : '25'};
-                box-shadow: ${selectedMode === mode.id ? `0 0 20px ${mode.color}30` : 'none'};
-              `"
-            >
-              <component :is="mode.icon" :size="24" :style="`color: ${mode.color};`" />
-            </div>
+            <component :is="mode.icon" :size="19" />
+          </span>
+          <span class="mt-8 font-display text-lg font-semibold tracking-tight">{{ mode.title }}</span>
+          <span class="mt-0.5 text-xs opacity-70">{{ mode.sub }}</span>
+          <ArrowUpRight
+            v-if="mode.id !== 'form'"
+            :size="16"
+            class="absolute right-5 top-5 opacity-40 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
+          />
+        </button>
+      </div>
+    </div>
 
-            <h3 class="font-display font-bold text-sm sm:text-base mb-1" style="color: var(--text-primary);">
-              {{ mode.title }}
-            </h3>
-            <p class="text-xs" :style="`color: ${selectedMode === mode.id ? mode.color : 'var(--text-muted)'};`">
-              {{ mode.sub }}
-            </p>
-
-            <!-- Selected indicator -->
-            <div
-              v-if="selectedMode === mode.id"
-              class="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-1 rounded-t-full"
-              :style="`background: ${mode.color};`"
-            />
-
-            <!-- Hover line on cards that launch action -->
-            <div
-              v-if="mode.id !== 'form'"
-              class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
-              style="color: var(--text-muted);"
-            >
-              <ChevronRight :size="14" />
-            </div>
+    <!-- ─── Detalle / formulario ─── -->
+    <div class="shell mt-10">
+      <Transition
+        mode="out-in"
+        enter-active-class="transition duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        enter-from-class="opacity-0 translate-y-5"
+        leave-active-class="transition duration-200 ease-in"
+        leave-to-class="opacity-0"
+      >
+        <!-- Modalidades que abren WhatsApp -->
+        <div v-if="selectedMode && selectedMode !== 'form'" :key="selectedMode" class="card mx-auto max-w-3xl p-8 text-center sm:p-12">
+          <span class="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent-soft text-accent">
+            <component :is="activeMode()?.icon" :size="24" />
+          </span>
+          <h2 class="display-3 mt-6 text-fg">{{ activeMode()?.title }}</h2>
+          <p class="lead mx-auto mt-3 max-w-lg">{{ activeMode()?.desc }}</p>
+          <button type="button" class="btn btn-wa mt-8" @click="activeMode()?.action()">
+            Contactar por {{ activeMode()?.title }}
+            <span class="btn-orb"><WhatsAppIcon :size="16" /></span>
           </button>
         </div>
 
-        <!-- Mode detail / form area -->
-        <Transition
-          enter-active-class="transition-all duration-450 ease-out"
-          enter-from-class="opacity-0 translate-y-6"
-          enter-to-class="opacity-100 translate-y-0"
-          leave-active-class="transition-all duration-250 ease-in"
-          leave-from-class="opacity-100"
-          leave-to-class="opacity-0"
-          mode="out-in"
-        >
-          <!-- Non-form modes: show info + quick action -->
-          <div
-            v-if="selectedMode && selectedMode !== 'form'"
-            :key="selectedMode"
-            class="max-w-2xl mx-auto"
-          >
-            <div
-              class="rounded-2xl p-8 text-center relative overflow-hidden"
-              :style="`background: var(--bg-card); border: 1px solid ${contactModes.find(m => m.id === selectedMode)?.color}30; backdrop-filter: blur(20px);`"
-            >
-              <div
-                class="absolute inset-0 pointer-events-none"
-                :style="`background: radial-gradient(ellipse at 50% 0%, ${contactModes.find(m => m.id === selectedMode)?.color}12 0%, transparent 65%);`"
-              />
-              <div class="relative">
-                <div
-                  class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-                  :style="`background: ${contactModes.find(m => m.id === selectedMode)?.color}18; border: 1.5px solid ${contactModes.find(m => m.id === selectedMode)?.color}35;`"
-                >
-                  <component
-                    :is="contactModes.find(m => m.id === selectedMode)?.icon"
-                    :size="28"
-                    :style="`color: ${contactModes.find(m => m.id === selectedMode)?.color};`"
-                  />
-                </div>
-                <h3 class="font-display font-bold text-xl mb-2" style="color: var(--text-primary);">
-                  {{ contactModes.find(m => m.id === selectedMode)?.title }}
-                </h3>
-                <p class="text-base mb-6" style="color: var(--text-secondary);">
-                  {{ contactModes.find(m => m.id === selectedMode)?.desc }}
+        <!-- Formulario -->
+        <div v-else-if="selectedMode === 'form'" key="form" class="grid gap-6 lg:grid-cols-12">
+          <!-- Información -->
+          <div class="on-ink grain relative overflow-hidden rounded-[30px] p-7 sm:p-9 lg:col-span-5">
+            <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_60%_at_100%_0%,rgba(37,99,235,0.35),transparent_70%)]" aria-hidden="true" />
+            <div class="relative flex h-full flex-col">
+              <p class="font-display text-2xl font-semibold">DASTI</p>
+              <p class="mt-1 text-sm text-on-ink-2">Desarrollo y Aplicación de Soluciones en TI.</p>
+
+              <ul class="mt-10 space-y-5">
+                <li>
+                  <a :href="`mailto:${CONTACT_EMAIL}`" class="group flex items-start gap-4">
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-ink-line"><Mail :size="16" /></span>
+                    <span class="min-w-0">
+                      <span class="block text-xs text-on-ink-3">Correo</span>
+                      <span class="link-u block break-all text-sm text-on-ink">{{ CONTACT_EMAIL }}</span>
+                    </span>
+                  </a>
+                </li>
+                <li class="flex items-start gap-4">
+                  <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-ink-line"><Phone :size="16" /></span>
+                  <span>
+                    <span class="block text-xs text-on-ink-3">Teléfono</span>
+                    <span class="block text-sm text-on-ink">{{ CONTACT_PHONE }}</span>
+                  </span>
+                </li>
+                <li class="flex items-start gap-4">
+                  <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-ink-line"><Clock :size="16" /></span>
+                  <span>
+                    <span class="block text-xs text-on-ink-3">Horario</span>
+                    <span class="block text-sm text-on-ink">{{ BUSINESS_HOURS }}</span>
+                  </span>
+                </li>
+                <li class="flex items-start gap-4">
+                  <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-ink-line"><MapPin :size="16" /></span>
+                  <span>
+                    <span class="block text-xs text-on-ink-3">Ubicación</span>
+                    <span class="block text-sm text-on-ink">Morelos · Cuernavaca, México</span>
+                  </span>
+                </li>
+              </ul>
+
+              <div class="mt-auto pt-10">
+                <p class="text-sm leading-relaxed text-on-ink-2">
+                  ¿Proyecto grande o complejo? Podemos coordinar una videollamada o junta presencial para revisar
+                  necesidades, alcance y tiempos.
                 </p>
-                <button
-                  @click="contactModes.find(m => m.id === selectedMode)?.action()"
-                  class="btn-primary"
-                  :style="`background: linear-gradient(135deg, ${contactModes.find(m => m.id === selectedMode)?.color}DD, ${contactModes.find(m => m.id === selectedMode)?.color});`"
-                >
-                  <component :is="contactModes.find(m => m.id === selectedMode)?.icon" :size="16" />
-                  Contactar por {{ contactModes.find(m => m.id === selectedMode)?.title }}
+                <button type="button" class="btn btn-ghost-ink btn-sm mt-5" @click="openWhatsApp">
+                  WhatsApp
+                  <span class="btn-orb"><WhatsAppIcon :size="14" /></span>
                 </button>
               </div>
             </div>
           </div>
 
-          <!-- Form mode -->
-          <div v-else-if="selectedMode === 'form'" key="form">
-            <div class="grid lg:grid-cols-5 gap-10">
-
-              <!-- Left: info + quick links -->
-              <div
-                v-motion
-                :initial="{ opacity: 0, x: -20 }"
-                :visibleOnce="{ opacity: 1, x: 0, transition: { duration: 600 } }"
-                class="lg:col-span-2 space-y-4"
-              >
-                <div class="rounded-2xl p-5" style="background: var(--bg-card); border: 1px solid var(--border-subtle);">
-                  <h3 class="font-display font-bold text-lg mb-1" style="color: var(--text-primary);">DASTI</h3>
-                  <p class="text-sm" style="color: var(--text-secondary);">Desarrollo y Aplicación de Soluciones en TI.</p>
-                </div>
-
-                <div class="space-y-2.5">
-                  <a :href="`mailto:${CONTACT_EMAIL}`" class="flex items-center gap-3 p-3.5 rounded-xl group transition-all duration-200" style="background: var(--bg-card); border: 1px solid var(--border-subtle);">
-                    <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.25);">
-                      <Mail :size="16" style="color: #3B82F6;" />
-                    </div>
-                    <div>
-                      <div class="text-xs" style="color: var(--text-muted);">Correo</div>
-                      <div class="text-sm transition-colors" style="color: var(--text-secondary);">{{ CONTACT_EMAIL }}</div>
-                    </div>
-                  </a>
-
-                  <div class="flex items-center gap-3 p-3.5 rounded-xl" style="background: var(--bg-card); border: 1px solid var(--border-subtle);">
-                    <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.25);">
-                      <Phone :size="16" style="color: #34D399;" />
-                    </div>
-                    <div>
-                      <div class="text-xs" style="color: var(--text-muted);">Teléfono</div>
-                      <div class="text-sm" style="color: var(--text-secondary);">{{ CONTACT_PHONE }}</div>
-                    </div>
-                  </div>
-
-                  <div class="flex items-center gap-3 p-3.5 rounded-xl" style="background: var(--bg-card); border: 1px solid var(--border-subtle);">
-                    <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.25);">
-                      <Clock :size="16" style="color: #FBBF24;" />
-                    </div>
-                    <div>
-                      <div class="text-xs" style="color: var(--text-muted);">Horario</div>
-                      <div class="text-sm" style="color: var(--text-secondary);">{{ BUSINESS_HOURS }}</div>
-                    </div>
-                  </div>
-
-                  <div class="flex items-center gap-3 p-3.5 rounded-xl" style="background: var(--bg-card); border: 1px solid var(--border-subtle);">
-                    <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(244,114,182,0.12); border: 1px solid rgba(244,114,182,0.25);">
-                      <MapPin :size="16" style="color: #F472B6;" />
-                    </div>
-                    <div>
-                      <div class="text-xs" style="color: var(--text-muted);">Ubicación</div>
-                      <div class="text-sm" style="color: var(--text-secondary);">Morelos · Cuernavaca, México</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Right: Form -->
-              <div
-                v-motion
-                :initial="{ opacity: 0, x: 20 }"
-                :visibleOnce="{ opacity: 1, x: 0, transition: { duration: 600, delay: 100 } }"
-                class="lg:col-span-3"
-              >
-                <div class="rounded-2xl p-7 sm:p-8" style="background: var(--bg-card); border: 1px solid var(--border-medium); backdrop-filter: blur(20px);">
-
-                  <!-- Success state -->
-                  <div v-if="submitted" class="text-center py-8">
-                    <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style="background: rgba(34,197,94,0.12); border: 2px solid rgba(34,197,94,0.3);">
-                      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                        <path d="M5 14L11 20L23 8" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </div>
-                    <h3 class="font-display font-bold text-xl mb-2" style="color: var(--text-primary);">Mensaje enviado</h3>
-                    <p class="text-sm mb-6" style="color: var(--text-secondary);">Gracias por contactarnos. Te responderemos a la brevedad a <strong>{{ form.email || 'la brevedad' }}</strong>.</p>
-                    <button @click="resetForm" class="btn-outline text-sm">Enviar otro mensaje</button>
-                  </div>
-
-                  <!-- Form -->
-                  <form v-else @submit.prevent="handleSubmit" class="space-y-4">
-                    <!-- Honeypot: hidden from users, bots fill it and get rejected -->
-                    <input v-model="form.website_url" type="text" name="website_url" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;" aria-hidden="true" />
-
-                    <div class="grid sm:grid-cols-2 gap-4">
-                      <div>
-                        <label class="block text-xs font-medium mb-1.5" style="color: var(--text-secondary);">Nombre *</label>
-                        <input v-model="form.name" type="text" required placeholder="Tu nombre" class="input-theme" />
-                      </div>
-                      <div>
-                        <label class="block text-xs font-medium mb-1.5" style="color: var(--text-secondary);">Empresa</label>
-                        <input v-model="form.company" type="text" placeholder="Nombre de tu empresa" class="input-theme" />
-                      </div>
-                    </div>
-
-                    <div class="grid sm:grid-cols-2 gap-4">
-                      <div>
-                        <label class="block text-xs font-medium mb-1.5" style="color: var(--text-secondary);">Teléfono</label>
-                        <input v-model="form.phone" type="tel" placeholder="+52 (XXX) XXX XXXX" class="input-theme" />
-                      </div>
-                      <div>
-                        <label class="block text-xs font-medium mb-1.5" style="color: var(--text-secondary);">Correo *</label>
-                        <input v-model="form.email" type="email" required placeholder="tu@empresa.com" class="input-theme" />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label class="block text-xs font-medium mb-1.5" style="color: var(--text-secondary);">Servicio de interés</label>
-                      <select v-model="form.service" class="input-theme cursor-pointer">
-                        <option value="" disabled>Selecciona un servicio</option>
-                        <option v-for="svc in services" :key="svc" :value="svc">{{ svc }}</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label class="block text-xs font-medium mb-1.5" style="color: var(--text-secondary);">Mensaje *</label>
-                      <textarea v-model="form.message" required rows="4" placeholder="Cuéntanos brevemente qué necesita tu empresa..." class="input-theme resize-none" />
-                    </div>
-
-                    <!-- Error message -->
-                    <div v-if="sendError" class="flex items-start gap-2.5 p-3 rounded-xl text-sm" style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #f87171;">
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="flex-shrink-0 mt-0.5"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 5zm0 7.5a.875.875 0 1 1 0-1.75.875.875 0 0 1 0 1.75z"/></svg>
-                      <span>{{ sendError }}</span>
-                    </div>
-
-                    <div class="flex flex-wrap gap-3">
-                      <button type="submit" :disabled="sending" class="btn-primary flex-1 justify-center">
-                        <span v-if="sending" class="flex items-center gap-2">
-                          <svg class="animate-spin" width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="32" stroke-dashoffset="12"/></svg>
-                          Enviando...
-                        </span>
-                        <span v-else class="flex items-center gap-2 justify-center w-full">
-                          Enviar mensaje <Send :size="15" />
-                        </span>
-                      </button>
-                      <button type="button" @click="openWhatsApp" class="btn-outline" style="border-color: rgba(37,211,102,0.3); color: #25D366;">
-                        <MessageCircle :size="15" />
-                        WhatsApp
-                      </button>
-                    </div>
-
-                    <p class="text-xs text-center" style="color: var(--text-muted);">
-                      También puedes contactarnos directamente por WhatsApp si prefieres atención inmediata.
-                    </p>
-                  </form>
-                </div>
-              </div>
+          <!-- Formulario -->
+          <div class="card p-6 sm:p-9 lg:col-span-7">
+            <!-- Éxito -->
+            <div v-if="submitted" class="py-10 text-center" role="status">
+              <span class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500/10">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                  <path d="M5 14L11 20L23 8" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <h2 class="display-3 mt-6 text-fg">Mensaje enviado</h2>
+              <p class="mx-auto mt-3 max-w-md text-sm text-fg-2">
+                Gracias por contactarnos. Te responderemos a la brevedad a <strong>{{ form.email || 'la brevedad' }}</strong>.
+              </p>
+              <button type="button" class="btn btn-line btn-plain mt-8" @click="resetForm">Enviar otro mensaje</button>
             </div>
+
+            <form v-else class="space-y-5" @submit.prevent="handleSubmit">
+              <!-- Honeypot: oculto para personas; si un bot lo llena, el servidor lo rechaza -->
+              <input
+                v-model="form.website_url"
+                type="text"
+                name="website_url"
+                tabindex="-1"
+                autocomplete="off"
+                style="position:absolute;left:-9999px;opacity:0;height:0;width:0;"
+                aria-hidden="true"
+              />
+
+              <div>
+                <h2 class="title-4 text-fg">Envíanos un mensaje</h2>
+                <p class="mt-1 text-sm text-fg-3">Los campos marcados con * son obligatorios.</p>
+              </div>
+
+              <div class="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label for="cf-name" class="field-label">Nombre *</label>
+                  <input id="cf-name" v-model="form.name" type="text" required autocomplete="name" placeholder="Tu nombre" class="field" />
+                </div>
+                <div>
+                  <label for="cf-company" class="field-label">Empresa</label>
+                  <input id="cf-company" v-model="form.company" type="text" autocomplete="organization" placeholder="Nombre de tu empresa" class="field" />
+                </div>
+              </div>
+
+              <div class="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label for="cf-phone" class="field-label">Teléfono</label>
+                  <input id="cf-phone" v-model="form.phone" type="tel" autocomplete="tel" placeholder="+52 (XXX) XXX XXXX" class="field" />
+                </div>
+                <div>
+                  <label for="cf-email" class="field-label">Correo *</label>
+                  <input id="cf-email" v-model="form.email" type="email" required autocomplete="email" placeholder="tu@empresa.com" class="field" />
+                </div>
+              </div>
+
+              <div>
+                <label for="cf-service" class="field-label">Servicio de interés</label>
+                <select id="cf-service" v-model="form.service" class="field cursor-pointer">
+                  <option value="" disabled>Selecciona un servicio</option>
+                  <option v-for="svc in services" :key="svc" :value="svc">{{ svc }}</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="cf-message" class="field-label">Mensaje *</label>
+                <textarea
+                  id="cf-message"
+                  v-model="form.message"
+                  required
+                  rows="5"
+                  placeholder="Cuéntanos brevemente qué necesita tu empresa..."
+                  class="field resize-none"
+                />
+              </div>
+
+              <!-- Error -->
+              <div
+                v-if="sendError"
+                class="flex items-start gap-2.5 rounded-2xl border border-red-500/25 bg-red-500/[0.07] p-3.5 text-sm text-red-600 dark:text-red-400"
+                role="alert"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="mt-0.5 shrink-0" aria-hidden="true">
+                  <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 5zm0 7.5a.875.875 0 1 1 0-1.75.875.875 0 0 1 0 1.75z" />
+                </svg>
+                <span>{{ sendError }}</span>
+              </div>
+
+              <div class="flex flex-col gap-3 pt-2 sm:flex-row">
+                <button type="submit" :disabled="sending" class="btn btn-accent btn-block sm:flex-1">
+                  <span v-if="sending" class="flex items-center gap-2">
+                    <svg class="animate-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="32" stroke-dashoffset="12" />
+                    </svg>
+                    Enviando...
+                  </span>
+                  <span v-else>Enviar mensaje</span>
+                  <span class="btn-orb"><Send :size="15" /></span>
+                </button>
+                <button type="button" class="btn btn-line btn-block sm:w-auto" @click="openWhatsApp">
+                  WhatsApp
+                  <span class="btn-orb text-[#128C4A]"><MessageCircle :size="15" /></span>
+                </button>
+              </div>
+
+              <p class="text-center text-xs text-fg-3">
+                También puedes contactarnos directamente por WhatsApp si prefieres atención inmediata.
+              </p>
+            </form>
           </div>
-        </Transition>
-      </div>
+        </div>
+      </Transition>
     </div>
   </section>
 </template>

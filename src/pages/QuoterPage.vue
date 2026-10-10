@@ -3,7 +3,7 @@ import QuoterSection from '@/components/QuoterSection.vue'
 </script>
 
 <template>
-  <div class="pt-18">
+  <div>
     <QuoterSection />
   </div>
 </template>

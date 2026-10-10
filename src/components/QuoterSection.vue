@@ -1,120 +1,16 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import {
-  Globe, Code2, Zap, Bot, Mail, Monitor, Wrench, Wifi, Printer,
-  Plus, Minus, CheckSquare, Square, MessageCircle, ChevronDown, ChevronUp, Info, Tag,
-} from '@lucide/vue'
-import AnimatedParticles from '@/components/AnimatedParticles.vue'
+import { ArrowUpRight, Check, ChevronDown, Info, Minus, Plus, Tag } from '@lucide/vue'
+import WhatsAppIcon from '@/components/ui/WhatsAppIcon.vue'
 import { buildWhatsAppUrl } from '@/config/contact'
+import { servicesDef, getEquipmentDiscount, VOLUME_DISCOUNT_SCALE, type ServiceDef } from '@/data/quoter'
 
-const router = useRouter()
-
-interface Tier { name: string; price: number; custom?: boolean; note?: string }
-interface MonthlyOption { name: string; price: number }
-
-interface ServiceDef {
-  id: string; icon: any; name: string; color: string; category: string
-  tiers: Tier[]; hasQuantity?: boolean; note?: string
-  mandatoryMonthly?: MonthlyOption[]
-}
-
-const servicesDef: ServiceDef[] = [
-  {
-    id: 'web', icon: Globe, name: 'Desarrollo web', color: '#818CF8', category: 'Software y desarrollo',
-    tiers: [
-      { name: 'Landing page profesional', price: 6000 },
-      { name: 'Sitio corporativo', price: 12000 },
-      { name: 'Sitio corporativo avanzado', price: 18000 },
-      { name: 'Sitio con funciones personalizadas', price: 25000, note: 'Precio de referencia; puede variar según alcance y funcionalidades' },
-    ],
-  },
-  {
-    id: 'software', icon: Code2, name: 'Software a medida', color: '#3B82F6', category: 'Software y desarrollo',
-    tiers: [
-      { name: 'Sistema interno básico', price: 25000 },
-      { name: 'Sistema administrativo con usuarios y reportes', price: 45000 },
-      { name: 'Sistema por módulos', price: 80000, note: 'Precio de referencia; puede variar según módulos y alcance' },
-      { name: 'Proyecto empresarial por alcance', price: 0, custom: true },
-    ],
-  },
-  {
-    id: 'email', icon: Mail, name: 'Correos corporativos', color: '#F472B6', category: 'Correos corporativos',
-    mandatoryMonthly: [
-      { name: 'Administración mensual estándar', price: 7500 },
-      { name: 'Administración mensual prioritaria', price: 9000 },
-    ],
-    tiers: [
-      { name: 'Implementación inicial (hasta 100 cuentas)', price: 20000, note: 'Incluye configuración técnica, cuentas por área, SPF/DKIM/DMARC y soporte de arranque' },
-    ],
-    note: 'La administración mensual es obligatoria e incluye soporte continuo, gestión de cuentas y renovaciones. Cuenta adicional: $70/mes. 10 GB adicionales: $150/mes.',
-  },
-  {
-    id: 'network', icon: Wifi, name: 'Redes e infraestructura', color: '#60A5FA', category: 'Redes e infraestructura',
-    tiers: [
-      { name: 'Diagnóstico de red', price: 1500 },
-      { name: 'Configuración básica de red', price: 3500 },
-      { name: 'Sistema mesh básico (2 puntos de acceso)', price: 9500, note: 'Incluye instalación y configuración de roaming automático' },
-      { name: 'Sistema mesh oficina (3 puntos de acceso)', price: 14500, note: 'Cobertura ampliada con roaming automático' },
-      { name: 'Sistema mesh empresarial (4+ puntos)', price: 22000, note: 'Red unificada con cobertura total y roaming automático' },
-      { name: 'Nodo adicional instalado y configurado', price: 4500 },
-      { name: 'Proyecto de red por alcance', price: 0, custom: true },
-    ],
-    note: 'Los sistemas mesh permiten cubrir toda la empresa con una sola red WiFi inteligente y roaming automático.',
-  },
-  {
-    id: 'equipment', icon: Monitor, name: 'Equipos de cómputo', color: '#FB923C', category: 'Equipos de cómputo',
-    hasQuantity: true,
-    tiers: [
-      { name: 'Actualización básica', price: 5000, note: 'Mejora de velocidad con SSD o RAM' },
-      { name: 'Actualización avanzada', price: 8000, note: 'Rendimiento, limpieza y configuración' },
-      { name: 'Equipo administrativo nuevo', price: 12000, note: 'Oficina, correo, documentos, sistemas básicos' },
-      { name: 'Equipo empresarial multitarea', price: 18000, note: 'Uso administrativo fuerte y multitarea' },
-      { name: 'Equipo de alto rendimiento', price: 25000, note: 'Mayor carga de trabajo y exigencia' },
-    ],
-    note: 'Descuento por volumen aplicado sobre integración y configuración.',
-  },
-  {
-    id: 'printers', icon: Printer, name: 'Impresoras y periféricos', color: '#2DD4BF', category: 'Equipos y periféricos',
-    tiers: [
-      { name: 'Suministro multimarca (cotización)', price: 0, custom: true, note: 'Disponibilidad varía según marca, modelo y proveedor.' },
-      { name: 'Instalación y configuración básica', price: 350 },
-      { name: 'Configuración en red', price: 500 },
-      { name: 'Soporte o diagnóstico', price: 600 },
-    ],
-    note: 'Sujeto a existencia, marca, modelo y requerimientos del cliente.',
-  },
-  {
-    id: 'support', icon: Wrench, name: 'Soporte técnico', color: '#A78BFA', category: 'Soporte técnico',
-    tiers: [
-      { name: 'Diagnóstico de equipo', price: 350 },
-      { name: 'Mantenimiento preventivo', price: 600 },
-      { name: 'Configuración de impresora o escáner', price: 350 },
-      { name: 'Configuración de correo en equipo', price: 250 },
-      { name: 'Optimización de sistema', price: 800 },
-      { name: 'Soporte especializado', price: 1200 },
-    ],
-  },
-  {
-    id: 'automation', icon: Zap, name: 'Automatización e integración', color: '#34D399', category: 'Automatización e integración',
-    tiers: [
-      { name: 'Automatización básica', price: 7500 },
-      { name: 'Reportes automáticos', price: 15000 },
-      { name: 'Integración con APIs externas', price: 25000 },
-      { name: 'Integración entre sistemas internos', price: 35000 },
-      { name: 'Automatización avanzada por alcance', price: 0, custom: true },
-    ],
-  },
-  {
-    id: 'chatbot', icon: Bot, name: 'Chatbots y asistentes digitales', color: '#FBBF24', category: 'Automatización e integración',
-    tiers: [
-      { name: 'Bot básico de respuestas frecuentes', price: 8000 },
-      { name: 'Bot con flujo comercial y captación de datos', price: 15000 },
-      { name: 'Bot avanzado con integración a sistemas', price: 28000 },
-      { name: 'Bot empresarial a medida', price: 0, custom: true },
-    ],
-  },
-]
+/*
+ * Cotizador DASTI.
+ * Catálogo, precios y descuentos: src/data/quoter.ts (sin cambios).
+ * La lógica de selección, cálculo y mensaje de WhatsApp se conserva
+ * idéntica a la versión anterior; el rediseño sólo afecta la interfaz.
+ */
 
 interface Selection { tierIndex: number; quantity: number; monthlyOptionIndex: number }
 
@@ -150,14 +46,6 @@ const adjustQty = (id: string, delta: number) => {
   const s = selections.value[id]
   if (!s) return
   selections.value[id] = { ...s, quantity: Math.max(1, s.quantity + delta) }
-}
-
-const getEquipmentDiscount = (qty: number): number => {
-  if (qty >= 21) return 0.15
-  if (qty >= 11) return 0.10
-  if (qty >= 6) return 0.08
-  if (qty >= 3) return 0.05
-  return 0
 }
 
 const getDiscountLabel = (qty: number): string => {
@@ -253,440 +141,380 @@ const categories = computed(() => {
   })
   return cats
 })
+
+/* ── Sólo interfaz ── */
+const guideSteps = [
+  { n: '1', label: 'Selecciona servicios' },
+  { n: '2', label: 'Ajusta cantidades' },
+  { n: '3', label: 'Revisa la inversión' },
+  { n: '4', label: 'Envía por WhatsApp' },
+]
+const guideStep = computed(() => (selectedCount.value === 0 ? 0 : 2))
+
+const minPrice = (svc: ServiceDef) => Math.min(...svc.tiers.filter(t => !t.custom).map(t => t.price))
+const toggleExpanded = (id: string) => {
+  expandedId.value = expandedId.value === id ? null : id
+}
+const scrollToSummary = () => {
+  document.getElementById('resumen')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 </script>
 
 <template>
-  <section id="cotizador" class="relative py-24 overflow-hidden" style="background: var(--bg-base);">
-    <div class="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
-    <AnimatedParticles density="low" variant="minimal" :opacity="0.6" speed="slow" />
-    <div class="orb w-[500px] h-[500px] top-1/2 left-0 -translate-y-1/2 opacity-10"
-      style="background: var(--accent-glow);" />
-
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-      <!-- 4-step usage guide -->
-      <div
-        v-motion
-        :initial="{ opacity: 0, y: 16 }"
-        :visibleOnce="{ opacity: 1, y: 0, transition: { duration: 500 } }"
-        class="flex flex-wrap items-center justify-center gap-2 mb-12"
-      >
-        <div
-          v-for="(step, i) in [
-            { n: '1', label: 'Selecciona servicios', color: '#3B82F6' },
-            { n: '2', label: 'Ajusta cantidades', color: '#34D399' },
-            { n: '3', label: 'Revisa la inversión', color: '#F472B6' },
-            { n: '4', label: 'Envía por WhatsApp', color: '#FBBF24' },
-          ]"
-          :key="i"
-          class="flex items-center gap-1.5"
-        >
-          <div
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
-            :style="`background: ${step.color}12; color: ${step.color}; border: 1px solid ${step.color}28;`"
-          >
-            <span
-              class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-              :style="`background: ${step.color};`"
-            >{{ step.n }}</span>
-            {{ step.label }}
-          </div>
-          <span v-if="i < 3" class="text-xs" style="color: var(--border-medium);">→</span>
-        </div>
-      </div>
-
-      <!-- Header -->
-      <div
-        v-motion
-        :initial="{ opacity: 0, y: 20 }"
-        :visibleOnce="{ opacity: 1, y: 0, transition: { duration: 600 } }"
-        class="text-center mb-16"
-      >
-        <span class="tag mb-4 inline-block">Cotizador aproximado</span>
-        <h1 class="display-text text-3xl sm:text-4xl lg:text-5xl mb-5" style="color: var(--text-primary);">
-          Cotizador aproximado
-          <span class="gradient-text block">de servicios TI</span>
+  <section id="cotizador" class="pb-24 pt-[96px]" aria-labelledby="quoter-title">
+    <!-- ─── Encabezado ─── -->
+    <div class="shell grid gap-12 pb-14 pt-10 sm:pt-16 lg:grid-cols-12 lg:items-end lg:pb-20">
+      <div class="lg:col-span-7">
+        <p class="eyebrow animate-fade" style="--d: 80ms">Cotizador aproximado</p>
+        <h1 id="quoter-title" class="display-1 mt-6 text-fg">
+          <span class="line-mask"><span style="--d: 120ms">Cotizador aproximado</span></span>
+          <span class="line-mask"><span style="--d: 220ms">de servicios <em class="serif font-normal text-accent">TI.</em></span></span>
         </h1>
-        <p class="text-lg max-w-2xl mx-auto" style="color: var(--text-secondary);">
+        <p class="lead animate-rise mt-7 max-w-2xl" style="--d: 360ms">
           Calcula una referencia aproximada. Para una propuesta formal, revisamos el alcance, condiciones técnicas,
           licencias, equipos, ubicación y tiempos de entrega.
         </p>
       </div>
 
-      <div class="grid lg:grid-cols-3 gap-8">
-
-        <!-- Services list grouped by category -->
-        <div class="lg:col-span-2 space-y-8">
-          <div
-            v-for="(svcs, catName) in categories"
-            :key="catName"
-            v-motion
-            :initial="{ opacity: 0, x: -20 }"
-            :visibleOnce="{ opacity: 1, x: 0, transition: { duration: 500 } }"
+      <!-- Guía de uso -->
+      <ol class="animate-rise grid grid-cols-2 gap-px overflow-hidden rounded-[24px] border border-line bg-line lg:col-span-5" style="--d: 440ms" aria-label="Cómo usar el cotizador">
+        <li
+          v-for="(step, i) in guideSteps"
+          :key="step.n"
+          class="flex items-center gap-3 bg-paper p-4 transition-colors duration-500"
+          :class="i <= guideStep ? '!bg-surface' : ''"
+        >
+          <span
+            class="grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-semibold transition-colors duration-500"
+            :class="i <= guideStep ? 'bg-accent text-white' : 'border border-line-2 text-fg-3'"
           >
-            <h3 class="text-xs font-semibold uppercase tracking-widest mb-3 px-1" style="color: var(--text-muted);">
-              {{ catName }}
-            </h3>
+            <Check v-if="i < guideStep" :size="14" />
+            <template v-else>{{ step.n }}</template>
+          </span>
+          <span class="text-[0.85rem] font-medium" :class="i <= guideStep ? 'text-fg' : 'text-fg-3'">{{ step.label }}</span>
+        </li>
+      </ol>
+    </div>
 
-            <div class="space-y-2.5">
-              <div
-                v-for="svc in svcs"
-                :key="svc.id"
-                class="rounded-xl overflow-hidden transition-all duration-300"
-                :style="`background: var(--bg-card); border: 1px solid ${isSelected(svc.id) ? svc.color + '45' : 'var(--border-subtle)'}; backdrop-filter: blur(12px); ${isSelected(svc.id) ? 'box-shadow: 0 0 20px ' + svc.color + '10;' : ''}`"
-              >
-                <!-- Toggle row -->
-                <div
-                  class="flex items-center gap-4 p-4 cursor-pointer group"
+    <div class="shell grid gap-10 lg:grid-cols-12 lg:gap-12">
+      <!-- ─── Servicios por categoría ─── -->
+      <div class="space-y-14 lg:col-span-8">
+        <div v-for="(svcs, catName) in categories" :key="catName">
+          <h2 class="eyebrow mb-5">{{ catName }}</h2>
+
+          <div class="space-y-3">
+            <article
+              v-for="svc in svcs"
+              :key="svc.id"
+              class="overflow-hidden rounded-[24px] border bg-surface transition-[border-color,box-shadow] duration-300"
+              :class="isSelected(svc.id) ? 'border-accent shadow-[0_0_0_3px_var(--c-accent-soft)]' : 'border-line hover:border-line-2'"
+            >
+              <!-- Fila principal -->
+              <div class="flex items-stretch">
+                <button
+                  type="button"
+                  class="flex flex-1 items-center gap-4 p-4 text-left sm:p-5"
+                  :aria-pressed="isSelected(svc.id)"
+                  :aria-label="`${isSelected(svc.id) ? 'Quitar' : 'Agregar'} ${svc.name}`"
                   @click="toggleService(svc)"
                 >
-                  <div class="flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
-                    <CheckSquare v-if="isSelected(svc.id)" :size="20" :style="`color: ${svc.color}`" />
-                    <Square v-else :size="20" style="color: var(--text-muted);" />
-                  </div>
-
-                  <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105"
-                    :style="`background: ${svc.color}15; border: 1px solid ${svc.color}30;`">
-                    <component :is="svc.icon" :size="17" :style="`color: ${svc.color}`" />
-                  </div>
-
-                  <span class="font-medium flex-1 text-sm" style="color: var(--text-primary);">{{ svc.name }}</span>
-
-                  <div class="text-right flex-shrink-0">
+                  <span
+                    class="grid h-6 w-6 shrink-0 place-items-center rounded-lg border-2 transition-all duration-300"
+                    :class="isSelected(svc.id) ? 'border-accent bg-accent text-white' : 'border-line-2 text-transparent'"
+                  >
+                    <Check :size="14" :stroke-width="3" />
+                  </span>
+                  <span
+                    class="hidden h-10 w-10 shrink-0 place-items-center rounded-xl transition-colors duration-300 sm:grid"
+                    :class="isSelected(svc.id) ? 'bg-accent-soft text-accent' : 'bg-paper text-fg-2'"
+                  >
+                    <component :is="svc.icon" :size="18" />
+                  </span>
+                  <span class="min-w-0 flex-1">
+                    <span class="block font-semibold text-fg">{{ svc.name }}</span>
+                    <span v-if="isSelected(svc.id)" class="mt-0.5 block truncate text-xs text-fg-3">
+                      {{ svc.tiers[selections[svc.id].tierIndex]?.name }}
+                      <template v-if="svc.hasQuantity"> × {{ selections[svc.id].quantity }}</template>
+                    </span>
+                  </span>
+                  <span class="shrink-0 text-right">
                     <template v-if="isSelected(svc.id) && !svc.tiers[selections[svc.id].tierIndex]?.custom">
-                      <div class="text-sm font-semibold transition-all duration-300" :style="`color: ${svc.color}`">
-                        {{ formatMXN(getOneTimeTotal(svc)) }}
-                      </div>
-                      <div v-if="svc.mandatoryMonthly" class="text-xs" :style="`color: ${svc.color}99`">
+                      <span class="tabular block text-sm font-semibold text-fg">{{ formatMXN(getOneTimeTotal(svc)) }}</span>
+                      <span v-if="svc.mandatoryMonthly" class="tabular block text-xs text-accent">
                         + {{ formatMXN(getMonthlyAmount(svc)) }}/mes
-                      </div>
-                      <div v-if="svc.hasQuantity && getEquipmentDiscount(selections[svc.id].quantity) > 0"
-                        class="text-xs" style="color: #34D399;">
+                      </span>
+                      <span
+                        v-if="svc.hasQuantity && getEquipmentDiscount(selections[svc.id].quantity) > 0"
+                        class="block text-xs font-medium text-emerald-600 dark:text-emerald-400"
+                      >
                         {{ getDiscountLabel(selections[svc.id].quantity) }}
-                      </div>
+                      </span>
                     </template>
-                    <template v-else-if="!isSelected(svc.id)">
-                      <div class="text-xs" style="color: var(--text-muted);">
-                        desde {{ formatMXN(Math.min(...svc.tiers.filter(t => !t.custom).map(t => t.price))) }}
-                      </div>
-                    </template>
-                  </div>
-
-                  <div
-                    v-if="isSelected(svc.id)"
-                    @click.stop="expandedId = expandedId === svc.id ? null : svc.id"
-                    class="flex-shrink-0 cursor-pointer transition-colors"
-                    style="color: var(--text-muted);"
-                  >
-                    <ChevronDown v-if="expandedId !== svc.id" :size="16" />
-                    <ChevronUp v-else :size="16" />
-                  </div>
-                </div>
-
-                <!-- Service note collapsed -->
-                <div v-if="svc.note && !isSelected(svc.id)" class="px-4 pb-3">
-                  <p class="text-xs italic" style="color: var(--text-muted);">{{ svc.note }}</p>
-                </div>
-
-                <!-- Expanded options -->
-                <Transition
-                  enter-active-class="transition-all duration-300 ease-out"
-                  enter-from-class="opacity-0 -translate-y-1"
-                  enter-to-class="opacity-100 translate-y-0"
-                  leave-active-class="transition-all duration-200"
-                  leave-to-class="opacity-0"
+                    <span v-else-if="isSelected(svc.id)" class="rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">
+                      A cotizar
+                    </span>
+                    <span v-else class="tabular text-xs text-fg-3">desde {{ formatMXN(minPrice(svc)) }}</span>
+                  </span>
+                </button>
+                <button
+                  v-if="isSelected(svc.id)"
+                  type="button"
+                  class="grid w-12 shrink-0 place-items-center border-l border-line text-fg-3 transition-colors hover:text-fg sm:w-14"
+                  :aria-expanded="expandedId === svc.id"
+                  :aria-controls="`opts-${svc.id}`"
+                  :aria-label="`${expandedId === svc.id ? 'Ocultar' : 'Mostrar'} opciones de ${svc.name}`"
+                  @click="toggleExpanded(svc.id)"
                 >
-                  <div
-                    v-if="isSelected(svc.id) && expandedId === svc.id"
-                    class="px-4 pb-4 border-t"
-                    style="border-color: var(--border-subtle);"
-                  >
-                    <!-- Note -->
-                    <div v-if="svc.note" class="mt-3 flex items-start gap-2 p-2.5 rounded-lg mb-3"
-                      :style="`background: ${svc.color}08; border: 1px solid ${svc.color}15;`">
-                      <Info :size="13" class="flex-shrink-0 mt-0.5" :style="`color: ${svc.color};`" />
-                      <p class="text-xs" style="color: var(--text-secondary);">{{ svc.note }}</p>
+                  <ChevronDown :size="18" class="transition-transform duration-300" :class="expandedId === svc.id ? 'rotate-180' : ''" />
+                </button>
+              </div>
+
+              <!-- Nota (no seleccionado) -->
+              <p v-if="svc.note && !isSelected(svc.id)" class="-mt-1 px-5 pb-4 text-xs leading-relaxed text-fg-3 sm:pl-[4.75rem]">
+                {{ svc.note }}
+              </p>
+
+              <!-- Opciones -->
+              <div
+                v-if="isSelected(svc.id)"
+                :id="`opts-${svc.id}`"
+                class="grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                :style="{ gridTemplateRows: expandedId === svc.id ? '1fr' : '0fr' }"
+              >
+                <div class="overflow-hidden">
+                  <div class="border-t border-line bg-paper/60 p-4 sm:p-6">
+                    <div v-if="svc.note" class="mb-5 flex items-start gap-2.5 rounded-2xl bg-accent-soft p-3.5">
+                      <Info :size="15" class="mt-0.5 shrink-0 text-accent" />
+                      <p class="text-xs leading-relaxed text-fg-2">{{ svc.note }}</p>
                     </div>
 
-                    <p class="text-xs font-medium uppercase tracking-wider mt-3 mb-2" style="color: var(--text-muted);">
-                      Tipo de servicio
-                    </p>
-
-                    <div class="space-y-2">
-                      <div
+                    <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-fg-3">Tipo de servicio</p>
+                    <div class="grid gap-2 sm:grid-cols-2" role="radiogroup" :aria-label="`Tipo de servicio: ${svc.name}`">
+                      <button
                         v-for="(tier, idx) in svc.tiers"
                         :key="tier.name"
-                        class="flex items-start justify-between gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200"
-                        :style="selections[svc.id]?.tierIndex === idx
-                          ? `background: ${svc.color}10; border: 1px solid ${svc.color}35;`
-                          : `background: var(--bg-elevated); border: 1px solid var(--border-subtle);`"
+                        type="button"
+                        role="radio"
+                        :aria-checked="selections[svc.id]?.tierIndex === idx"
+                        :tabindex="expandedId === svc.id ? 0 : -1"
+                        class="flex items-start justify-between gap-3 rounded-2xl border p-3.5 text-left transition-all duration-200"
+                        :class="selections[svc.id]?.tierIndex === idx ? 'border-accent bg-surface shadow-[var(--shadow-soft)]' : 'border-line bg-surface/60 hover:border-line-2'"
                         @click="setTier(svc.id, idx)"
                       >
-                        <div class="flex items-start gap-2.5">
-                          <div
-                            class="w-4 h-4 rounded-full flex items-center justify-center border-2 flex-shrink-0 mt-0.5 transition-all"
-                            :style="selections[svc.id]?.tierIndex === idx
-                              ? `border-color: ${svc.color}; background: ${svc.color};`
-                              : `border-color: var(--border-medium); background: transparent;`"
+                        <span class="flex items-start gap-2.5">
+                          <span
+                            class="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border-2 transition-colors"
+                            :class="selections[svc.id]?.tierIndex === idx ? 'border-accent' : 'border-line-2'"
                           >
-                            <div v-if="selections[svc.id]?.tierIndex === idx" class="w-1.5 h-1.5 rounded-full bg-white" />
-                          </div>
-                          <div>
-                            <span class="text-sm block" style="color: var(--text-primary);">{{ tier.name }}</span>
-                            <span v-if="tier.note" class="text-xs block mt-0.5" style="color: var(--text-muted);">{{ tier.note }}</span>
-                          </div>
-                        </div>
-                        <span
-                          class="text-sm font-semibold flex-shrink-0"
-                          :style="`color: ${tier.custom ? 'var(--text-muted)' : svc.color}`"
-                        >
+                            <span v-if="selections[svc.id]?.tierIndex === idx" class="h-1.5 w-1.5 rounded-full bg-accent" />
+                          </span>
+                          <span>
+                            <span class="block text-sm text-fg">{{ tier.name }}</span>
+                            <span v-if="tier.note" class="mt-0.5 block text-xs leading-snug text-fg-3">{{ tier.note }}</span>
+                          </span>
+                        </span>
+                        <span class="tabular shrink-0 text-sm font-semibold" :class="tier.custom ? 'text-fg-3' : 'text-fg'">
                           {{ tier.custom ? 'A cotizar' : formatMXN(tier.price) }}
                         </span>
-                      </div>
+                      </button>
                     </div>
 
-                    <!-- Quantity (equipment) -->
-                    <div v-if="svc.hasQuantity" class="mt-4">
-                      <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-medium" style="color: var(--text-secondary);">Cantidad de equipos:</span>
-                        <div v-if="getEquipmentDiscount(selections[svc.id]?.quantity ?? 1) > 0"
-                          class="flex items-center gap-1 text-xs font-medium" style="color: #34D399;">
-                          <Tag :size="11" />
+                    <!-- Cantidad (equipos) -->
+                    <div v-if="svc.hasQuantity" class="mt-6">
+                      <div class="mb-3 flex items-center justify-between gap-3">
+                        <span class="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-fg-3">Cantidad de equipos</span>
+                        <span
+                          v-if="getEquipmentDiscount(selections[svc.id]?.quantity ?? 1) > 0"
+                          class="flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400"
+                        >
+                          <Tag :size="12" />
                           {{ getDiscountLabel(selections[svc.id]?.quantity ?? 1) }} por volumen
-                        </div>
-                      </div>
-
-                      <div class="flex items-center gap-3">
-                        <button
-                          @click="adjustQty(svc.id, -1)"
-                          aria-label="Reducir cantidad"
-                          class="w-8 h-8 rounded-md flex items-center justify-center transition-colors"
-                          style="border: 1px solid var(--border-medium); background: var(--bg-elevated); color: var(--text-muted);"
-                        >
-                          <Minus :size="14" />
-                        </button>
-                        <span class="w-10 text-center text-sm font-bold" style="color: var(--text-primary);">
-                          {{ selections[svc.id]?.quantity ?? 1 }}
                         </span>
-                        <button
-                          @click="adjustQty(svc.id, 1)"
-                          aria-label="Aumentar cantidad"
-                          class="w-8 h-8 rounded-md flex items-center justify-center transition-colors"
-                          style="border: 1px solid var(--border-medium); background: var(--bg-elevated); color: var(--text-muted);"
-                        >
-                          <Plus :size="14" />
-                        </button>
-                        <span class="text-xs" style="color: var(--text-muted);">equipo(s)</span>
+                      </div>
+                      <div class="flex items-center gap-3">
+                        <div class="flex items-center rounded-full border border-line-2 bg-surface p-1">
+                          <button
+                            type="button"
+                            class="grid h-9 w-9 place-items-center rounded-full text-fg-2 transition-colors hover:bg-paper-2"
+                            aria-label="Reducir cantidad"
+                            :tabindex="expandedId === svc.id ? 0 : -1"
+                            @click="adjustQty(svc.id, -1)"
+                          >
+                            <Minus :size="15" />
+                          </button>
+                          <span class="tabular w-10 text-center font-semibold text-fg" aria-live="polite">
+                            {{ selections[svc.id]?.quantity ?? 1 }}
+                          </span>
+                          <button
+                            type="button"
+                            class="grid h-9 w-9 place-items-center rounded-full text-fg-2 transition-colors hover:bg-paper-2"
+                            aria-label="Aumentar cantidad"
+                            :tabindex="expandedId === svc.id ? 0 : -1"
+                            @click="adjustQty(svc.id, 1)"
+                          >
+                            <Plus :size="15" />
+                          </button>
+                        </div>
+                        <span class="text-xs text-fg-3">equipo(s)</span>
                       </div>
 
-                      <!-- Discount scale -->
-                      <div class="mt-3 grid grid-cols-5 gap-1">
+                      <!-- Escala de descuentos -->
+                      <div class="mt-4 grid grid-cols-5 gap-1.5">
                         <div
-                          v-for="(vol, i) in [
-                            { range: '1-2', disc: 0 },
-                            { range: '3-5', disc: 5 },
-                            { range: '6-10', disc: 8 },
-                            { range: '11-20', disc: 10 },
-                            { range: '21+', disc: 15 },
-                          ]"
-                          :key="i"
-                          class="text-center p-1.5 rounded-md text-xs transition-all"
-                          :style="getEquipmentDiscount(selections[svc.id]?.quantity ?? 1) * 100 === vol.disc
-                            ? `background: ${svc.color}18; border: 1px solid ${svc.color}40; color: ${svc.color};`
-                            : `background: var(--bg-elevated); border: 1px solid var(--border-subtle); color: var(--text-muted);`"
+                          v-for="vol in VOLUME_DISCOUNT_SCALE"
+                          :key="vol.range"
+                          class="rounded-xl border p-2 text-center text-xs transition-all duration-300"
+                          :class="getEquipmentDiscount(selections[svc.id]?.quantity ?? 1) * 100 === vol.disc
+                            ? 'border-accent bg-accent text-white'
+                            : 'border-line bg-surface text-fg-3'"
                         >
                           <div class="font-semibold">{{ vol.disc > 0 ? vol.disc + '%' : '—' }}</div>
-                          <div class="text-xs opacity-70">{{ vol.range }}</div>
+                          <div class="mt-0.5 opacity-75">{{ vol.range }}</div>
                         </div>
                       </div>
                     </div>
 
-                    <!-- Mandatory monthly options -->
-                    <div v-if="svc.mandatoryMonthly" class="mt-4">
-                      <div class="flex items-start gap-2 p-2.5 rounded-lg mb-3"
-                        :style="`background: ${svc.color}0A; border: 1px solid ${svc.color}25;`">
-                        <Info :size="13" class="flex-shrink-0 mt-0.5" :style="`color: ${svc.color};`" />
-                        <p class="text-xs" style="color: var(--text-secondary);">
+                    <!-- Mensualidad obligatoria -->
+                    <div v-if="svc.mandatoryMonthly" class="mt-6">
+                      <div class="mb-4 flex items-start gap-2.5 rounded-2xl border border-accent/25 bg-accent-soft p-3.5">
+                        <Info :size="15" class="mt-0.5 shrink-0 text-accent" />
+                        <p class="text-xs leading-relaxed text-fg-2">
                           La administración mensual es <strong>obligatoria</strong> con correos corporativos. Selecciona el plan que mejor se adapte.
                         </p>
                       </div>
-
-                      <p class="text-xs font-medium uppercase tracking-wider mb-2" style="color: var(--text-muted);">
-                        Administración mensual (obligatoria)
-                      </p>
-
-                      <div class="space-y-2">
-                        <div
+                      <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-fg-3">Administración mensual (obligatoria)</p>
+                      <div class="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Administración mensual">
+                        <button
                           v-for="(opt, idx) in svc.mandatoryMonthly"
                           :key="opt.name"
-                          class="flex items-center justify-between gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200"
-                          :style="(selections[svc.id]?.monthlyOptionIndex ?? 0) === idx
-                            ? `background: ${svc.color}10; border: 1px solid ${svc.color}35;`
-                            : `background: var(--bg-elevated); border: 1px solid var(--border-subtle);`"
+                          type="button"
+                          role="radio"
+                          :aria-checked="(selections[svc.id]?.monthlyOptionIndex ?? 0) === idx"
+                          :tabindex="expandedId === svc.id ? 0 : -1"
+                          class="flex items-center justify-between gap-3 rounded-2xl border p-3.5 text-left transition-all duration-200"
+                          :class="(selections[svc.id]?.monthlyOptionIndex ?? 0) === idx ? 'border-accent bg-surface shadow-[var(--shadow-soft)]' : 'border-line bg-surface/60 hover:border-line-2'"
                           @click="setMonthlyOption(svc.id, idx)"
                         >
-                          <div class="flex items-center gap-2.5">
-                            <div
-                              class="w-4 h-4 rounded-full flex items-center justify-center border-2 flex-shrink-0 transition-all"
-                              :style="(selections[svc.id]?.monthlyOptionIndex ?? 0) === idx
-                                ? `border-color: ${svc.color}; background: ${svc.color};`
-                                : `border-color: var(--border-medium); background: transparent;`"
+                          <span class="flex items-center gap-2.5">
+                            <span
+                              class="grid h-4 w-4 shrink-0 place-items-center rounded-full border-2"
+                              :class="(selections[svc.id]?.monthlyOptionIndex ?? 0) === idx ? 'border-accent' : 'border-line-2'"
                             >
-                              <div v-if="(selections[svc.id]?.monthlyOptionIndex ?? 0) === idx" class="w-1.5 h-1.5 rounded-full bg-white" />
-                            </div>
-                            <span class="text-sm" style="color: var(--text-primary);">{{ opt.name }}</span>
-                          </div>
-                          <span class="text-sm font-semibold flex-shrink-0" :style="`color: ${svc.color}`">
-                            {{ formatMXN(opt.price) }}/mes
+                              <span v-if="(selections[svc.id]?.monthlyOptionIndex ?? 0) === idx" class="h-1.5 w-1.5 rounded-full bg-accent" />
+                            </span>
+                            <span class="text-sm text-fg">{{ opt.name }}</span>
                           </span>
-                        </div>
+                          <span class="tabular shrink-0 text-sm font-semibold text-fg">{{ formatMXN(opt.price) }}/mes</span>
+                        </button>
                       </div>
                     </div>
                   </div>
-                </Transition>
+                </div>
               </div>
-            </div>
+            </article>
           </div>
         </div>
+      </div>
 
-        <!-- Summary panel -->
-        <div class="lg:col-span-1">
-          <div
-            v-motion
-            :initial="{ opacity: 0, x: 20 }"
-            :visibleOnce="{ opacity: 1, x: 0, transition: { duration: 600 } }"
-            class="rounded-2xl p-6 sticky top-24"
-            style="background: var(--bg-card); border: 1px solid var(--border-medium); backdrop-filter: blur(20px);"
-          >
-            <h3 class="font-display font-bold text-lg mb-5" style="color: var(--text-primary);">Resumen estimado</h3>
+      <!-- ─── Resumen ─── -->
+      <aside id="resumen" class="lg:col-span-4" aria-labelledby="summary-title">
+        <div class="on-ink grain relative overflow-hidden rounded-[30px] p-6 shadow-[var(--shadow-deep)] sm:p-7 lg:sticky lg:top-28">
+          <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(80%_50%_at_100%_0%,rgba(37,99,235,0.35),transparent_70%)]" aria-hidden="true" />
+          <div class="relative">
+            <div class="flex items-center justify-between">
+              <h3 id="summary-title" class="font-display text-lg font-semibold">Resumen estimado</h3>
+              <span class="tabular rounded-full border border-ink-line px-2.5 py-1 text-xs text-on-ink-2">
+                {{ selectedCount }} {{ selectedCount === 1 ? 'servicio' : 'servicios' }}
+              </span>
+            </div>
 
-            <!-- Empty state -->
-            <div v-if="selectedCount === 0" class="text-center py-8">
-              <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3"
-                style="background: var(--bg-elevated); border: 1px solid var(--border-subtle);">
-                <CheckSquare :size="20" style="color: var(--text-muted);" />
+            <!-- Vacío -->
+            <div v-if="selectedCount === 0" class="py-10 text-center">
+              <div class="mx-auto grid h-14 w-14 place-items-center rounded-full border border-dashed border-white/25">
+                <Plus :size="20" class="text-on-ink-3" />
               </div>
-              <p class="text-sm" style="color: var(--text-muted);">
+              <p class="mx-auto mt-4 max-w-[230px] text-sm text-on-ink-3">
                 Selecciona los servicios que necesitas para ver la referencia.
               </p>
             </div>
 
-            <!-- Summary sections -->
-            <div v-else class="space-y-4 max-h-72 overflow-y-auto pr-1">
-
-              <!-- Pago único -->
+            <!-- Detalle -->
+            <div v-else class="mt-6 max-h-80 space-y-5 overflow-y-auto pr-1">
               <div v-if="oneTimeServices.length > 0">
-                <p class="text-xs font-semibold uppercase tracking-wider mb-2" style="color: var(--text-muted);">Pago único</p>
-                <div class="space-y-2.5">
-                  <div v-for="svc in oneTimeServices" :key="svc.id" class="flex items-start justify-between gap-3">
-                    <div class="flex items-center gap-2 min-w-0">
-                      <div class="w-6 h-6 rounded flex-shrink-0 flex items-center justify-center"
-                        :style="`background: ${svc.color}15;`">
-                        <component :is="svc.icon" :size="11" :style="`color: ${svc.color}`" />
+                <p class="mb-2.5 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-on-ink-3">Pago único</p>
+                <ul class="space-y-2.5">
+                  <li v-for="svc in oneTimeServices" :key="svc.id" class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <div class="truncate text-sm text-on-ink">{{ svc.name }}</div>
+                      <div class="truncate text-xs text-on-ink-3">
+                        {{ svc.tiers[selections[svc.id]?.tierIndex ?? 0]?.name }}
+                        <span v-if="svc.hasQuantity"> × {{ selections[svc.id]?.quantity }}</span>
                       </div>
-                      <div class="min-w-0">
-                        <div class="text-xs truncate" style="color: var(--text-primary);">{{ svc.name }}</div>
-                        <div class="text-xs truncate" style="color: var(--text-muted);">
-                          {{ svc.tiers[selections[svc.id]?.tierIndex ?? 0]?.name }}
-                          <span v-if="svc.hasQuantity"> × {{ selections[svc.id]?.quantity }}</span>
-                        </div>
-                        <div v-if="svc.hasQuantity && getEquipmentDiscount(selections[svc.id]?.quantity ?? 1) > 0"
-                          class="text-xs" style="color: #34D399;">
-                          {{ getDiscountLabel(selections[svc.id]?.quantity ?? 1) }}
-                        </div>
+                      <div v-if="svc.hasQuantity && getEquipmentDiscount(selections[svc.id]?.quantity ?? 1) > 0" class="text-xs text-emerald-300">
+                        {{ getDiscountLabel(selections[svc.id]?.quantity ?? 1) }}
                       </div>
                     </div>
-                    <span class="text-xs font-semibold flex-shrink-0" :style="`color: ${svc.color}`">
-                      {{ formatMXN(getOneTimeTotal(svc)) }}
-                    </span>
-                  </div>
-                </div>
+                    <span class="tabular shrink-0 text-sm font-medium text-on-ink">{{ formatMXN(getOneTimeTotal(svc)) }}</span>
+                  </li>
+                </ul>
               </div>
 
-              <!-- Mensualidad -->
               <div v-if="monthlyServices.length > 0">
-                <p class="text-xs font-semibold uppercase tracking-wider mb-2 mt-1" style="color: var(--text-muted);">Mensualidad</p>
-                <div class="space-y-2.5">
-                  <div v-for="svc in monthlyServices" :key="svc.id" class="flex items-start justify-between gap-3">
-                    <div class="flex items-center gap-2 min-w-0">
-                      <div class="w-6 h-6 rounded flex-shrink-0 flex items-center justify-center"
-                        :style="`background: ${svc.color}15;`">
-                        <component :is="svc.icon" :size="11" :style="`color: ${svc.color}`" />
-                      </div>
-                      <div class="min-w-0">
-                        <div class="text-xs truncate" style="color: var(--text-primary);">{{ svc.name }}</div>
-                        <div class="text-xs truncate" style="color: var(--text-muted);">
-                          {{ svc.mandatoryMonthly![selections[svc.id]?.monthlyOptionIndex ?? 0]?.name }}
-                        </div>
+                <p class="mb-2.5 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-on-ink-3">Mensualidad</p>
+                <ul class="space-y-2.5">
+                  <li v-for="svc in monthlyServices" :key="svc.id" class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <div class="truncate text-sm text-on-ink">{{ svc.name }}</div>
+                      <div class="truncate text-xs text-on-ink-3">
+                        {{ svc.mandatoryMonthly![selections[svc.id]?.monthlyOptionIndex ?? 0]?.name }}
                       </div>
                     </div>
-                    <span class="text-xs font-semibold flex-shrink-0" :style="`color: ${svc.color}`">
-                      {{ formatMXN(getMonthlyAmount(svc)) }}/mes
-                    </span>
-                  </div>
-                </div>
+                    <span class="tabular shrink-0 text-sm font-medium text-on-ink">{{ formatMXN(getMonthlyAmount(svc)) }}/mes</span>
+                  </li>
+                </ul>
               </div>
 
-              <!-- A cotizar -->
               <div v-if="customServices.length > 0">
-                <p class="text-xs font-semibold uppercase tracking-wider mb-2 mt-1" style="color: var(--text-muted);">A cotizar</p>
-                <div class="space-y-2">
-                  <div
+                <p class="mb-2.5 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-on-ink-3">A cotizar</p>
+                <ul class="space-y-2">
+                  <li
                     v-for="svc in customServices"
                     :key="svc.id"
-                    class="flex items-center justify-between gap-2 p-2 rounded-lg"
-                    style="background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.18);"
+                    class="flex items-center justify-between gap-2 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] px-3 py-2"
                   >
-                    <div class="flex items-center gap-2 min-w-0">
-                      <component :is="svc.icon" :size="11" :style="`color: ${svc.color}`" class="flex-shrink-0" />
-                      <span class="text-xs truncate" style="color: var(--text-secondary);">{{ svc.name }}</span>
-                    </div>
-                    <span class="text-xs font-medium flex-shrink-0" style="color: #FBBF24;">A cotizar</span>
-                  </div>
-                </div>
+                    <span class="truncate text-xs text-on-ink-2">{{ svc.name }}</span>
+                    <span class="shrink-0 text-xs font-medium text-amber-300">A cotizar</span>
+                  </li>
+                </ul>
               </div>
-
             </div>
 
-            <div v-if="selectedCount > 0" class="section-line my-5" />
-
-            <!-- Totals -->
-            <div v-if="selectedCount > 0" class="mb-5 space-y-4">
+            <!-- Totales -->
+            <div v-if="selectedCount > 0" class="mt-6 space-y-4 border-t border-ink-line pt-6">
               <div v-if="oneTimeTotal > 0">
-                <p class="text-xs uppercase tracking-wider mb-1" style="color: var(--text-muted);">Pago único estimado</p>
-                <div class="text-3xl sm:text-4xl font-bold gradient-text leading-tight">
-                  {{ formatMXN(oneTimeTotal) }}
-                </div>
-                <p class="text-xs mt-1" style="color: var(--text-muted);">MXN (referencia aproximada)</p>
+                <p class="text-[0.68rem] uppercase tracking-[0.16em] text-on-ink-3">Pago único estimado</p>
+                <p class="tabular mt-1 font-display text-4xl font-semibold tracking-tight text-on-ink">{{ formatMXN(oneTimeTotal) }}</p>
+                <p class="mt-1 text-xs text-on-ink-3">MXN (referencia aproximada)</p>
               </div>
-
-              <div v-if="monthlyTotal > 0" :class="oneTimeTotal > 0 ? 'pt-3 border-t' : ''" style="border-color: var(--border-subtle);">
-                <p class="text-xs uppercase tracking-wider mb-1" style="color: var(--text-muted);">Mensualidad estimada</p>
-                <div class="text-2xl font-bold leading-tight" style="color: var(--accent-lighter);">
-                  {{ formatMXN(monthlyTotal) }}
-                  <span class="text-sm font-normal" style="color: var(--text-muted);"> / mes</span>
-                </div>
+              <div v-if="monthlyTotal > 0" :class="oneTimeTotal > 0 ? 'border-t border-ink-line pt-4' : ''">
+                <p class="text-[0.68rem] uppercase tracking-[0.16em] text-on-ink-3">Mensualidad estimada</p>
+                <p class="tabular mt-1 font-display text-2xl font-semibold text-signal">
+                  {{ formatMXN(monthlyTotal) }} <span class="text-sm font-normal text-on-ink-3">/ mes</span>
+                </p>
               </div>
-
-              <div v-if="oneTimeTotal === 0 && monthlyTotal === 0"
-                class="py-2 px-3 rounded-lg"
-                style="background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.18);"
-              >
-                <p class="text-sm font-medium" style="color: #FBBF24;">Requiere cotización formal</p>
-                <p class="text-xs mt-0.5" style="color: var(--text-muted);">Los servicios seleccionados se cotizan según alcance.</p>
+              <div v-if="oneTimeTotal === 0 && monthlyTotal === 0" class="rounded-xl border border-amber-300/20 bg-amber-300/[0.06] px-3 py-2.5">
+                <p class="text-sm font-medium text-amber-300">Requiere cotización formal</p>
+                <p class="mt-0.5 text-xs text-on-ink-3">Los servicios seleccionados se cotizan según alcance.</p>
               </div>
             </div>
 
-            <!-- Disclaimer -->
-            <div
-              class="flex gap-2 p-3 rounded-xl mb-5"
-              style="background: var(--bg-elevated); border: 1px solid var(--border-subtle);"
-            >
-              <Info :size="14" class="flex-shrink-0 mt-0.5" style="color: var(--text-muted);" />
-              <p class="text-xs leading-relaxed" style="color: var(--text-muted);">
+            <!-- Aviso -->
+            <div class="mt-6 flex gap-2.5 rounded-2xl bg-white/[0.05] p-3.5">
+              <Info :size="14" class="mt-0.5 shrink-0 text-on-ink-3" />
+              <p class="text-xs leading-relaxed text-on-ink-3">
                 <template v-if="selectedCount > 0 && hasCustom && oneTimeTotal > 0">
                   El total estimado no incluye los servicios marcados como
-                  <strong style="color: #FBBF24;">A cotizar</strong>. Estos se definen según alcance.
+                  <strong class="text-amber-300">A cotizar</strong>. Estos se definen según alcance.
                 </template>
                 <template v-else-if="selectedCount > 0 && hasCustom && oneTimeTotal === 0">
                   Los servicios seleccionados requieren cotización formal según alcance y requerimientos.
@@ -697,31 +525,45 @@ const categories = computed(() => {
               </p>
             </div>
 
-            <!-- CTAs -->
-            <div class="space-y-2.5">
-              <button
-                @click="openWhatsApp"
-                :disabled="selectedCount === 0"
-                class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-250"
-                :style="selectedCount > 0
-                  ? 'background: linear-gradient(135deg, #25D366, #128C7E); color: white; cursor: pointer; box-shadow: 0 4px 16px rgba(37,211,102,0.25);'
-                  : 'background: var(--bg-elevated); color: var(--text-muted); cursor: not-allowed; opacity: 0.5;'"
-              >
-                <MessageCircle :size="16" />
+            <!-- Acciones -->
+            <div class="mt-6 space-y-2.5">
+              <button type="button" class="btn btn-wa btn-block" :disabled="selectedCount === 0" @click="openWhatsApp">
                 Solicitar cotización formal
+                <span class="btn-orb"><WhatsAppIcon :size="16" /></span>
               </button>
-              <button
-                @click="router.push('/contacto')"
-                class="btn-ghost w-full justify-center text-sm"
-              >
+              <RouterLink to="/contacto" class="btn btn-ghost-ink btn-block">
                 Formulario de contacto
-              </button>
+                <span class="btn-orb"><ArrowUpRight :size="16" /></span>
+              </RouterLink>
             </div>
           </div>
         </div>
-      </div>
+      </aside>
     </div>
 
-    <div class="section-line max-w-7xl mx-auto mt-20" />
+    <!-- ─── Barra móvil ─── -->
+    <Transition
+      enter-active-class="transition duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+      enter-from-class="translate-y-full opacity-0"
+      leave-active-class="transition duration-300"
+      leave-to-class="translate-y-full opacity-0"
+    >
+      <div v-if="selectedCount > 0" class="fixed inset-x-3 bottom-3 z-40 lg:hidden">
+        <div class="on-ink flex items-center justify-between gap-3 rounded-full py-2 pl-5 pr-2 shadow-[var(--shadow-deep)]">
+          <div class="min-w-0">
+            <p class="text-[0.68rem] text-on-ink-3">{{ selectedCount }} {{ selectedCount === 1 ? 'servicio' : 'servicios' }}</p>
+            <p class="tabular truncate text-sm font-semibold">
+              <template v-if="oneTimeTotal > 0">{{ formatMXN(oneTimeTotal) }}</template>
+              <template v-if="monthlyTotal > 0">{{ oneTimeTotal > 0 ? ' + ' : '' }}{{ formatMXN(monthlyTotal) }}/mes</template>
+              <template v-if="oneTimeTotal === 0 && monthlyTotal === 0">A cotizar</template>
+            </p>
+          </div>
+          <button type="button" class="btn btn-light btn-sm" @click="scrollToSummary">
+            Ver resumen
+            <span class="btn-orb"><ChevronDown :size="14" /></span>
+          </button>
+        </div>
+      </div>
+    </Transition>
   </section>
 </template>

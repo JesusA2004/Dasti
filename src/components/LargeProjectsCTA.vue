@@ -1,116 +1,69 @@
 <script setup lang="ts">
-import { Video, Users, MessageCircle, ArrowRight } from '@lucide/vue'
-import { useRouter } from 'vue-router'
+import { ArrowUpRight, MessageCircle, Users, Video } from '@lucide/vue'
 import { buildWhatsAppUrl } from '@/config/contact'
-
-const router = useRouter()
 
 const openWhatsApp = (type: string) => {
   const msg = `Hola, me interesa coordinar una ${type} con DASTI para revisar un proyecto.`
-  window.open(buildWhatsAppUrl(msg), '_blank')
+  window.open(buildWhatsAppUrl(msg), '_blank', 'noopener,noreferrer')
 }
 
+const options = [
+  { icon: Video, title: 'Videollamada', desc: 'Revisamos alcance, requerimientos y tiempos de forma remota.', action: 'videollamada' },
+  { icon: Users, title: 'Junta presencial', desc: 'Coordinamos una reunión presencial para proyectos complejos.', action: 'junta presencial' },
+  { icon: MessageCircle, title: 'WhatsApp', desc: 'Cuéntanos el proyecto y te orientamos sobre el siguiente paso.', action: 'consulta' },
+]
 </script>
 
 <template>
-  <section class="relative py-24 overflow-hidden" style="background: var(--bg-base);">
-    <div class="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
-    <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 60% 50% at 50% 50%, var(--accent-glow-sm) 0%, transparent 70%);" />
-
-    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-
-      <div
-        v-motion
-        :initial="{ opacity: 0, y: 30 }"
-        :visibleOnce="{ opacity: 1, y: 0, transition: { duration: 700 } }"
-        class="rounded-3xl p-8 sm:p-12 lg:p-16 text-center relative overflow-hidden"
-        style="background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--border-medium);"
-      >
-        <!-- Inner glow -->
-        <div class="absolute inset-0 rounded-3xl pointer-events-none"
-          style="background: linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(129,140,248,0.04) 50%, transparent 100%);" />
-        <!-- Top border glow -->
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px"
-          style="background: linear-gradient(90deg, transparent, rgba(59,130,246,0.5), transparent);" />
-
-        <div class="relative">
-          <!-- Tag -->
-          <span class="tag mb-6 inline-block">Proyectos de mayor alcance</span>
-
-          <!-- Title -->
-          <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-5" style="color: var(--text-primary);">
-            ¿Tu proyecto requiere una
-            <span class="gradient-text block">solución más completa?</span>
+  <section class="pb-6" aria-labelledby="large-projects-title">
+    <div class="stage on-ink grain">
+      <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_70%_at_0%_100%,rgba(37,99,235,0.32),transparent_70%)]" aria-hidden="true" />
+      <div class="shell section relative grid gap-12 lg:grid-cols-12 lg:gap-16">
+        <div class="lg:col-span-6">
+          <p v-reveal="'fade'" class="eyebrow !text-on-ink-3">Proyectos de mayor alcance</p>
+          <h2 id="large-projects-title" v-reveal="'clip'" class="display-2 mt-5 text-on-ink">
+            ¿Tu proyecto requiere una <span class="serif text-signal">solución más completa?</span>
           </h2>
-
-          <p class="text-lg max-w-2xl mx-auto mb-4 leading-relaxed" style="color: var(--text-secondary);">
-            Para proyectos grandes, integraciones especiales, infraestructura de red, sistemas a medida
-            o implementaciones por etapas, DASTI puede coordinar una videollamada o junta presencial
-            para revisar necesidades, alcance, tiempos y requerimientos técnicos.
+          <p v-reveal="{ variant: 'up', delay: 100 }" class="lead mt-6 !text-on-ink-2">
+            Para proyectos grandes, integraciones especiales, infraestructura de red, sistemas a medida o implementaciones
+            por etapas, DASTI puede coordinar una videollamada o junta presencial para revisar necesidades, alcance, tiempos
+            y requerimientos técnicos.
           </p>
-
-          <p class="text-sm max-w-xl mx-auto mb-10" style="color: var(--text-muted);">
+          <p v-reveal="{ variant: 'up', delay: 140 }" class="mt-4 text-sm text-on-ink-3">
             La modalidad presencial dependerá de ubicación, disponibilidad y alcance del proyecto.
           </p>
-
-          <!-- Action cards -->
-          <div class="grid sm:grid-cols-3 gap-4 mb-10">
-            <div
-              v-for="(option, i) in [
-                {
-                  icon: Video,
-                  title: 'Videollamada',
-                  desc: 'Revisamos alcance, requerimientos y tiempos de forma remota.',
-                  color: '#3B82F6',
-                  action: 'videollamada',
-                },
-                {
-                  icon: Users,
-                  title: 'Junta presencial',
-                  desc: 'Coordinamos una reunión presencial para proyectos complejos.',
-                  color: '#818CF8',
-                  action: 'junta presencial',
-                },
-                {
-                  icon: MessageCircle,
-                  title: 'WhatsApp',
-                  desc: 'Cuéntanos el proyecto y te orientamos sobre el siguiente paso.',
-                  color: '#25D366',
-                  action: 'consulta',
-                },
-              ]"
-              :key="i"
-              v-motion
-              :initial="{ opacity: 0, y: 20 }"
-              :visibleOnce="{ opacity: 1, y: 0, transition: { delay: i * 100, duration: 500 } }"
-              class="rounded-2xl p-5 cursor-pointer group transition-all duration-300 hover:-translate-y-1"
-              :style="`background: ${option.color}0A; border: 1px solid ${option.color}25;`"
-              @click="openWhatsApp(option.action)"
-            >
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3 transition-transform duration-300 group-hover:scale-110"
-                :style="`background: ${option.color}15; border: 1px solid ${option.color}30;`">
-                <component :is="option.icon" :size="20" :style="`color: ${option.color}`" />
-              </div>
-              <h4 class="font-semibold text-sm mb-1" style="color: var(--text-primary);">{{ option.title }}</h4>
-              <p class="text-xs leading-relaxed" style="color: var(--text-muted);">{{ option.desc }}</p>
-            </div>
-          </div>
-
-          <!-- Buttons -->
-          <div class="flex flex-wrap gap-4 justify-center">
-            <button @click="router.push('/contacto')" class="btn-primary">
+          <div v-reveal="{ variant: 'up', delay: 180 }" class="mt-9 flex flex-wrap gap-3">
+            <RouterLink to="/contacto" class="btn btn-light">
               Hablar con DASTI
-              <ArrowRight :size="16" />
-            </button>
-            <button @click="router.push('/cotizador')" class="btn-outline">
+              <span class="btn-orb"><ArrowUpRight :size="16" /></span>
+            </RouterLink>
+            <RouterLink to="/cotizador" class="btn btn-ghost-ink">
               Estimar inversión
-            </button>
+              <span class="btn-orb"><ArrowUpRight :size="16" /></span>
+            </RouterLink>
           </div>
         </div>
+
+        <ul class="self-end border-t border-ink-line lg:col-span-6">
+          <li v-for="(o, i) in options" :key="o.title" v-reveal="{ variant: 'up', delay: i * 90 }" class="border-b border-ink-line">
+            <button
+              type="button"
+              class="group grid w-full grid-cols-[auto_1fr_auto] items-center gap-5 py-6 text-left"
+              :aria-label="`Coordinar ${o.action} por WhatsApp`"
+              @click="openWhatsApp(o.action)"
+            >
+              <span class="grid h-11 w-11 place-items-center rounded-full border border-ink-line text-signal">
+                <component :is="o.icon" :size="18" />
+              </span>
+              <span>
+                <span class="block font-semibold text-on-ink">{{ o.title }}</span>
+                <span class="mt-1 block text-sm text-on-ink-3">{{ o.desc }}</span>
+              </span>
+              <ArrowUpRight :size="18" class="text-on-ink-3 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-on-ink" />
+            </button>
+          </li>
+        </ul>
       </div>
-
     </div>
-
-    <div class="section-line max-w-7xl mx-auto mt-20" />
   </section>
 </template>

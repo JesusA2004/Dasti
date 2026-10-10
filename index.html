@@ -19,7 +19,7 @@
     <meta name="keywords" content="DASTI, soluciones TI Morelos, soluciones TI Cuernavaca, desarrollo web Morelos, desarrollo web Cuernavaca, software a medida Morelos, software empresarial, correos corporativos, correos empresariales, redes empresariales, sistemas mesh, soporte técnico Morelos, soporte técnico Cuernavaca, equipos de cómputo, automatización de procesos, integración de sistemas, chatbots empresariales, asesoramiento en TI" />
     <meta name="robots" content="index, follow" />
     <meta name="author" content="DASTI" />
-    <meta name="theme-color" content="#0F172A" />
+    <meta name="theme-color" content="#071426" />
     <link rel="canonical" href="https://dasti.cloud" />
 
     <!-- Open Graph -->
@@ -40,7 +40,21 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+
+    <!-- Tema inicial (evita parpadeo). Migra los temas anteriores a claro/oscuro. -->
+    <script>
+      (function () {
+        try {
+          var map = { dark: 'dark', 'dark-tech': 'dark', graphite: 'dark', 'blue-premium': 'dark', indigo: 'dark', light: 'light', 'light-corporate': 'light' };
+          var stored = localStorage.getItem('dasti-theme');
+          var theme = map[stored] || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
 
     <!-- JSON-LD: Organization -->
     <script type="application/ld+json">
@@ -92,7 +106,8 @@
         "Integración de sistemas",
         "Chatbots y asistentes digitales",
         "Asesoramiento en TI",
-        "Presencia digital y redes sociales"
+        "Presencia digital y redes sociales",
+        "Tarjetas inteligentes NFC"
       ]
     }
     </script>

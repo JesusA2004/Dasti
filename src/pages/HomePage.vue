@@ -1,38 +1,34 @@
 <script setup lang="ts">
 import InteractiveHero from '@/components/InteractiveHero.vue'
-import SolutionConfigurator from '@/components/SolutionConfigurator.vue'
-import DastiAboutBlock from '@/components/DastiAboutBlock.vue'
-import GuidedTourSection from '@/components/GuidedTourSection.vue'
-import VisualServicesExplorer from '@/components/VisualServicesExplorer.vue'
-import MeetingModesSection from '@/components/MeetingModesSection.vue'
-import ProjectShowcasePreview from '@/components/ProjectShowcasePreview.vue'
-import MiniQuoteCTA from '@/components/MiniQuoteCTA.vue'
+import HomeManifesto from '@/components/home/HomeManifesto.vue'
+import HomeSolutions from '@/components/home/HomeSolutions.vue'
+import HomeProcess from '@/components/home/HomeProcess.vue'
+import HomeNfc from '@/components/home/HomeNfc.vue'
+import HomeProjects from '@/components/home/HomeProjects.vue'
+import HomeAbout from '@/components/home/HomeAbout.vue'
+import HomeAlliances from '@/components/home/HomeAlliances.vue'
+import HomeCta from '@/components/home/HomeCta.vue'
 </script>
 
 <template>
   <div>
-    <!-- 1. Hero futurista interactivo con canvas + parallax -->
+    <!-- 1. Hero tecnológico inmersivo (red de partículas interactiva) -->
     <InteractiveHero />
-
-    <!-- 2. Configurador de soluciones — área de mejora seleccionable -->
-    <SolutionConfigurator />
-
-    <!-- 3. Quiénes somos — editorial con imagen grande -->
-    <DastiAboutBlock />
-
-    <!-- 4. Tour guiado: cómo trabajamos en 4 pasos -->
-    <GuidedTourSection />
-
-    <!-- 5. Explorador visual de servicios por categoría -->
-    <VisualServicesExplorer />
-
-    <!-- 6. Modalidad de atención: remoto / video / presencial -->
-    <MeetingModesSection />
-
-    <!-- 7. Preview de proyectos (placeholders elegantes) -->
-    <ProjectShowcasePreview />
-
-    <!-- 8. CTA final hacia el cotizador -->
-    <MiniQuoteCTA />
+    <!-- 2. Propuesta de valor (texto que se enciende con el scroll) -->
+    <HomeManifesto />
+    <!-- 3. Soluciones tecnológicas (índice editorial + imagen activa) -->
+    <HomeSolutions />
+    <!-- 4. Forma de trabajo (columna fija + pasos) -->
+    <HomeProcess />
+    <!-- 5. Productos NFC -->
+    <div class="pt-6"><HomeNfc /></div>
+    <!-- 6. Proyectos (casos en preparación) -->
+    <HomeProjects />
+    <!-- 7. Acerca de DASTI + modalidades de atención -->
+    <HomeAbout />
+    <!-- 8. Alianzas estratégicas -->
+    <HomeAlliances />
+    <!-- 9. CTA final -->
+    <HomeCta />
   </div>
 </template>
