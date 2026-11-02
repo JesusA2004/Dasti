@@ -1,4 +1,5 @@
 import { buildWhatsAppUrl } from '@/config/contact'
+import { formatMXN } from '@/utils/format'
 
 /**
  * PRODUCTOS DASTI · TARJETAS INTELIGENTES NFC
@@ -8,7 +9,7 @@ import { buildWhatsAppUrl } from '@/config/contact'
  *
  * PRECIOS: importes oficiales FINALES CON IVA INCLUIDO, en MXN
  * (política de precios de productos DASTI). Se capturan como número,
- * p. ej. 399, y la interfaz les da formato.
+ * p. ej. 449, y la interfaz les da formato.
  *
  * WHATSAPP: todos los botones usan el WhatsApp oficial de DASTI
  * (src/config/contact.ts) con un mensaje precargado por producto.
@@ -109,101 +110,128 @@ export const nfcSteps = [
 
 /* ── Catálogo comercial ─────────────────────────────────────────── */
 
-export interface NfcPriceOption {
-  id: string
+/**
+ * Modalidades de diseño. Cada producto (tarjeta individual y combos) tiene
+ * un precio final por modalidad. Las condiciones se muestran en la página.
+ */
+export type NfcDesignMode = 'lista' | 'imprimimos' | 'disenamos'
+
+export interface NfcDesignModeDef {
+  id: NfcDesignMode
   label: string
-  /** Precio final con IVA incluido, MXN. */
-  price: number
-  /** Mensaje de WhatsApp precargado para esta opción. */
-  message: string
 }
 
-/** Tarjeta individual: precio base + variantes de diseño. */
-export const nfcIndividual = {
-  name: 'Tarjeta individual',
-  fromPrice: 399,
-  subtitle: 'Precios finales con IVA incluido',
-  includes: ['NFC + QR funcional', 'Diseño genérico listo para usar', 'Configuración inicial incluida'],
-  options: [
-    {
-      id: 'generico',
-      label: 'Diseño genérico listo para usar',
-      price: 399,
-      message: 'Hola, me interesa la tarjeta NFC individual de DASTI. Quiero recibir información y cotización.',
-    },
-    {
-      id: 'tu-diseno',
-      label: 'Tu diseño',
-      price: 429,
-      message: 'Hola, me interesa la tarjeta NFC individual con mi propio diseño. Quiero recibir información y cotización.',
-    },
-    {
-      id: 'personalizada',
-      label: 'Personalizada por nosotros',
-      price: 499,
-      message: 'Hola, me interesa la tarjeta NFC personalizada por DASTI. Quiero recibir información y cotización.',
-    },
-  ] as NfcPriceOption[],
-}
+export const nfcDesignModes: NfcDesignModeDef[] = [
+  { id: 'lista', label: 'Lista para usar' },
+  { id: 'imprimimos', label: 'Imprimimos tu diseño' },
+  { id: 'disenamos', label: 'Diseñamos para ti' },
+]
 
-export interface NfcCombo {
+/** Condiciones de diseño (tarjeta individual y combos). No prometer revisiones ilimitadas. */
+export const NFC_DESIGN_CONDITIONS = {
+  individual: {
+    imprimimos: 'El cliente proporciona su diseño final, listo para impresión.',
+    disenamos:
+      'DASTI crea una línea gráfica similar entre las tarjetas del pedido y la adapta a cada función. Incluye una ronda de cambios.',
+  },
+  combos: {
+    imprimimos: 'El cliente comparte su diseño final listo para impresión.',
+    disenamos:
+      'Creamos una línea gráfica similar entre todas las tarjetas y la adaptamos a cada función. Incluye una ronda de cambios.',
+  },
+} satisfies Record<'individual' | 'combos', Partial<Record<NfcDesignMode, string>>>
+
+/** Precio final con IVA incluido (MXN) por modalidad de diseño. */
+export type NfcModePrices = Record<NfcDesignMode, number>
+
+export interface NfcProduct {
   id: string
   name: string
   cards: number
-  /** Precio final con IVA incluido, MXN. */
-  price: number
+  /** Texto de cantidad, p. ej. "4 tarjetas NFC + QR". */
+  quantityLabel: string
+  /** Cómo se nombra el producto en el mensaje de WhatsApp. */
+  messageSubject: string
+  prices: NfcModePrices
   includes: string[]
-  notes: string[]
-  message: string
-  featured?: boolean
 }
 
-export const NFC_COMBOS_FROM = 699
+/** Tarjeta individual. */
+export const nfcIndividual = {
+  id: 'individual',
+  name: 'Tarjeta individual',
+  cards: 1,
+  quantityLabel: '1 tarjeta',
+  messageSubject: 'la Tarjeta individual de 1 tarjeta NFC + QR',
+  fromPrice: 449,
+  subtitle: 'Precios finales con IVA incluido',
+  prices: { lista: 449, imprimimos: 479, disenamos: 499 },
+  includes: ['NFC + QR funcional', 'Diseño listo para usar', 'Configuración inicial incluida', 'Entrega lista para usar'],
+} satisfies NfcProduct & { fromPrice: number; subtitle: string }
 
-export const nfcCombos: NfcCombo[] = [
+export const NFC_COMBOS_FROM = 799
+
+export const NFC_COMBOS_INTRO = {
+  title: 'Combos más vendidos',
+  subtitle: 'Pensados para negocios que quieren conectar mejor con sus clientes.',
+}
+
+export const nfcCombos: NfcProduct[] = [
   {
-    id: 'reputacion',
-    name: 'Combo Reputación',
+    id: 'impulso',
+    name: 'Combo Impulso',
     cards: 2,
-    price: 699,
-    includes: ['Google Maps', 'Facebook o Instagram'],
-    notes: ['Ahorro de $99 MXN frente a dos tarjetas individuales.'],
-    message: 'Hola, me interesa el Combo Reputación de tarjetas NFC de DASTI. Quiero recibir información y cotización.',
+    quantityLabel: '2 tarjetas NFC + QR',
+    messageSubject: 'el Combo Impulso de 2 tarjetas NFC + QR',
+    prices: { lista: 799, imprimimos: 849, disenamos: 899 },
+    includes: ['2 tarjetas NFC + QR', 'Tú eliges para qué utilizar cada tarjeta'],
   },
   {
     id: 'conecta',
     name: 'Combo Conecta',
     cards: 4,
-    price: 1199,
-    includes: ['Facebook', 'Instagram', 'TikTok', 'WhatsApp'],
-    notes: ['Equivale a $299.75 MXN por tarjeta.', 'Ahorro de $397 MXN frente a comprarlas individualmente.'],
-    message: 'Hola, me interesa el Combo Conecta de tarjetas NFC de DASTI. Quiero recibir información y cotización.',
-  },
-  {
-    id: 'restaurante-digital',
-    name: 'Combo Restaurante Digital',
-    cards: 4,
-    price: 1249,
-    includes: ['Menú digital', 'Sitio web', 'Google Maps', 'WhatsApp'],
-    notes: ['Ahorro de $347 MXN frente a cuatro tarjetas individuales.'],
-    message: 'Hola, me interesa el Combo Restaurante Digital de tarjetas NFC de DASTI. Quiero recibir información y cotización.',
+    quantityLabel: '4 tarjetas NFC + QR',
+    messageSubject: 'el Combo Conecta de 4 tarjetas NFC + QR',
+    prices: { lista: 1499, imprimimos: 1599, disenamos: 1699 },
+    includes: ['4 tarjetas NFC + QR', 'Ideal para redes sociales, WhatsApp, Google Maps o página web'],
   },
   {
     id: 'presencia-total',
     name: 'Combo Presencia Total',
     cards: 6,
-    price: 1699,
-    includes: ['Facebook', 'Instagram', 'TikTok', 'WhatsApp', 'Google Maps', 'Página web o menú'],
-    notes: ['Ahorro de $695 MXN frente a seis tarjetas individuales.'],
-    message: 'Hola, me interesa el Combo Presencia Total de tarjetas NFC de DASTI. Quiero recibir información y cotización.',
-    featured: true,
+    quantityLabel: '6 tarjetas NFC + QR',
+    messageSubject: 'el Combo Presencia Total de 6 tarjetas NFC + QR',
+    prices: { lista: 2099, imprimimos: 2249, disenamos: 2399 },
+    includes: [
+      '6 tarjetas NFC + QR',
+      'Mayor presencia para tu negocio',
+      'Posibilidad de asignar diferentes funciones a las tarjetas',
+    ],
   },
 ]
 
+/** Plan Empresarial: sin precio fijo (cotización especial por volumen). */
+export const nfcEnterprise = {
+  id: 'empresarial',
+  name: 'Plan Empresarial',
+  quantityLabel: '7 o más tarjetas',
+  priceLabel: 'Cotización especial',
+  tagline: 'Precio preferencial por volumen.',
+  includes: ['Ideal para equipos o sucursales', 'Tú eliges la función de cada tarjeta', 'Atención personalizada'],
+  message:
+    'Hola, me interesa el Plan Empresarial de DASTI para 7 o más tarjetas NFC + QR. Me gustaría solicitar una cotización especial.',
+}
+
 /** Condición general obligatoria de todos los combos. */
 export const NFC_COMBOS_NOTE = {
-  included: 'Todos los combos incluyen IVA, NFC, QR, configuración inicial y diseños genéricos.',
-  excluded: 'La creación de un menú digital o página web no está incluida.',
+  included: 'Todos los combos incluyen IVA, NFC, QR y configuración inicial.',
+  excluded: 'La creación de una página web o catálogo digital no está incluida en el precio.',
+}
+
+/** Mensaje de WhatsApp que identifica producto, cantidad y modalidad. */
+export function nfcOrderMessage(product: Pick<NfcProduct, 'messageSubject'>, mode: NfcDesignMode): string {
+  const label = nfcDesignModes.find((m) => m.id === mode)?.label ?? ''
+  return `Hola, me interesa ${product.messageSubject}, en la modalidad ${label}. Me gustaría solicitar información para realizar mi pedido.`
 }
 
 export interface NfcExtra {
@@ -347,7 +375,7 @@ export const nfcFaq = [
   },
   {
     q: '¿Puedo personalizar el diseño?',
-    a: 'Sí. Puedes elegir un diseño genérico listo para usar (desde $399 MXN), enviarnos tu propio diseño ($429 MXN) o pedir que lo personalicemos por ti ($499 MXN). Precios finales con IVA incluido. La información o enlaces de la tarjeta se definen contigo antes de prepararla.',
+    a: `Sí. Cada tarjeta y combo se ofrece en tres modalidades: Lista para usar, Imprimimos tu diseño (nos compartes tu diseño final listo para impresión) o Diseñamos para ti (creamos una línea gráfica similar entre las tarjetas y la adaptamos a cada función; incluye una ronda de cambios). La tarjeta individual cuesta ${formatMXN(nfcIndividual.prices.lista)}, ${formatMXN(nfcIndividual.prices.imprimimos)} o ${formatMXN(nfcIndividual.prices.disenamos)} MXN, respectivamente. Precios finales con IVA incluido.`,
   },
   {
     q: '¿Cómo solicito mis tarjetas?',
@@ -362,8 +390,12 @@ export const nfcFaq = [
     a: 'Sí, la facturación está disponible.',
   },
   {
-    q: '¿Los combos incluyen menú digital o página web?',
-    a: 'No. Todos los combos incluyen IVA, NFC, QR, configuración inicial y diseños genéricos, pero la creación de un menú digital o página web no está incluida.',
+    q: '¿Qué métodos de pago aceptan?',
+    a: 'Aceptamos efectivo, transferencia bancaria y tarjetas de crédito y débito. Los métodos y condiciones de pago se confirman directamente con DASTI al realizar tu pedido.',
+  },
+  {
+    q: '¿Los combos incluyen página web o catálogo digital?',
+    a: `No. ${NFC_COMBOS_NOTE.included} ${NFC_COMBOS_NOTE.excluded}`,
   },
   {
     q: '¿Cómo se usa en el día a día?',

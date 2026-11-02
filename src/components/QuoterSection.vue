@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { ArrowUpRight, Check, ChevronDown, Info, Minus, Plus, Tag } from '@lucide/vue'
 import WhatsAppIcon from '@/components/ui/WhatsAppIcon.vue'
 import { buildWhatsAppUrl } from '@/config/contact'
+import { PAYMENT_PAGE_ROUTE, PAYMENT_SUMMARY } from '@/data/payments'
 import { servicesDef, getEquipmentDiscount, VOLUME_DISCOUNT_SCALE, type ServiceDef } from '@/data/quoter'
 
 /*
@@ -536,6 +537,10 @@ const scrollToSummary = () => {
                 <span class="btn-orb"><ArrowUpRight :size="16" /></span>
               </RouterLink>
             </div>
+            <p class="mt-5 text-center text-xs leading-relaxed text-on-ink-3">
+              Métodos de pago: {{ PAYMENT_SUMMARY }}
+              <RouterLink :to="PAYMENT_PAGE_ROUTE" class="link-u font-medium text-on-ink-2 hover:text-on-ink">Ver métodos de pago</RouterLink>
+            </p>
           </div>
         </div>
       </aside>

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ArrowUpRight, Send, MessageCircle, Mail, Phone, Clock, MapPin, Video, CalendarCheck } from '@lucide/vue'
+import { ArrowUpRight, Send, MessageCircle, Mail, Phone, Clock, MapPin, Video, CalendarCheck, CreditCard } from '@lucide/vue'
 import WhatsAppIcon from '@/components/ui/WhatsAppIcon.vue'
 import { buildWhatsAppUrl, CONTACT_CONFIG } from '@/config/contact'
+import { PAYMENT_PAGE_ROUTE, PAYMENT_SUMMARY } from '@/data/payments'
 
 /*
  * Contacto DASTI. La lógica del formulario (campos, honeypot, envío a
@@ -241,6 +242,15 @@ const activeMode = () => contactModes.find(m => m.id === selectedMode.value)
                     <span class="block text-xs text-on-ink-3">Ubicación</span>
                     <span class="block text-sm text-on-ink">Morelos · Cuernavaca, México</span>
                   </span>
+                </li>
+                <li>
+                  <RouterLink :to="PAYMENT_PAGE_ROUTE" class="group flex items-start gap-4">
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-ink-line"><CreditCard :size="16" /></span>
+                    <span class="min-w-0">
+                      <span class="block text-xs text-on-ink-3">Métodos de pago</span>
+                      <span class="link-u block text-sm text-on-ink">{{ PAYMENT_SUMMARY }}</span>
+                    </span>
+                  </RouterLink>
                 </li>
               </ul>
 

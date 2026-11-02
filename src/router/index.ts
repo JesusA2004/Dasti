@@ -122,6 +122,18 @@ const router = createRouter({
       },
     },
     {
+      path: '/metodos-de-pago',
+      component: () => import('@/pages/PaymentMethodsPage.vue'),
+      meta: {
+        title: 'Métodos de pago - DASTI',
+        description:
+          'Métodos de pago aceptados por DASTI para sus productos y servicios: efectivo, transferencia bancaria y tarjetas de crédito y débito. Las condiciones se confirman al realizar la contratación o pedido.',
+        canonical: 'https://dasti.cloud/metodos-de-pago',
+        ogTitle: 'Métodos de pago | DASTI',
+        ogDesc: 'Efectivo, transferencia bancaria y tarjetas de crédito y débito para productos y servicios DASTI.',
+      },
+    },
+    {
       path: '/alianzas',
       component: () => import('@/pages/AlliancesPage.vue'),
       meta: {

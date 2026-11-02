@@ -4,6 +4,7 @@ import WhatsAppIcon from '@/components/ui/WhatsAppIcon.vue'
 import { buildWhatsAppUrl, CONTACT_CONFIG, SOCIAL_LINKS } from '@/config/contact'
 import { serviceCategories } from '@/data/services'
 import { alliances } from '@/data/alliances'
+import { PAYMENT_PAGE_ROUTE } from '@/data/payments'
 
 const year = new Date().getFullYear()
 const whatsappUrl = buildWhatsAppUrl('Hola, me interesa recibir asesoría de DASTI para una solución en TI.')
@@ -15,6 +16,7 @@ const navLinks = [
   { name: 'Cotizador', href: '/cotizador' },
   { name: 'Nosotros', href: '/nosotros' },
   { name: 'Contacto', href: '/contacto' },
+  { name: 'Métodos de pago', href: PAYMENT_PAGE_ROUTE },
 ]
 
 const coverageZones = [

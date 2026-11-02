@@ -1,8 +1,25 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue'
-import { ArrowDown, ArrowUpRight, Check, Info, MapPin, Palette, QrCode, ReceiptText, Smartphone, Truck, Wallet } from '@lucide/vue'
+import { computed, nextTick, reactive, ref } from 'vue'
+import {
+  ArrowDown,
+  ArrowLeftRight,
+  ArrowUpRight,
+  Banknote,
+  Building2,
+  Check,
+  CreditCard,
+  Info,
+  MapPin,
+  Palette,
+  QrCode,
+  ReceiptText,
+  Smartphone,
+  Truck,
+  Wallet,
+} from '@lucide/vue'
 import NfcCardVisual from '@/components/products/NfcCardVisual.vue'
 import NfcDesignMock from '@/components/products/NfcDesignMock.vue'
+import NfcModeOptions from '@/components/products/NfcModeOptions.vue'
 import NfcPhoneMock from '@/components/products/NfcPhoneMock.vue'
 import MediaFrame from '@/components/ui/MediaFrame.vue'
 import FaqList from '@/components/ui/FaqList.vue'
@@ -11,23 +28,29 @@ import { useSectionProgress } from '@/composables/useSectionProgress'
 import { formatMXN } from '@/utils/format'
 import {
   NFC_COMBOS_FROM,
+  NFC_COMBOS_INTRO,
   NFC_COMBOS_NOTE,
+  NFC_DESIGN_CONDITIONS,
   NFC_EXTRAS_FROM,
   NFC_EXTRAS_MESSAGE,
   NFC_PRICING,
   nfcCardTypes,
   nfcCombos,
+  nfcEnterprise,
   nfcExtras,
   nfcFaq,
   nfcGenericDesigns,
   nfcImages,
   nfcIndividual,
   nfcMessageUrl,
+  nfcOrderMessage,
   nfcShipping,
   nfcSteps,
   nfcWhatsAppUrl,
+  type NfcDesignMode,
   type NfcExtra,
 } from '@/data/nfc'
+import { PAYMENT_PAGE_ROUTE, paymentShortLabels } from '@/data/payments'
 
 /* ── Tipos de tarjeta (pestañas accesibles) ── */
 const activeType = ref(0)
@@ -57,7 +80,16 @@ const mxn = (n: number) => `${formatMXN(n)} ${NFC_PRICING.currency}`
 const extraPrice = (e: NfcExtra) => (e.kind === 'monthly' ? `${mxn(e.price)}/mes` : `+${mxn(e.price)}`)
 
 const generalWhatsApp = nfcWhatsAppUrl()
-const individualWhatsApp = nfcMessageUrl(nfcIndividual.options[0].message)
+
+/* Modalidad de diseño seleccionada por producto (por defecto: Lista para usar). */
+const selectedMode = reactive<Record<string, NfcDesignMode>>(
+  Object.fromEntries([nfcIndividual, ...nfcCombos].map((p) => [p.id, 'lista' as NfcDesignMode])),
+)
+const orderUrl = (product: Parameters<typeof nfcOrderMessage>[0] & { id: string }) =>
+  nfcMessageUrl(nfcOrderMessage(product, selectedMode[product.id] ?? 'lista'))
+const enterpriseWhatsApp = nfcMessageUrl(nfcEnterprise.message)
+
+const paymentIcons = [Banknote, ArrowLeftRight, CreditCard, CreditCard] as const
 const extrasWhatsApp = nfcMessageUrl(NFC_EXTRAS_MESSAGE)
 
 const shippingIcons = { local: MapPin, nacional: Truck, costo: Wallet, factura: ReceiptText } as const
@@ -292,7 +324,7 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
           aria-labelledby="individual-title"
         >
           <div class="lg:col-span-5">
-            <span class="rounded-full bg-paper-2 px-2.5 py-1 text-[0.68rem] font-semibold text-fg-2">1 tarjeta</span>
+            <span class="rounded-full bg-paper-2 px-2.5 py-1 text-[0.68rem] font-semibold text-fg-2">{{ nfcIndividual.quantityLabel }}</span>
             <h3 id="individual-title" class="display-3 mt-5 text-fg">{{ nfcIndividual.name }}</h3>
             <p class="mt-6 text-sm text-fg-3">Desde</p>
             <p class="font-display text-[2.4rem] font-semibold leading-none tracking-tight text-fg">
@@ -305,42 +337,38 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
                 <span class="text-fg-2">{{ f }}</span>
               </li>
             </ul>
-            <a :href="individualWhatsApp" target="_blank" rel="noopener noreferrer" class="btn btn-ink mt-8">
-              Solicitar cotización
+            <a
+              :href="orderUrl(nfcIndividual)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-ink mt-8"
+              aria-label="Pedir la tarjeta individual en la modalidad seleccionada por WhatsApp"
+            >
+              Hacer mi pedido
               <span class="btn-orb"><WhatsAppIcon :size="15" /></span>
             </a>
           </div>
 
           <div class="lg:col-span-7">
-            <p class="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-fg-3">Elige tu diseño</p>
-            <ul class="mt-4 space-y-3">
-              <li
-                v-for="opt in nfcIndividual.options"
-                :key="opt.id"
-                class="flex flex-col gap-4 rounded-[22px] border border-line p-5 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div>
-                  <p class="font-semibold text-fg">{{ opt.label }}</p>
-                  <p class="mt-0.5 font-display text-xl font-semibold tracking-tight text-fg">{{ mxn(opt.price) }}</p>
-                </div>
-                <a
-                  :href="nfcMessageUrl(opt.message)"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="btn btn-line btn-sm shrink-0"
-                  :aria-label="`Cotizar tarjeta individual: ${opt.label} por WhatsApp`"
-                >
-                  Cotizar
-                  <span class="btn-orb"><WhatsAppIcon :size="14" /></span>
-                </a>
-              </li>
-            </ul>
+            <p class="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-fg-3">Elige tu modalidad</p>
+            <NfcModeOptions
+              v-model="selectedMode[nfcIndividual.id]"
+              class="mt-4"
+              :name="`modo-${nfcIndividual.id}`"
+              :product-name="nfcIndividual.name"
+              :prices="nfcIndividual.prices"
+              :conditions="NFC_DESIGN_CONDITIONS.individual"
+              size="lg"
+            />
           </div>
         </article>
 
         <!-- Combos más vendidos -->
         <div class="mt-20 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <h3 v-reveal="'clip'" class="display-3 text-fg">Combos más vendidos</h3>
+          <div>
+            <h3 v-reveal="'clip'" class="display-3 text-fg">{{ NFC_COMBOS_INTRO.title }}</h3>
+            <p v-reveal="'fade'" class="mt-3 text-sm text-fg-2">{{ NFC_COMBOS_INTRO.subtitle }}</p>
+          </div>
           <p v-reveal="'fade'" class="text-sm text-fg-3">
             Desde <span class="font-semibold text-fg">{{ mxn(NFC_COMBOS_FROM) }}</span> · {{ NFC_PRICING.vatLabel }}
           </p>
@@ -351,51 +379,85 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
             v-for="(combo, i) in nfcCombos"
             :key="combo.id"
             v-reveal="{ variant: 'up', delay: i * 90 }"
-            class="relative flex flex-col overflow-hidden rounded-[30px] p-7"
-            :class="combo.featured ? 'on-ink grain shadow-[var(--shadow-deep)]' : 'card'"
+            class="card relative flex flex-col overflow-hidden rounded-[30px] p-7"
           >
-            <div v-if="combo.featured" class="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_50%_at_100%_0%,rgba(37,99,235,0.4),transparent_70%)]" aria-hidden="true" />
             <div class="relative flex h-full flex-col">
               <div class="flex items-start justify-between gap-3">
-                <h4 class="title-4" :class="combo.featured ? 'text-on-ink' : 'text-fg'">{{ combo.name }}</h4>
-                <span
-                  class="shrink-0 rounded-full px-2.5 py-1 text-[0.68rem] font-semibold"
-                  :class="combo.featured ? 'bg-white/10 text-on-ink-2' : 'bg-paper-2 text-fg-2'"
-                >
+                <h4 class="title-4 text-fg">{{ combo.name }}</h4>
+                <span class="shrink-0 rounded-full bg-paper-2 px-2.5 py-1 text-[0.68rem] font-semibold text-fg-2">
                   {{ combo.cards }} tarjetas
                 </span>
               </div>
 
-              <div class="mt-6 border-y py-5" :class="combo.featured ? 'border-ink-line' : 'border-line'">
-                <p class="font-display text-[1.75rem] font-semibold tracking-tight" :class="combo.featured ? 'text-on-ink' : 'text-fg'">
-                  {{ mxn(combo.price) }}
-                </p>
-                <p class="mt-1 text-xs" :class="combo.featured ? 'text-on-ink-3' : 'text-fg-3'">{{ NFC_PRICING.vatLabel }}</p>
+              <div class="mt-6 border-y border-line py-5">
+                <NfcModeOptions
+                  v-model="selectedMode[combo.id]"
+                  :name="`modo-${combo.id}`"
+                  :product-name="combo.name"
+                  :prices="combo.prices"
+                />
+                <p class="mt-3 text-xs text-fg-3">{{ NFC_PRICING.currency }} · {{ NFC_PRICING.vatLabel }}</p>
               </div>
 
-              <p class="mt-5 text-[0.7rem] font-semibold uppercase tracking-[0.16em]" :class="combo.featured ? 'text-on-ink-3' : 'text-fg-3'">
-                Incluye
-              </p>
+              <p class="mt-5 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-fg-3">Incluye</p>
               <ul class="mt-3 space-y-2">
                 <li v-for="f in combo.includes" :key="f" class="flex items-start gap-2.5 text-sm">
-                  <Check :size="16" class="mt-0.5 shrink-0" :class="combo.featured ? 'text-signal' : 'text-accent'" />
-                  <span :class="combo.featured ? 'text-on-ink-2' : 'text-fg-2'">{{ f }}</span>
+                  <Check :size="16" class="mt-0.5 shrink-0 text-accent" />
+                  <span class="text-fg-2">{{ f }}</span>
                 </li>
-              </ul>
-
-              <ul class="mt-5 space-y-1">
-                <li v-for="n in combo.notes" :key="n" class="text-xs" :class="combo.featured ? 'text-on-ink-3' : 'text-fg-3'">· {{ n }}</li>
               </ul>
 
               <div class="mt-auto pt-7">
                 <a
-                  :href="nfcMessageUrl(combo.message)"
+                  :href="orderUrl(combo)"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn btn-block"
-                  :class="combo.featured ? 'btn-light' : 'btn-ink'"
+                  class="btn btn-ink btn-block"
+                  :aria-label="`Pedir ${combo.name} en la modalidad seleccionada por WhatsApp`"
                 >
-                  Cotizar combo
+                  Pedir combo
+                  <span class="btn-orb"><WhatsAppIcon :size="15" /></span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Plan Empresarial (destacado) -->
+          <article
+            v-reveal="{ variant: 'up', delay: nfcCombos.length * 90 }"
+            class="on-ink grain relative flex flex-col overflow-hidden rounded-[30px] p-7 shadow-[var(--shadow-deep)]"
+            aria-labelledby="enterprise-title"
+          >
+            <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_50%_at_100%_0%,rgba(37,99,235,0.4),transparent_70%)]" aria-hidden="true" />
+            <div class="relative flex h-full flex-col">
+              <div class="flex items-start justify-between gap-3">
+                <h4 id="enterprise-title" class="title-4 text-on-ink">{{ nfcEnterprise.name }}</h4>
+                <span class="shrink-0 rounded-full bg-white/10 px-2.5 py-1 text-[0.68rem] font-semibold text-on-ink-2">
+                  {{ nfcEnterprise.quantityLabel }}
+                </span>
+              </div>
+
+              <div class="mt-6 border-y border-ink-line py-5">
+                <span class="grid h-10 w-10 place-items-center rounded-full border border-ink-line text-signal">
+                  <Building2 :size="17" />
+                </span>
+                <p class="mt-4 font-display text-[1.75rem] font-semibold leading-tight tracking-tight text-on-ink">
+                  {{ nfcEnterprise.priceLabel }}
+                </p>
+                <p class="mt-1 text-sm text-on-ink-2">{{ nfcEnterprise.tagline }}</p>
+              </div>
+
+              <p class="mt-5 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-on-ink-3">Incluye</p>
+              <ul class="mt-3 space-y-2">
+                <li v-for="f in nfcEnterprise.includes" :key="f" class="flex items-start gap-2.5 text-sm">
+                  <Check :size="16" class="mt-0.5 shrink-0 text-signal" />
+                  <span class="text-on-ink-2">{{ f }}</span>
+                </li>
+              </ul>
+
+              <div class="mt-auto pt-7">
+                <a :href="enterpriseWhatsApp" target="_blank" rel="noopener noreferrer" class="btn btn-light btn-block">
+                  Solicitar cotización
                   <span class="btn-orb"><WhatsAppIcon :size="15" /></span>
                 </a>
               </div>
@@ -403,18 +465,26 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
           </article>
         </div>
 
-        <!-- Condición general de los combos -->
-        <div v-reveal="'up'" class="mt-6 flex items-start gap-3 rounded-[22px] border border-line bg-paper-2 p-5 sm:p-6">
-          <Info :size="18" class="mt-0.5 shrink-0 text-accent" />
-          <p class="text-sm leading-relaxed text-fg-2">
-            <span class="font-semibold text-fg">{{ NFC_COMBOS_NOTE.included }}</span>
-            {{ NFC_COMBOS_NOTE.excluded }}
-          </p>
+        <!-- Condición general de los combos y condiciones de diseño -->
+        <div v-reveal="'up'" class="mt-6 grid gap-5 rounded-[22px] border border-line bg-paper-2 p-5 sm:p-6 lg:grid-cols-12">
+          <div class="flex items-start gap-3 lg:col-span-5">
+            <Info :size="18" class="mt-0.5 shrink-0 text-accent" />
+            <p class="text-sm leading-relaxed text-fg-2">
+              <span class="font-semibold text-fg">{{ NFC_COMBOS_NOTE.included }}</span>
+              {{ NFC_COMBOS_NOTE.excluded }}
+            </p>
+          </div>
+          <dl class="grid gap-4 text-sm sm:grid-cols-2 lg:col-span-7">
+            <div>
+              <dt class="font-semibold text-fg">Imprimimos tu diseño</dt>
+              <dd class="mt-1 leading-relaxed text-fg-2">{{ NFC_DESIGN_CONDITIONS.combos.imprimimos }}</dd>
+            </div>
+            <div>
+              <dt class="font-semibold text-fg">Diseñamos para ti</dt>
+              <dd class="mt-1 leading-relaxed text-fg-2">{{ NFC_DESIGN_CONDITIONS.combos.disenamos }}</dd>
+            </div>
+          </dl>
         </div>
-        <p class="mt-4 text-sm text-fg-3">
-          ¿Necesitas más tarjetas para tu equipo o empresa?
-          <a :href="generalWhatsApp" target="_blank" rel="noopener noreferrer" class="link-u font-medium text-fg">Escríbenos y cotizamos según cantidad.</a>
-        </p>
 
         <!-- Extras y Smart -->
         <div class="mt-20 grid gap-8 lg:grid-cols-12 lg:items-start">
@@ -434,6 +504,33 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
               <span class="shrink-0 font-display font-semibold tracking-tight text-fg">{{ extraPrice(e) }}</span>
             </li>
           </ul>
+        </div>
+
+        <!-- Métodos de pago (DASTI) -->
+        <div
+          v-reveal="'up'"
+          class="mt-20 flex flex-col gap-6 rounded-[24px] border border-line p-6 sm:p-7 lg:flex-row lg:items-center lg:justify-between"
+          aria-labelledby="nfc-pay-title"
+          role="group"
+        >
+          <div class="flex items-start gap-4">
+            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
+              <Wallet :size="17" />
+            </span>
+            <div>
+              <h3 id="nfc-pay-title" class="title-4 text-fg">Paga como prefieras</h3>
+              <ul class="mt-3 flex flex-wrap gap-1.5" aria-label="Métodos de pago aceptados">
+                <li v-for="(label, i) in paymentShortLabels" :key="label" class="chip inline-flex items-center gap-1.5">
+                  <component :is="paymentIcons[i]" :size="13" class="text-accent" aria-hidden="true" />
+                  {{ label }}
+                </li>
+              </ul>
+            </div>
+          </div>
+          <RouterLink :to="PAYMENT_PAGE_ROUTE" class="btn btn-line btn-sm shrink-0 self-start lg:self-center">
+            Ver métodos de pago
+            <span class="btn-orb"><ArrowUpRight :size="14" /></span>
+          </RouterLink>
         </div>
       </div>
     </section>
@@ -475,8 +572,8 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
             </h2>
           </div>
           <p v-reveal="{ variant: 'up', delay: 100 }" class="lead lg:col-span-5">
-            Así lucen los modelos que ya producimos en DASTI, por frente y reverso. Son los diseños genéricos incluidos en la
-            tarjeta individual y en los combos.
+            Así lucen los modelos que ya producimos en DASTI, por frente y reverso. Son los diseños de la modalidad
+            «Lista para usar», disponibles en la tarjeta individual y en los combos.
           </p>
         </div>
 
@@ -512,8 +609,8 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
           </article>
         </div>
         <p class="mt-6 text-xs text-fg-3">
-          Vistas recreadas a partir de las tarjetas impresas reales. ¿Prefieres otro diseño? Envíanos el tuyo o pide que lo
-          personalicemos por ti.
+          Vistas recreadas a partir de las tarjetas impresas reales. ¿Prefieres otro diseño? Elige «Imprimimos tu diseño» o
+          «Diseñamos para ti».
         </p>
       </div>
     </section>

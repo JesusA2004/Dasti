@@ -291,6 +291,8 @@ Ajuste de contenido sobre el rediseño existente; no se modificó la línea visu
 
 ### Precios NFC cargados (MXN, IVA incluido)
 
+> **Histórico.** Estos precios y paquetes ya no están vigentes; fueron sustituidos por el catálogo de la **sección K**.
+
 **Tarjeta individual** — desde $399 MXN. Incluye NFC + QR funcional, diseño genérico listo para usar y configuración inicial.
 - Diseño genérico: $399 · Tu diseño: $429 · Personalizada por nosotros: $499.
 
@@ -333,3 +335,121 @@ Las fotografías no estaban en el repositorio, así que no se publicó ninguna f
 - `npm run type-check` (no ejecutado).
 
 No se ejecutaron build, pruebas ni type-check. No se hizo commit, push ni se crearon ramas.
+
+---
+
+## K. Actualización de catálogo NFC y métodos de pago (2026-11-02)
+
+Actualización puntual de información comercial. **No es un rediseño:** se conservaron identidad visual, distribución, hero, navegación y animaciones. Solo se ajustó la presentación interna de los precios NFC para mostrar tres modalidades por producto.
+
+### Archivo donde se administran los precios
+
+Todo el catálogo NFC vive en **`src/data/nfc.ts`** (precios finales en MXN, **IVA incluido**; no sumar IVA):
+
+| Export | Contenido |
+|---|---|
+| `nfcDesignModes` / `NfcDesignMode` | Modalidades: `lista` (Lista para usar), `imprimimos` (Imprimimos tu diseño), `disenamos` (Diseñamos para ti). |
+| `NFC_DESIGN_CONDITIONS` | Condiciones de diseño para la tarjeta individual y para los combos. |
+| `nfcIndividual` | Tarjeta individual: `fromPrice`, `prices` por modalidad, `includes`. `fromPrice` también lo leen `HomeNfc.vue` y `ProductsPage.vue`. |
+| `nfcCombos`, `NFC_COMBOS_FROM`, `NFC_COMBOS_INTRO` | Combos vigentes y su encabezado. |
+| `nfcEnterprise` | Plan Empresarial (sin precio numérico). |
+| `NFC_COMBOS_NOTE` | Condición general de los combos. |
+| `nfcOrderMessage(product, mode)` | Mensaje de WhatsApp con producto, cantidad y modalidad. |
+
+Los precios del cotizador de servicios (`src/data/quoter.ts`) **no se modificaron**. Los extras NFC (`nfcExtras`) se conservaron sin cambios.
+
+### Nuevos precios NFC (MXN, IVA incluido)
+
+**Tarjeta individual** — 1 tarjeta — desde $449.
+
+| Modalidad | Precio |
+|---|---:|
+| Lista para usar | $449 |
+| Imprimimos tu diseño | $479 |
+| Diseñamos para ti | $499 |
+
+Incluye: NFC + QR funcional · Diseño listo para usar · Configuración inicial incluida · Entrega lista para usar.
+
+**Combos más vendidos** — "Pensados para negocios que quieren conectar mejor con sus clientes." — desde $799.
+
+| Combo | Tarjetas | Lista para usar | Imprimimos tu diseño | Diseñamos para ti | Incluye |
+|---|---|---:|---:|---:|---|
+| Impulso | 2 | $799 | $849 | $899 | 2 tarjetas NFC + QR · el cliente elige para qué usar cada tarjeta |
+| Conecta | 4 | $1,499 | $1,599 | $1,699 | 4 tarjetas NFC + QR · ideal para redes sociales, WhatsApp, Google Maps o página web (ejemplos, no destinos obligatorios) |
+| Presencia Total | 6 | $2,099 | $2,249 | $2,399 | 6 tarjetas NFC + QR · mayor presencia · funciones diferentes por tarjeta |
+
+**Plan Empresarial** — 7 o más tarjetas — **Cotización especial** · "Precio preferencial por volumen." Incluye: ideal para equipos o sucursales · el cliente elige la función de cada tarjeta · atención personalizada. Sin precio fijo, porcentaje ni rango de ahorro. Conserva el tratamiento visual destacado (bloque oscuro) que antes tenía Presencia Total.
+
+### Condiciones comerciales visibles
+
+- Bajo los combos: *"Todos los combos incluyen IVA, NFC, QR y configuración inicial."* + *"La creación de una página web o catálogo digital no está incluida en el precio."*
+- **Imprimimos tu diseño:** el cliente comparte/proporciona su diseño final listo para impresión.
+- **Diseñamos para ti:** línea gráfica similar entre las tarjetas, adaptada a cada función. **Incluye una ronda de cambios** (no se prometen revisiones ilimitadas).
+- En la tarjeta individual las condiciones aparecen dentro de cada opción; en los combos, en el bloque de condiciones bajo la rejilla.
+
+### Representación de las tres modalidades
+
+Nuevo componente `src/components/products/NfcModeOptions.vue`: grupo de radios accesible (`fieldset` + `legend` oculto, `input type="radio"` nativo, foco visible). Cada fila muestra modalidad y precio; la elegida se resalta con el acento. Por defecto está seleccionada "Lista para usar".
+
+- Tarjeta individual: filas amplias en la columna derecha (como antes), con su condición; un botón **Hacer mi pedido**.
+- Combos: filas compactas dentro de la tarjeta (en el bloque donde antes estaba el precio único); un botón **Pedir combo**.
+- El botón de WhatsApp usa la modalidad seleccionada: `nfcOrderMessage()` → `nfcMessageUrl()` → `buildWhatsAppUrl()` (`https://wa.me/527778779239?text=…` con `encodeURIComponent`). Ejemplo: *"Hola, me interesa el Combo Conecta de 4 tarjetas NFC + QR, en la modalidad Imprimimos tu diseño. Me gustaría solicitar información para realizar mi pedido."*
+- Plan Empresarial: *"Hola, me interesa el Plan Empresarial de DASTI para 7 o más tarjetas NFC + QR. Me gustaría solicitar una cotización especial."*
+
+### Paquetes sustituidos / eliminados
+
+- Eliminados: **Combo Reputación** ($699) y **Combo Restaurante Digital** ($1,249).
+- Sustituidos: tarjeta individual desde $399 (opciones $399/$429/$499), Combo Conecta $1,199, Combo Presencia Total $1,699.
+- Se retiraron todas las notas de ahorro ("ahorro de $397", "$299.75 por tarjeta", etc.); el nuevo catálogo no muestra descuentos.
+- Se retiró la línea "¿Necesitas más tarjetas…? cotizamos según cantidad" (la cubre el Plan Empresarial).
+- Se retiraron `NfcPriceOption`, `NfcCombo` y los campos `notes`, `message` y `featured` de los combos.
+- FAQ NFC: se actualizaron "¿Puedo personalizar el diseño?" (precios leídos desde `nfcIndividual.prices`) y "¿Los combos incluyen página web o catálogo digital?"; se agregó "¿Qué métodos de pago aceptan?". El resto de preguntas se conservó.
+- Textos de la sección de diseños genéricos ajustados a las modalidades ("Lista para usar", "Imprimimos tu diseño", "Diseñamos para ti").
+
+### Métodos de pago
+
+Datos en **`src/data/payments.ts`** (métodos, nota de condiciones, alcance y enlace de WhatsApp). Aplican a productos y servicios **propios de DASTI**; no a Nexora ni a otros aliados (no se agregó nada en sus páginas).
+
+Nueva ruta **`/metodos-de-pago`** → `src/pages/PaymentMethodsPage.vue` (carga diferida, SEO en `src/router/index.ts`, añadida a `public/sitemap.xml`):
+
+- Encabezado "Métodos de pago" con el subtítulo solicitado.
+- Tres tarjetas: Efectivo · Transferencia bancaria · Tarjetas de crédito y débito, con los textos solicitados.
+- Bloque informativo: *"Los métodos y condiciones de pago se confirman directamente con DASTI al realizar la contratación o pedido."* + aclaración de que aplican a productos y servicios propios de DASTI.
+- CTA **Consultar opciones de pago** → WhatsApp DASTI con *"Hola, me gustaría conocer las opciones de pago disponibles en DASTI."*
+- Página solo informativa: sin pasarela, checkout, formularios de tarjeta, enlaces de cobro, backend ni base de datos. No se publicaron bancos, cuentas, CLABE, terminales, procesadores, MSI, comisiones ni descuentos.
+
+### Ubicación de los enlaces a `/metodos-de-pago`
+
+| Lugar | Archivo | Forma |
+|---|---|---|
+| Footer | `src/components/FooterSection.vue` | Enlace "Métodos de pago" en la columna Navegación. |
+| Página NFC | `src/pages/NfcCardsPage.vue` | Bloque "Paga como prefieras" (Efectivo · Transferencia · Crédito · Débito) + "Ver métodos de pago", al final de la sección de precios. |
+| Cotizador | `src/components/QuoterSection.vue` | Línea discreta bajo los botones del resumen. Sin cambios en precios, cálculos ni reglas. |
+| Contacto | `src/components/ContactSection.vue` | Nuevo elemento "Métodos de pago" en el panel de información (vista Formulario). |
+
+No se agregó al navbar principal.
+
+### Archivos modificados en esta actualización
+
+- `src/data/nfc.ts` — nuevo catálogo, modalidades, condiciones, Plan Empresarial, mensajes y FAQ.
+- `src/data/payments.ts` — **nuevo**.
+- `src/components/products/NfcModeOptions.vue` — **nuevo**.
+- `src/pages/NfcCardsPage.vue` — precios por modalidad, Plan Empresarial, condiciones, bloque de pagos.
+- `src/pages/PaymentMethodsPage.vue` — **nuevo**.
+- `src/router/index.ts` — ruta `/metodos-de-pago`.
+- `src/components/FooterSection.vue`, `src/components/QuoterSection.vue`, `src/components/ContactSection.vue` — enlaces.
+- `public/sitemap.xml` — nueva URL y `lastmod` de tarjetas NFC.
+- `docs/REDISENO-FRONTEND-DASTI.md` — esta sección.
+
+`HomeNfc.vue` y `ProductsPage.vue` no se editaron: muestran automáticamente "Desde $449 MXN" porque leen `nfcIndividual.fromPrice`.
+
+### Pendientes de revisión manual
+
+- Probar la selección de modalidad en cada producto y verificar el mensaje de WhatsApp resultante.
+- Rejilla de combos con filas de modalidad a 320–430 px, tablet (2 columnas) y ≥1280 px (4 columnas): confirmar que "Imprimimos tu diseño" y el precio no se vean apretados.
+- Tema oscuro del selector de modalidad (`bg-accent-soft`, `border-accent`).
+- El extra **"Personalización de combo" (+$299)** se conservó tal cual por instrucción; confirmar si sigue vigente ahora que existe la modalidad "Diseñamos para ti".
+- Redacción de la aclaración de alcance en `/metodos-de-pago` ("Los aliados independientes manejan sus propias condiciones").
+- `npm run type-check` y build (no ejecutados).
+
+No se ejecutaron build, pruebas ni type-check. No se hizo commit, push ni se crearon ramas. No se modificó el backend.
