@@ -155,7 +155,7 @@ Todo vive en **`src/data/nfc.ts`**. Las vistas (`NfcCardsPage.vue`, `HomeNfc.vue
 | Pasos del proceso | `nfcSteps` (5 pasos) |
 | Tarjeta individual | `nfcIndividual` (ver sección J) |
 | Combos | `nfcCombos`, `NFC_COMBOS_FROM`, `NFC_COMBOS_NOTE` |
-| Extras y Smart | `nfcExtras`, `NFC_EXTRAS_FROM`, `NFC_EXTRAS_MESSAGE` |
+| ~~Extras y Smart~~ | Retirado en la sección L. |
 | Envíos y cobertura | `nfcShipping` |
 | Diseños genéricos (sustituye a la galería) | `nfcGenericDesigns` |
 | Preguntas frecuentes | `nfcFaq` |
@@ -356,7 +356,7 @@ Todo el catálogo NFC vive en **`src/data/nfc.ts`** (precios finales en MXN, **I
 | `NFC_COMBOS_NOTE` | Condición general de los combos. |
 | `nfcOrderMessage(product, mode)` | Mensaje de WhatsApp con producto, cantidad y modalidad. |
 
-Los precios del cotizador de servicios (`src/data/quoter.ts`) **no se modificaron**. Los extras NFC (`nfcExtras`) se conservaron sin cambios.
+Los precios del cotizador de servicios (`src/data/quoter.ts`) **no se modificaron**. Los extras NFC (`nfcExtras`) se conservaron sin cambios en esa ronda (retirados después; ver sección L).
 
 ### Nuevos precios NFC (MXN, IVA incluido)
 
@@ -453,3 +453,108 @@ No se agregó al navbar principal.
 - `npm run type-check` y build (no ejecutados).
 
 No se ejecutaron build, pruebas ni type-check. No se hizo commit, push ni se crearon ramas. No se modificó el backend.
+
+---
+
+## L. Sección NFC: catálogo dinámico, soporte de madera, combinaciones y administración de enlaces (2026-11-02)
+
+Evolución de la página `/productos/tarjetas-nfc` sin cambiar el diseño general del sitio. **Precios, modalidades, Plan Empresarial y métodos de pago de la sección K no se modificaron.** No se tocó backend, cotizador de servicios, rutas ni navegación.
+
+### Nuevo recorrido de la página
+
+1. **Hero** — tarjeta vertical (frente) + reverso con QR + teléfono como contexto; chips «Frente · tu diseño + NFC», «Reverso · QR personalizado», «Mismo destino».
+2. **Cómo funciona** — cinco pasos + bloque nuevo «dos caras, un mismo destino» con tarjeta que se gira (botón «Ver reverso con QR»).
+3. **Tipos de tarjetas** (usos) — ilustración corregida a vertical.
+4. **Cambia tu enlace, no tu tarjeta** — nueva sección oscura (`NfcLinkManager.vue`).
+5. **Catálogo de diseños** — nuevo catálogo filtrable (`NfcDesignCatalog.vue`), sustituye a «Diseños genéricos listos para usar».
+6. **Precios** — tarjeta individual, combos y Plan Empresarial, ahora con distintivo de soporte de madera y «N funciones, iguales o diferentes».
+7. **Combina tus tarjetas como quieras** — demostración interactiva (`NfcComboMixer.vue`) + bloque **Soporte de madera incluido** (`NfcStandVisual.vue`).
+8. **Envíos, facturación y pagos** — envíos + bloque «Paga como prefieras» (movido aquí desde Precios).
+9. **Preguntas frecuentes** y **CTA final** (tarjeta vertical que se gira).
+
+### Secciones eliminadas
+
+- **Extras y Smart** (personalización de combo +$299, soporte acrílico +$79, protector acrílico +$149, Smart individual $49/mes) y su botón «Agregar extras». Se eliminaron `NfcExtra`, `nfcExtras`, `NFC_EXTRAS_FROM` y `NFC_EXTRAS_MESSAGE` de `src/data/nfc.ts`. El cotizador no tenía referencias.
+- **Diseños genéricos listos para usar** (recreaciones CSS). Se eliminaron `nfcGenericDesigns` y sus tipos, y el componente `src/components/products/NfcDesignMock.vue`. Los diseños ahora solo se muestran con imágenes originales.
+
+### Soporte de madera
+
+- `NFC_STAND` y `nfcStandLabel(cards)` en `src/data/nfc.ts`. Siempre **un soporte por tarjeta**, sin costo adicional (individual 1, Impulso 2, Conecta 4, Presencia Total 6, Plan Empresarial 1 por tarjeta). Las cantidades se calculan desde `cards` de cada producto.
+- Se muestra en: puntos clave del hero, cada tarjeta de precio (distintivo color madera `.stand-pill`), demostración de combinaciones, bloque «Lista para exhibir», FAQ («¿Qué incluye cada tarjeta?»), CTA final, y en las líneas «Desde $449…» de `HomeNfc.vue` y `ProductsPage.vue`.
+- No hay foto real del soporte: `NfcStandVisual.vue` muestra una representación sobria marcada como «Representación ilustrativa». Para usar la foto, colócala p. ej. en `public/img/products/nfc/soporte-madera.jpg` y asigna `nfcImages.stand.src`.
+- No es el antiguo soporte acrílico (retirado).
+
+### Combinaciones de funciones
+
+- Cada combo indica «N funciones, iguales o diferentes»; el Plan Empresarial, «la combinación de funciones que necesite tu empresa».
+- `NfcComboMixer.vue`: eliges combo (Impulso / Conecta / Presencia Total), asignas funciones del catálogo a cada tarjeta (clic para agregar, clic en la tarjeta para quitar), ejemplos rápidos y «Vaciar». Muestra el resumen y los soportes incluidos. Se identifica como **«Demostración ilustrativa: no genera un pedido ni un cobro.»** El botón «Consultar esta combinación» abre WhatsApp con, p. ej.: *«Hola, me interesa el Combo Conecta de 4 tarjetas NFC + QR con esta combinación: 1 Facebook, 1 Menú digital, 1 WhatsApp y 1 Google Maps. Me gustaría solicitar información para realizar mi pedido.»*
+- Datos estructurados para la futura tienda (`src/data/nfcCatalog.ts`): `NfcCardSelection { categoryId, quantity }`, `summarizeSelection()`, `selectionText()`, `comboSelectionMessage()`.
+
+### Corrección de ilustraciones NFC
+
+`src/components/products/NfcCardVisual.vue` se reescribió:
+
+- Formato **vertical CR80** (`aspect-ratio: 54 / 85.6`), tipografía escalada con unidades de contenedor (`cqw`) para que no se deforme a ningún tamaño.
+- **Frente**: logotipo, símbolo NFC y etiqueta. **Sin QR.**
+- **Reverso**: QR personalizado (patrón decorativo no funcional, con marcas de posición) y «Escanea el código o acerca tu teléfono».
+- Props nuevas: `side` (`front` | `back`) y `flippable` (botón accesible con `aria-pressed` que gira la tarjeta en 3D). Respeta `prefers-reduced-motion`.
+- Aplicado en: hero NFC, «Cómo funciona», «Tipos de tarjetas», demostración de enlaces, soporte de madera, CTA final, `HomeNfc.vue` (home) y `ProductsPage.vue` (frente + reverso).
+- Ya no existe ninguna tarjeta horizontal ni QR en el frente.
+
+### Catálogo de diseños
+
+Archivo de datos: **`src/data/nfcCatalog.ts`**.
+
+- `nfcCatalogCategories`: Facebook, Instagram, Google Maps, WhatsApp, TikTok, Wi-Fi, Sitio web, Menú digital (id estable, nombre, función, ícono genérico —no logotipos oficiales—, orden).
+- `nfcCatalogModels`: un modelo por categoría (`facebook-01`, `instagram-01`, …) con `categoryId`, `name`, `description`, `front`/`back` (`src` + `alt`), `order` y `available`.
+- Interfaz (`NfcDesignCatalog.vue`): filtros «Todos | Facebook | … | Menú digital» con contador (botones `aria-pressed`, desplazables en móvil), transición entre categorías, ficha con **frente y reverso** etiquetados, nota «QR del reverso personalizado para tu negocio», botón **Consultar diseño** (WhatsApp: *«Hola, me interesa una tarjeta NFC con el diseño de WhatsApp (modelo 01). Me gustaría solicitar información.»*) y **Ver en grande** (diálogo nativo `<dialog>`: Esc o clic fuera para cerrar, flechas ←/→ y botones para recorrer, selector Frente/Reverso en móvil, ambas caras en escritorio).
+- `NfcDesignImage.vue`: imagen con `object-contain` en proporción 54 × 85.6 (no recorta ni deforma). Si el archivo no existe, muestra **«Imagen pendiente»** (sin ícono roto). En modo desarrollo también muestra la ruta esperada.
+
+#### Estructura de imágenes
+
+```
+public/img/products/nfc/catalogo/
+  facebook/      modelo-01-frente.png  modelo-01-reverso.png
+  instagram/     modelo-01-frente.png  modelo-01-reverso.png
+  google-maps/   modelo-01-frente.png  modelo-01-reverso.png
+  whatsapp/      modelo-01-frente.png  modelo-01-reverso.png
+  tiktok/        modelo-01-frente.png  modelo-01-reverso.png
+  wifi/          modelo-01-frente.png  modelo-01-reverso.png
+  sitio-web/     modelo-01-frente.png  modelo-01-reverso.png
+  menu-digital/  modelo-01-frente.png  modelo-01-reverso.png
+```
+
+Las carpetas están creadas (con `.gitkeep`). **En el repositorio no existía ninguna imagen real de diseños**, así que no se pudo reutilizar ninguna: las **16 imágenes** anteriores están pendientes. Deben ser el archivo original de cada cara, recortado al borde de la tarjeta, vertical (≈ 54 × 85.6, p. ej. 1080 × 1712 px), PNG. Si usas otra extensión, cambia `catalogImagePath()`.
+
+#### Agregar diseños y categorías
+
+- **Otro modelo**: copia `modelo-02-frente.png` / `modelo-02-reverso.png` en la carpeta de la categoría y agrega `catalogModel('facebook', 2, 'Descripción…')` a `nfcCatalogModels`. La interfaz no cambia.
+- **Ocultar un modelo**: cuarto argumento `available = false`.
+- **Nueva categoría**: agrega el id a `NfcCatalogCategoryId`, un objeto en `nfcCatalogCategories` (con `order` e ícono de `@lucide/vue`) y su carpeta. Aparece sola en los filtros y en la demostración de combinaciones.
+- No cambies los `id` ya publicados: servirán como referencia de artículo para el carrito y Stripe.
+
+### Administración de enlaces (en desarrollo)
+
+- Sección `NfcLinkManager.vue`, datos en `NFC_LINK_MANAGER` (`src/data/nfc.ts`).
+- Mensaje principal: «Cambia tu enlace, no tu tarjeta» · «Tu tarjeta evoluciona con tu negocio». Explica el acceso individual con usuario y contraseña y que el cambio aplica al destino administrado por NFC y por QR, sin comprar otra tarjeta.
+- Estado visible: **«Panel de administración de enlaces: próximamente»** + nota de que está en desarrollo.
+- Demostración **ilustrativa** antes/después (Instagram → sitio web; menú anterior → menú actualizado) con dominios genéricos `tu-negocio`. Se reproduce sola solo cuando es visible y sin movimiento reducido; se detiene si el usuario interactúa.
+- No se publicó URL de acceso, inicio de sesión, planes, mensualidades, límites ni analítica.
+- **Cuando el sistema esté operativo:** cambia `NFC_LINK_MANAGER.status` a `'disponible'` y revisa `statusCopy.disponible` y la FAQ «¿Puedo cambiar el destino después?». No hace falta rediseñar.
+
+### Archivos de esta ronda
+
+- Modificados: `src/data/nfc.ts`, `src/pages/NfcCardsPage.vue`, `src/components/products/NfcCardVisual.vue`, `src/components/home/HomeNfc.vue`, `src/pages/ProductsPage.vue`, `docs/REDISENO-FRONTEND-DASTI.md`.
+- Nuevos: `src/data/nfcCatalog.ts`, `src/components/products/NfcDesignCatalog.vue`, `NfcDesignImage.vue`, `NfcComboMixer.vue`, `NfcLinkManager.vue`, `NfcStandVisual.vue`, carpetas `public/img/products/nfc/catalogo/*/.gitkeep`.
+- Eliminado: `src/components/products/NfcDesignMock.vue`.
+
+### Pendientes y limitaciones
+
+- Agregar las 16 imágenes del catálogo (y, opcionalmente, la foto del soporte de madera).
+- Revisar en móvil (320–430 px): filtros desplazables, diálogo ampliado, mezclador (2 filas de 3 en Presencia Total) y composición del hero.
+- Las ilustraciones usan unidades `cqw` (navegadores actuales); en navegadores muy antiguos el texto de la ilustración puede verse con tamaño por defecto.
+- Los íconos de categoría son genéricos de Lucide (no logotipos oficiales de Facebook, Instagram, etc.).
+- Revisar la redacción de la sección de enlaces y de la nota «se habilitará para los clientes de DASTI».
+- `npm run type-check` y build no ejecutados.
+
+No se ejecutaron build, pruebas ni type-check. No se hizo commit, push, pull ni se crearon ramas. No se modificó el backend.

@@ -36,13 +36,15 @@ export const NFC_PRICING = {
   pendingLabel: 'Solicitar cotización',
 }
 
-export const nfcImages: Record<'hero' | 'front' | 'back' | 'desk' | 'hand' | 'phone', ProductImage> = {
+export const nfcImages: Record<'hero' | 'front' | 'back' | 'desk' | 'hand' | 'phone' | 'stand', ProductImage> = {
   hero: { src: null, alt: 'Tarjeta inteligente NFC de DASTI', caption: 'Fotografía principal del producto' },
   front: { src: null, alt: 'Vista frontal de la tarjeta NFC', caption: 'Vista frontal' },
   back: { src: null, alt: 'Vista posterior de la tarjeta NFC con código QR', caption: 'Vista posterior' },
   desk: { src: null, alt: 'Tarjeta NFC sobre escritorio', caption: 'Presentación sobre escritorio' },
   hand: { src: null, alt: 'Tarjeta NFC en mano', caption: 'Tarjeta en mano' },
   phone: { src: null, alt: 'Tarjeta NFC junto a un smartphone', caption: 'Lectura con smartphone' },
+  // Fotografía real del soporte de madera, p. ej. `${NFC_IMAGE_BASE}/soporte-madera.jpg`
+  stand: { src: null, alt: 'Tarjeta NFC vertical en su soporte de madera', caption: 'Tarjeta con soporte de madera' },
 }
 
 export type NfcTypeId = 'presentacion' | 'redes' | 'resenas' | 'enlaces'
@@ -104,7 +106,7 @@ export const nfcSteps = [
   { n: '01', title: 'Eliges el producto', desc: 'Seleccionas el tipo de tarjeta según lo que quieres compartir.' },
   { n: '02', title: 'Defines diseño y personalización', desc: 'Acordamos el diseño y los datos o enlaces que tendrá tu tarjeta.' },
   { n: '03', title: 'DASTI prepara la tarjeta', desc: 'Preparamos la tarjeta física con el diseño aprobado.' },
-  { n: '04', title: 'Programamos el destino NFC', desc: 'Configuramos el destino digital y el código QR correspondiente.' },
+  { n: '04', title: 'Programamos NFC y QR', desc: 'Configuramos el destino digital y personalizamos el código QR del reverso.' },
   { n: '05', title: 'Acercas y compartes', desc: 'La tarjeta se acerca a un smartphone compatible o se escanea su QR.' },
 ]
 
@@ -234,25 +236,76 @@ export function nfcOrderMessage(product: Pick<NfcProduct, 'messageSubject'>, mod
   return `Hola, me interesa ${product.messageSubject}, en la modalidad ${label}. Me gustaría solicitar información para realizar mi pedido.`
 }
 
-export interface NfcExtra {
-  id: string
-  name: string
-  /** Precio final con IVA incluido, MXN. */
-  price: number
-  /** `addon` se muestra como "+$X MXN"; `monthly` como "$X MXN/mes". */
-  kind: 'addon' | 'monthly'
+/* ── Soporte de madera (incluido en cada tarjeta) ──────────────────── */
+
+/**
+ * Cada tarjeta NFC vendida por DASTI incluye su propio soporte de madera,
+ * sin costo adicional: 1 tarjeta = 1 soporte; un combo de 4 = 4 soportes.
+ * No confundir con el antiguo "soporte acrílico" (+$79), ya retirado.
+ */
+export const NFC_STAND = {
+  title: 'Soporte de madera incluido',
+  headline: 'Cada tarjeta incluye su propio soporte de madera.',
+  description:
+    'Tu tarjeta NFC llega lista para exhibirse en mostrador, recepción o mesa: cada una viene acompañada de su soporte de madera, sin costo adicional.',
+  costLabel: 'Sin costo adicional',
+  enterpriseLabel: '1 soporte de madera por cada tarjeta',
 }
 
-export const NFC_EXTRAS_FROM = 49
+/** Texto de soportes según el número de tarjetas (siempre uno por tarjeta). */
+export function nfcStandLabel(cards: number): string {
+  return cards === 1 ? '1 soporte de madera incluido' : `${cards} soportes de madera incluidos, uno por tarjeta`
+}
 
-export const nfcExtras: NfcExtra[] = [
-  { id: 'personalizacion-combo', name: 'Personalización de combo', price: 299, kind: 'addon' },
-  { id: 'soporte-acrilico', name: 'Soporte acrílico', price: 79, kind: 'addon' },
-  { id: 'protector-acrilico', name: 'Protector acrílico', price: 149, kind: 'addon' },
-  { id: 'smart-individual', name: 'Smart individual', price: 49, kind: 'monthly' },
-]
+/* ── Administración de enlaces (en desarrollo) ──────────────────────── */
 
-export const NFC_EXTRAS_MESSAGE = 'Hola, me interesa agregar extras a mis tarjetas NFC de DASTI. Quiero recibir información.'
+/**
+ * Panel para que cada cliente cambie el destino de sus tarjetas (NFC y QR)
+ * con su propio usuario y contraseña. ESTÁ EN DESARROLLO: no publicar URL
+ * de acceso, inicio de sesión, planes, límites ni analítica.
+ *
+ * Cuando el sistema esté operativo, cambia `status` a 'disponible' y revisa
+ * los textos de `statusCopy.disponible`. La sección no requiere rediseño.
+ */
+export type NfcLinkManagerStatus = 'en-desarrollo' | 'disponible'
+
+export const NFC_LINK_MANAGER = {
+  status: 'en-desarrollo' as NfcLinkManagerStatus,
+  eyebrow: 'Tu tarjeta evoluciona con tu negocio',
+  description:
+    'Estamos desarrollando un panel de administración para que cada cliente controle a dónde dirigen sus tarjetas. Con tu propio usuario y contraseña podrás cambiar el destino digital sin comprar otra tarjeta física.',
+  benefits: [
+    { id: 'misma-tarjeta', title: 'La misma tarjeta, otro destino', desc: 'Actualiza el enlace sin reimprimir ni reemplazar la tarjeta.' },
+    { id: 'nfc-qr', title: 'NFC y QR a la vez', desc: 'El cambio aplica al destino administrado, tanto al acercar la tarjeta como al escanear su QR.' },
+    { id: 'acceso', title: 'Acceso individual', desc: 'Cada cliente entra con su propio usuario y contraseña a las tarjetas que adquirió.' },
+  ],
+  statusCopy: {
+    'en-desarrollo': {
+      badge: 'Panel de administración de enlaces: próximamente',
+      note: 'El panel está en desarrollo y se habilitará para los clientes de DASTI. Mientras tanto, DASTI realiza la configuración inicial de cada tarjeta.',
+    },
+    disponible: {
+      badge: 'Panel de administración de enlaces disponible',
+      note: 'Al adquirir tus tarjetas recibes tu acceso individual al panel.',
+    },
+  } satisfies Record<NfcLinkManagerStatus, { badge: string; note: string }>,
+  /** Ejemplos ilustrativos antes/después (no son datos de clientes reales). */
+  examples: [
+    {
+      id: 'perfil-a-web',
+      label: 'De Instagram a tu sitio web',
+      before: { title: 'Perfil de Instagram', url: 'instagram.com/tu-negocio' },
+      after: { title: 'Sitio web', url: 'tu-negocio.com' },
+    },
+    {
+      id: 'menu',
+      label: 'Del menú anterior al actualizado',
+      before: { title: 'Menú de temporada anterior', url: 'tu-negocio.com/menu-anterior' },
+      after: { title: 'Menú actualizado', url: 'tu-negocio.com/menu' },
+    },
+  ],
+  message: 'Hola, me interesan las tarjetas NFC de DASTI y quiero saber más sobre la administración de enlaces.',
+}
 
 /** Envíos y cobertura (información oficial; no agregar políticas no confirmadas). */
 export const nfcShipping = [
@@ -262,100 +315,6 @@ export const nfcShipping = [
   { id: 'factura', title: 'Facturación disponible', desc: 'Emitimos factura si la necesitas.' },
 ] as const
 
-/* ── Diseños genéricos (ejemplos reales impresos) ───────────────── */
-
-export type NfcDesignTheme = 'maps' | 'instagram' | 'facebook'
-
-export interface NfcDesignFront {
-  title: string
-  text: string
-  button: string
-  image: ProductImage
-}
-
-export interface NfcDesignBack {
-  title: string
-  text: string
-  steps: string[]
-  image: ProductImage
-}
-
-export interface NfcGenericDesign {
-  id: NfcDesignTheme
-  name: string
-  category: string
-  front: NfcDesignFront
-  back: NfcDesignBack
-}
-
-const TAP_STEPS = ['Desbloquea tu teléfono', 'Acércalo a la tarjeta', 'Se abre automáticamente']
-
-/**
- * Diseños genéricos que DASTI ya produce. Los textos replican los de las
- * tarjetas impresas. Cuando haya fotografías recortadas y limpias, asigna
- * `image.src` (sugerencia de nombres en el comentario de cada una); mientras
- * tanto la interfaz muestra una recreación del diseño.
- */
-export const nfcGenericDesigns: NfcGenericDesign[] = [
-  {
-    id: 'maps',
-    name: 'Google Maps · Reseñas',
-    category: 'Reputación',
-    front: {
-      title: '¡Tu opinión es muy importante!',
-      text: 'Acerca tu teléfono y comparte tu experiencia en Google Maps.',
-      button: 'Dejar reseña',
-      // `${NFC_IMAGE_BASE}/google-maps-frente.jpg`
-      image: { src: null, alt: 'Tarjeta NFC de reseñas en Google Maps, frente', caption: 'Frente' },
-    },
-    back: {
-      title: 'Tu opinión hace la diferencia',
-      text: 'Acerca tu teléfono y comparte tu experiencia en segundos.',
-      steps: TAP_STEPS,
-      // `${NFC_IMAGE_BASE}/google-maps-reverso.jpg`
-      image: { src: null, alt: 'Tarjeta NFC de reseñas en Google Maps, reverso con instrucciones', caption: 'Reverso' },
-    },
-  },
-  {
-    id: 'instagram',
-    name: 'Instagram',
-    category: 'Redes sociales',
-    front: {
-      title: '¡Inspírate con nuestro contenido!',
-      text: 'Acerca tu teléfono y descubre fotos, ideas y novedades pensadas para ti.',
-      button: 'Ver Instagram',
-      // `${NFC_IMAGE_BASE}/instagram-frente.jpg`
-      image: { src: null, alt: 'Tarjeta NFC para Instagram, frente', caption: 'Frente' },
-    },
-    back: {
-      title: 'Encuentra inspiración cada día',
-      text: 'Acerca tu teléfono y descubre ideas, fotos, novedades y promociones al instante.',
-      steps: TAP_STEPS,
-      // `${NFC_IMAGE_BASE}/instagram-reverso.jpg`
-      image: { src: null, alt: 'Tarjeta NFC para Instagram, reverso con instrucciones', caption: 'Reverso' },
-    },
-  },
-  {
-    id: 'facebook',
-    name: 'Facebook',
-    category: 'Comunidad',
-    front: {
-      title: '¡Únete a nuestra comunidad!',
-      text: 'Acerca tu teléfono y descubre novedades, promociones y contenido pensado para ti.',
-      button: 'Ir a Facebook',
-      // `${NFC_IMAGE_BASE}/facebook-frente.jpg`
-      image: { src: null, alt: 'Tarjeta NFC para Facebook, frente', caption: 'Frente' },
-    },
-    back: {
-      title: 'Descubre más en un solo toque',
-      text: 'Acerca tu teléfono y conoce novedades, promociones y contenido pensado para ti.',
-      steps: TAP_STEPS,
-      // `${NFC_IMAGE_BASE}/facebook-reverso.jpg`
-      image: { src: null, alt: 'Tarjeta NFC para Facebook, reverso con instrucciones', caption: 'Reverso' },
-    },
-  },
-]
-
 export const nfcFaq = [
   {
     q: '¿Cómo funciona una tarjeta NFC?',
@@ -363,7 +322,7 @@ export const nfcFaq = [
   },
   {
     q: '¿Para qué sirve el código QR?',
-    a: 'El código QR es una alternativa para teléfonos sin NFC o con NFC desactivado: basta con escanearlo con la cámara para abrir el mismo destino.',
+    a: 'El código QR va en el reverso de la tarjeta y se personaliza para tu negocio. Es una alternativa para teléfonos sin NFC o con NFC desactivado: basta con escanearlo con la cámara para abrir el mismo destino.',
   },
   {
     q: '¿Es compatible con cualquier smartphone?',
@@ -376,6 +335,14 @@ export const nfcFaq = [
   {
     q: '¿Puedo personalizar el diseño?',
     a: `Sí. Cada tarjeta y combo se ofrece en tres modalidades: Lista para usar, Imprimimos tu diseño (nos compartes tu diseño final listo para impresión) o Diseñamos para ti (creamos una línea gráfica similar entre las tarjetas y la adaptamos a cada función; incluye una ronda de cambios). La tarjeta individual cuesta ${formatMXN(nfcIndividual.prices.lista)}, ${formatMXN(nfcIndividual.prices.imprimimos)} o ${formatMXN(nfcIndividual.prices.disenamos)} MXN, respectivamente. Precios finales con IVA incluido.`,
+  },
+  {
+    q: '¿Puedo combinar diferentes funciones en un combo?',
+    a: 'Sí. Cada tarjeta del combo puede dirigir a un destino distinto o repetir el mismo, como prefieras: por ejemplo, una para Facebook, otra para tu menú digital, otra para WhatsApp y otra para reseñas en Google Maps.',
+  },
+  {
+    q: '¿Qué incluye cada tarjeta?',
+    a: `NFC + QR personalizado, configuración inicial y su propio soporte de madera, sin costo adicional. En los combos recibes un soporte por cada tarjeta.`,
   },
   {
     q: '¿Cómo solicito mis tarjetas?',
@@ -403,7 +370,7 @@ export const nfcFaq = [
   },
   {
     q: '¿Puedo cambiar el destino después?',
-    a: 'Depende de cómo se configure la tarjeta. Las opciones para actualizar el destino digital se confirman al momento de solicitarla.',
+    a: 'Estamos desarrollando un panel de administración de enlaces para que puedas cambiar el destino de tus tarjetas con tu propio usuario y contraseña, sin cambiar la tarjeta física. Mientras se habilita, las opciones para actualizar el destino se confirman al momento de solicitar tus tarjetas.',
   },
 ]
 

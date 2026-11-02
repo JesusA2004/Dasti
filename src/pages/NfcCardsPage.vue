@@ -8,19 +8,23 @@ import {
   Building2,
   Check,
   CreditCard,
+  Gift,
   Info,
   MapPin,
-  Palette,
   QrCode,
   ReceiptText,
   Smartphone,
+  Shuffle,
   Truck,
   Wallet,
 } from '@lucide/vue'
 import NfcCardVisual from '@/components/products/NfcCardVisual.vue'
-import NfcDesignMock from '@/components/products/NfcDesignMock.vue'
+import NfcComboMixer from '@/components/products/NfcComboMixer.vue'
+import NfcDesignCatalog from '@/components/products/NfcDesignCatalog.vue'
+import NfcLinkManager from '@/components/products/NfcLinkManager.vue'
 import NfcModeOptions from '@/components/products/NfcModeOptions.vue'
 import NfcPhoneMock from '@/components/products/NfcPhoneMock.vue'
+import NfcStandVisual from '@/components/products/NfcStandVisual.vue'
 import MediaFrame from '@/components/ui/MediaFrame.vue'
 import FaqList from '@/components/ui/FaqList.vue'
 import WhatsAppIcon from '@/components/ui/WhatsAppIcon.vue'
@@ -31,25 +35,23 @@ import {
   NFC_COMBOS_INTRO,
   NFC_COMBOS_NOTE,
   NFC_DESIGN_CONDITIONS,
-  NFC_EXTRAS_FROM,
-  NFC_EXTRAS_MESSAGE,
   NFC_PRICING,
+  NFC_STAND,
   nfcCardTypes,
   nfcCombos,
   nfcEnterprise,
-  nfcExtras,
   nfcFaq,
-  nfcGenericDesigns,
   nfcImages,
   nfcIndividual,
   nfcMessageUrl,
   nfcOrderMessage,
   nfcShipping,
+  nfcStandLabel,
   nfcSteps,
   nfcWhatsAppUrl,
   type NfcDesignMode,
-  type NfcExtra,
 } from '@/data/nfc'
+import { NFC_CATALOG_COPY, nfcCatalogCategories } from '@/data/nfcCatalog'
 import { PAYMENT_PAGE_ROUTE, paymentShortLabels } from '@/data/payments'
 
 /* ── Tipos de tarjeta (pestañas accesibles) ── */
@@ -77,7 +79,6 @@ const stepsProgress = useSectionProgress(stepsRef, 0.8, 0.5)
 
 /* ── Precios (MXN, IVA incluido) ── */
 const mxn = (n: number) => `${formatMXN(n)} ${NFC_PRICING.currency}`
-const extraPrice = (e: NfcExtra) => (e.kind === 'monthly' ? `${mxn(e.price)}/mes` : `+${mxn(e.price)}`)
 
 const generalWhatsApp = nfcWhatsAppUrl()
 
@@ -90,16 +91,23 @@ const orderUrl = (product: Parameters<typeof nfcOrderMessage>[0] & { id: string 
 const enterpriseWhatsApp = nfcMessageUrl(nfcEnterprise.message)
 
 const paymentIcons = [Banknote, ArrowLeftRight, CreditCard, CreditCard] as const
-const extrasWhatsApp = nfcMessageUrl(NFC_EXTRAS_MESSAGE)
 
 const shippingIcons = { local: MapPin, nacional: Truck, costo: Wallet, factura: ReceiptText } as const
-const designSides = ['front', 'back'] as const
 
 const highlights = [
   { icon: Smartphone, title: 'Un toque', desc: 'Lectura por NFC en smartphones compatibles.' },
-  { icon: QrCode, title: 'Código QR', desc: 'Alternativa para cualquier cámara.' },
-  { icon: Palette, title: 'Personalizada', desc: 'Diseño y destino definidos contigo.' },
+  { icon: QrCode, title: 'QR en el reverso', desc: 'Personalizado para tu negocio, para cualquier cámara.' },
+  { icon: Gift, title: 'Lista para exhibir', desc: 'Cada tarjeta incluye su soporte de madera.' },
 ]
+
+/* Dos caras, un mismo destino (sección «Cómo funciona») */
+const faces = [
+  { id: 'front', icon: Smartphone, title: 'Frente · NFC', desc: 'Tu diseño con la tecnología NFC integrada. Basta con acercar un smartphone compatible.' },
+  { id: 'back', icon: QrCode, title: 'Reverso · QR', desc: 'Un código QR personalizado para tu negocio, para teléfonos sin NFC activo.' },
+  { id: 'same', icon: Shuffle, title: 'Un mismo destino', desc: 'NFC y QR abren el destino digital configurado para esa tarjeta.' },
+]
+
+const catalogFunctions = nfcCatalogCategories.map((c) => c.name).join(', ')
 
 const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' })
 </script>
@@ -146,13 +154,24 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
           <div v-if="nfcImages.hero.src" class="animate-fade aspect-[4/5] overflow-hidden rounded-[32px]" style="--d: 200ms">
             <MediaFrame :src="nfcImages.hero.src" :alt="nfcImages.hero.alt" eager />
           </div>
-          <div v-else class="animate-fade relative mx-auto flex max-w-[560px] items-center justify-center py-6" style="--d: 200ms">
-            <div class="w-[46%] max-w-[240px] -rotate-6">
-              <NfcPhoneMock type="presentacion" />
+          <div v-else class="animate-fade mx-auto w-full max-w-[560px]" style="--d: 200ms">
+            <!-- Frente (diseño + NFC), reverso (QR) y teléfono como contexto -->
+            <div class="relative aspect-square w-full">
+              <div class="absolute right-[2%] top-0 w-[38%] rotate-[7deg]">
+                <NfcPhoneMock type="presentacion" />
+              </div>
+              <div class="absolute left-[4%] top-[6%] w-[42%]">
+                <NfcCardVisual label="Presentación digital" />
+              </div>
+              <div class="absolute bottom-[3%] right-[16%] w-[33%] rotate-[5deg]">
+                <NfcCardVisual label="Presentación digital" side="back" finish="pearl" :interactive="false" :waves="false" />
+              </div>
             </div>
-            <div class="absolute left-0 top-1/2 w-[72%] -translate-y-1/3 sm:left-[-4%]">
-              <NfcCardVisual label="Presentación digital" />
-            </div>
+            <ul class="mt-10 flex flex-wrap justify-center gap-2" aria-label="Partes de la tarjeta">
+              <li class="chip chip-ink">Frente · tu diseño + NFC</li>
+              <li class="chip chip-ink">Reverso · QR personalizado</li>
+              <li class="chip chip-ink">Mismo destino</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -205,6 +224,22 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
               <p class="mt-2 text-[0.93rem] leading-relaxed text-fg-2">{{ s.desc }}</p>
             </li>
           </ol>
+        </div>
+
+        <!-- Dos caras, un mismo destino -->
+        <div class="mt-16 grid items-center gap-10 rounded-[30px] border border-line p-6 sm:p-9 lg:grid-cols-12">
+          <div class="mx-auto w-full max-w-[220px] lg:col-span-3">
+            <NfcCardVisual label="Tu diseño" finish="electric" flippable class="text-fg" />
+          </div>
+          <ul class="grid gap-6 sm:grid-cols-3 lg:col-span-9">
+            <li v-for="(f, i) in faces" :key="f.id" v-reveal="{ variant: 'up', delay: i * 90 }">
+              <span class="grid h-10 w-10 place-items-center rounded-full bg-accent-soft text-accent">
+                <component :is="f.icon" :size="17" />
+              </span>
+              <h3 class="title-4 mt-5 text-fg">{{ f.title }}</h3>
+              <p class="mt-2 text-[0.93rem] leading-relaxed text-fg-2">{{ f.desc }}</p>
+            </li>
+          </ul>
         </div>
       </div>
     </section>
@@ -264,7 +299,7 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
               <div class="w-[48%] max-w-[220px]">
                 <NfcPhoneMock :type="current.id" />
               </div>
-              <div class="absolute bottom-8 left-0 w-[62%]">
+              <div class="absolute bottom-10 left-[4%] w-[34%] max-w-[160px] -rotate-6">
                 <NfcCardVisual :label="current.short" :finish="finishes[activeType]" :waves="false" />
               </div>
             </div>
@@ -302,8 +337,31 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
       </div>
     </section>
 
-    <!-- ─── Precios: tarjeta individual, combos, extras ─── -->
-    <section id="paquetes" class="section" aria-labelledby="packages-title">
+    <!-- ─── Administración de enlaces (propuesta de valor) ─── -->
+    <NfcLinkManager />
+
+    <!-- ─── Catálogo de diseños ─── -->
+    <section id="catalogo" class="section" aria-labelledby="designs-title">
+      <div class="shell">
+        <div class="grid gap-8 lg:grid-cols-12 lg:items-end">
+          <div class="lg:col-span-7">
+            <p v-reveal="'fade'" class="eyebrow">Catálogo de diseños</p>
+            <h2 id="designs-title" v-reveal="'clip'" class="display-2 mt-5 text-fg">
+              Diseños listos para usar, <span class="serif">para cada objetivo.</span>
+            </h2>
+          </div>
+          <p v-reveal="{ variant: 'up', delay: 100 }" class="lead lg:col-span-5">
+            {{ NFC_CATALOG_COPY.qrNote }} Son los diseños de la modalidad «Lista para usar».
+          </p>
+        </div>
+        <div v-reveal="'up'" class="mt-12">
+          <NfcDesignCatalog />
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Precios: tarjeta individual, combos y Plan Empresarial ─── -->
+    <section id="paquetes" class="section border-t border-line" aria-labelledby="packages-title">
       <div class="shell">
         <div class="grid gap-8 lg:grid-cols-12 lg:items-end">
           <div class="lg:col-span-7">
@@ -313,7 +371,8 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
             </h2>
           </div>
           <p v-reveal="{ variant: 'up', delay: 100 }" class="lead lg:col-span-5">
-            Una tarjeta, un combo o extras para complementarlos. {{ NFC_PRICING.policyNote }} Precios en {{ NFC_PRICING.currency }}.
+            Una tarjeta, un combo o el Plan Empresarial. Cada tarjeta incluye su propio soporte de madera.
+            {{ NFC_PRICING.policyNote }} Precios en {{ NFC_PRICING.currency }}.
           </p>
         </div>
 
@@ -337,6 +396,10 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
                 <span class="text-fg-2">{{ f }}</span>
               </li>
             </ul>
+            <p class="stand-pill mt-6">
+              <Gift :size="15" aria-hidden="true" />
+              <span><strong>{{ nfcStandLabel(nfcIndividual.cards) }}</strong> · {{ NFC_STAND.costLabel }}</span>
+            </p>
             <a
               :href="orderUrl(nfcIndividual)"
               target="_blank"
@@ -407,6 +470,17 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
                 </li>
               </ul>
 
+              <div class="mt-5 space-y-2">
+                <p class="flex items-start gap-2 text-[0.82rem] text-fg-2">
+                  <Shuffle :size="14" class="mt-0.5 shrink-0 text-accent" aria-hidden="true" />
+                  <span><strong class="font-semibold text-fg">{{ combo.cards }} funciones</strong>, iguales o diferentes</span>
+                </p>
+                <p class="stand-pill">
+                  <Gift :size="14" aria-hidden="true" />
+                  <span><strong>{{ combo.cards }} soportes de madera</strong> · uno por tarjeta</span>
+                </p>
+              </div>
+
               <div class="mt-auto pt-7">
                 <a
                   :href="orderUrl(combo)"
@@ -455,6 +529,17 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
                 </li>
               </ul>
 
+              <div class="mt-5 space-y-2">
+                <p class="flex items-start gap-2 text-[0.82rem] text-on-ink-2">
+                  <Shuffle :size="14" class="mt-0.5 shrink-0 text-signal" aria-hidden="true" />
+                  <span>La combinación de funciones que necesite tu empresa</span>
+                </p>
+                <p class="stand-pill is-ink">
+                  <Gift :size="14" aria-hidden="true" />
+                  <span><strong>{{ NFC_STAND.enterpriseLabel }}</strong></span>
+                </p>
+              </div>
+
               <div class="mt-auto pt-7">
                 <a :href="enterpriseWhatsApp" target="_blank" rel="noopener noreferrer" class="btn btn-light btn-block">
                   Solicitar cotización
@@ -485,31 +570,88 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
             </div>
           </dl>
         </div>
+      </div>
+    </section>
 
-        <!-- Extras y Smart -->
-        <div class="mt-20 grid gap-8 lg:grid-cols-12 lg:items-start">
-          <div class="lg:col-span-4">
-            <h3 v-reveal="'clip'" class="display-3 text-fg">Extras y Smart</h3>
-            <p v-reveal="'fade'" class="mt-3 text-sm text-fg-3">
-              Desde <span class="font-semibold text-fg">{{ mxn(NFC_EXTRAS_FROM) }}/mes</span> · {{ NFC_PRICING.vatLabel }}
-            </p>
-            <a :href="extrasWhatsApp" target="_blank" rel="noopener noreferrer" class="btn btn-ink mt-7">
-              Agregar extras
-              <span class="btn-orb"><WhatsAppIcon :size="15" /></span>
-            </a>
+    <!-- ─── Combina funciones + soporte de madera ─── -->
+    <section id="combina" class="stage bg-sky" aria-labelledby="mix-title">
+      <div class="shell section">
+        <div class="grid gap-8 lg:grid-cols-12 lg:items-end">
+          <div class="lg:col-span-7">
+            <p v-reveal="'fade'" class="eyebrow">Diferentes funciones, un solo combo</p>
+            <h2 id="mix-title" v-reveal="'clip'" class="display-2 mt-5 text-fg">
+              Combina tus tarjetas <span class="serif">como quieras.</span>
+            </h2>
           </div>
-          <ul v-reveal="'up'" class="grid gap-px overflow-hidden rounded-[24px] border border-line bg-line sm:grid-cols-2 lg:col-span-8">
-            <li v-for="e in nfcExtras" :key="e.id" class="flex items-center justify-between gap-4 bg-surface p-5 sm:p-6">
-              <span class="font-medium text-fg">{{ e.name }}</span>
-              <span class="shrink-0 font-display font-semibold tracking-tight text-fg">{{ extraPrice(e) }}</span>
-            </li>
-          </ul>
+          <p v-reveal="{ variant: 'up', delay: 100 }" class="lead lg:col-span-5">
+            Tú eliges a dónde dirige cada tarjeta. Repite una función o mezcla varias ({{ catalogFunctions }}) según la
+            cantidad de tarjetas de tu combo.
+          </p>
         </div>
+
+        <div v-reveal="'up'" class="mt-12">
+          <NfcComboMixer />
+        </div>
+
+        <!-- Soporte de madera -->
+        <div class="mt-20 grid items-center gap-12 rounded-[30px] bg-surface/80 p-7 sm:p-10 lg:grid-cols-12">
+          <div v-reveal="'scale'" class="lg:col-span-4">
+            <NfcStandVisual />
+          </div>
+          <div class="lg:col-span-8">
+            <p v-reveal="'fade'" class="eyebrow">{{ NFC_STAND.title }}</p>
+            <h3 id="stand-title" v-reveal="'clip'" class="display-3 mt-4 text-fg">
+              Lista para exhibir, <span class="serif">desde el primer día.</span>
+            </h3>
+            <p v-reveal="{ variant: 'up', delay: 80 }" class="mt-4 max-w-2xl leading-relaxed text-fg-2">
+              {{ NFC_STAND.headline }} {{ NFC_STAND.description }}
+            </p>
+            <ul v-reveal="{ variant: 'up', delay: 140 }" class="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[22px] border border-line bg-line sm:grid-cols-4" aria-label="Soportes incluidos por producto">
+              <li class="bg-surface p-4">
+                <p class="text-xs text-fg-3">{{ nfcIndividual.name }}</p>
+                <p class="mt-1 font-display text-lg font-semibold tracking-tight text-fg">{{ nfcIndividual.cards }} soporte</p>
+              </li>
+              <li v-for="c in nfcCombos" :key="c.id" class="bg-surface p-4">
+                <p class="text-xs text-fg-3">{{ c.name }}</p>
+                <p class="mt-1 font-display text-lg font-semibold tracking-tight text-fg">{{ c.cards }} soportes</p>
+              </li>
+            </ul>
+            <p class="mt-4 text-sm text-fg-3">
+              {{ nfcEnterprise.name }}: {{ NFC_STAND.enterpriseLabel.toLowerCase() }}. {{ NFC_STAND.costLabel }}.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Envíos y cobertura ─── -->
+    <section aria-labelledby="shipping-title">
+      <div class="shell section-sm">
+        <p v-reveal="'fade'" class="eyebrow">Envíos, facturación y pagos</p>
+        <h2 id="shipping-title" v-reveal="'clip'" class="display-3 mt-4 text-fg">
+          Te las llevamos <span class="serif">a donde estés.</span>
+        </h2>
+        <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <li
+            v-for="(item, i) in nfcShipping"
+            :key="item.id"
+            v-reveal="{ variant: 'up', delay: i * 80 }"
+            class="flex items-start gap-4 rounded-[22px] border border-line bg-surface p-5"
+          >
+            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-white">
+              <component :is="shippingIcons[item.id]" :size="17" />
+            </span>
+            <span>
+              <span class="block text-sm font-semibold text-fg">{{ item.title }}</span>
+              <span class="mt-0.5 block text-[0.82rem] leading-snug text-fg-2">{{ item.desc }}</span>
+            </span>
+          </li>
+        </ul>
 
         <!-- Métodos de pago (DASTI) -->
         <div
           v-reveal="'up'"
-          class="mt-20 flex flex-col gap-6 rounded-[24px] border border-line p-6 sm:p-7 lg:flex-row lg:items-center lg:justify-between"
+          class="mt-6 flex flex-col gap-6 rounded-[24px] border border-line p-6 sm:p-7 lg:flex-row lg:items-center lg:justify-between"
           aria-labelledby="nfc-pay-title"
           role="group"
         >
@@ -532,86 +674,6 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
             <span class="btn-orb"><ArrowUpRight :size="14" /></span>
           </RouterLink>
         </div>
-      </div>
-    </section>
-
-    <!-- ─── Envíos y cobertura ─── -->
-    <section class="stage bg-sky" aria-labelledby="shipping-title">
-      <div class="shell section-sm">
-        <p v-reveal="'fade'" class="eyebrow">Envíos y cobertura</p>
-        <h2 id="shipping-title" v-reveal="'clip'" class="display-3 mt-4 text-fg">
-          Te las llevamos <span class="serif">a donde estés.</span>
-        </h2>
-        <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <li
-            v-for="(item, i) in nfcShipping"
-            :key="item.id"
-            v-reveal="{ variant: 'up', delay: i * 80 }"
-            class="flex items-start gap-4 rounded-[22px] bg-surface/80 p-5"
-          >
-            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-white">
-              <component :is="shippingIcons[item.id]" :size="17" />
-            </span>
-            <span>
-              <span class="block text-sm font-semibold text-fg">{{ item.title }}</span>
-              <span class="mt-0.5 block text-[0.82rem] leading-snug text-fg-2">{{ item.desc }}</span>
-            </span>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- ─── Diseños genéricos (ejemplos reales) ─── -->
-    <section class="section" aria-labelledby="designs-title">
-      <div class="shell">
-        <div class="grid gap-8 lg:grid-cols-12 lg:items-end">
-          <div class="lg:col-span-7">
-            <p v-reveal="'fade'" class="eyebrow">Ejemplos reales</p>
-            <h2 id="designs-title" v-reveal="'clip'" class="display-2 mt-5 text-fg">
-              Diseños genéricos <span class="serif">listos para usar.</span>
-            </h2>
-          </div>
-          <p v-reveal="{ variant: 'up', delay: 100 }" class="lead lg:col-span-5">
-            Así lucen los modelos que ya producimos en DASTI, por frente y reverso. Son los diseños de la modalidad
-            «Lista para usar», disponibles en la tarjeta individual y en los combos.
-          </p>
-        </div>
-
-        <div class="mt-12 grid gap-5 md:grid-cols-3">
-          <article
-            v-for="(d, i) in nfcGenericDesigns"
-            :key="d.id"
-            v-reveal="{ variant: 'up', delay: i * 90 }"
-            class="card flex flex-col rounded-[30px] p-4 sm:p-5"
-          >
-            <div class="grid grid-cols-2 gap-3 rounded-[22px] bg-sky p-4 sm:gap-4 sm:p-5">
-              <figure v-for="side in designSides" :key="side">
-                <div v-if="d[side].image.src" class="aspect-[54/85.6] overflow-hidden rounded-[0.9em] shadow-[var(--shadow-float)]">
-                  <MediaFrame :src="d[side].image.src" :alt="d[side].image.alt" :show-caption="false" />
-                </div>
-                <div v-else role="img" :aria-label="`${d[side].image.alt} (recreación del diseño impreso)`">
-                  <NfcDesignMock :theme="d.id" :side="side" :front="d.front" :back="d.back" />
-                </div>
-                <figcaption class="mt-2.5 text-center text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-fg-3">
-                  {{ d[side].image.caption }}
-                </figcaption>
-              </figure>
-            </div>
-            <div class="flex items-end justify-between gap-3 px-2 pb-1 pt-5">
-              <div>
-                <p class="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-fg-3">{{ d.category }}</p>
-                <h3 class="title-4 mt-1 text-fg">{{ d.name }}</h3>
-              </div>
-              <span class="shrink-0 rounded-full bg-paper-2 px-2.5 py-1 text-[0.66rem] font-semibold text-fg-2">
-                {{ d.front.image.src ? 'Foto real' : 'Diseño impreso' }}
-              </span>
-            </div>
-          </article>
-        </div>
-        <p class="mt-6 text-xs text-fg-3">
-          Vistas recreadas a partir de las tarjetas impresas reales. ¿Prefieres otro diseño? Elige «Imprimimos tu diseño» o
-          «Diseñamos para ti».
-        </p>
       </div>
     </section>
 
@@ -640,7 +702,8 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
               Diseñemos tus <span class="serif text-signal">tarjetas inteligentes.</span>
             </h2>
             <p v-reveal="{ variant: 'up', delay: 100 }" class="lead mt-6 max-w-xl !text-on-ink-2">
-              Escríbenos por WhatsApp con la tarjeta o el combo que te interesa y te compartimos la cotización. Envíos a toda la República.
+              Escríbenos por WhatsApp con la tarjeta, el combo o el diseño que te interesa y te compartimos la cotización.
+              Cada tarjeta incluye su soporte de madera. Envíos a toda la República.
             </p>
             <div v-reveal="{ variant: 'up', delay: 160 }" class="mt-9 flex flex-wrap gap-3">
               <a :href="generalWhatsApp" target="_blank" rel="noopener noreferrer" class="btn btn-wa">
@@ -653,11 +716,35 @@ const scrollToHow = () => document.getElementById('como-funciona')?.scrollIntoVi
               </RouterLink>
             </div>
           </div>
-          <div v-reveal="'scale'" class="mx-auto w-full max-w-[380px] lg:col-span-5">
-            <NfcCardVisual label="Tu diseño" finish="electric" />
+          <div v-reveal="'scale'" class="mx-auto w-full max-w-[240px] text-on-ink lg:col-span-5">
+            <NfcCardVisual label="Tu diseño" finish="electric" flippable />
           </div>
         </div>
       </div>
     </section>
   </div>
 </template>
+
+<style scoped>
+/* Distintivo del soporte de madera incluido (beneficio permanente, no promoción) */
+.stand-pill {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border-radius: 14px;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: #6B4423;
+  background: linear-gradient(135deg, rgba(200, 154, 103, 0.18), rgba(168, 116, 63, 0.1));
+  border: 1px solid rgba(168, 116, 63, 0.28);
+}
+.stand-pill :deep(svg) { margin-top: 0.1rem; flex-shrink: 0; }
+.stand-pill strong { font-weight: 600; }
+:global([data-theme='dark'] .stand-pill) { color: #E9C9A2; }
+.stand-pill.is-ink {
+  color: #E9C9A2;
+  background: rgba(200, 154, 103, 0.12);
+  border-color: rgba(233, 201, 162, 0.22);
+}
+</style>

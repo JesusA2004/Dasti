@@ -6,7 +6,7 @@ import { formatMXN } from '@/utils/format'
 
 const points = [
   { icon: Smartphone, title: 'Con un toque', desc: 'Acércala a un smartphone compatible con NFC.' },
-  { icon: QrCode, title: 'O con su QR', desc: 'Alternativa para equipos sin NFC activo.' },
+  { icon: QrCode, title: 'O con su QR', desc: 'En el reverso, para equipos sin NFC activo.' },
   { icon: Palette, title: 'Personalizada', desc: 'Diseño y destino definidos contigo.' },
 ]
 </script>
@@ -21,11 +21,14 @@ const points = [
     <div class="shell section relative">
       <div class="grid items-center gap-14 lg:grid-cols-12 lg:gap-10">
         <!-- Visual -->
-        <div v-reveal="'scale'" class="relative mx-auto w-full max-w-[520px] lg:col-span-6 lg:max-w-none lg:pr-10">
-          <div class="relative">
-            <NfcCardVisual label="Presentación digital" finish="midnight" />
-            <div class="absolute -bottom-6 right-0 w-[58%] sm:-bottom-10">
-              <NfcCardVisual label="Reseñas" finish="pearl" :waves="false" :interactive="false" />
+        <div v-reveal="'scale'" class="relative mx-auto w-full max-w-[460px] lg:col-span-6 lg:pr-10">
+          <!-- Tarjetas verticales: frente con NFC y reverso con QR personalizado -->
+          <div class="relative aspect-[5/4] w-full">
+            <div class="absolute left-[8%] top-0 w-[42%]">
+              <NfcCardVisual label="Presentación digital" finish="midnight" />
+            </div>
+            <div class="absolute bottom-0 right-[8%] w-[35%] rotate-[5deg]">
+              <NfcCardVisual label="Presentación digital" side="back" finish="pearl" :waves="false" :interactive="false" />
             </div>
           </div>
         </div>
@@ -61,7 +64,7 @@ const points = [
 
           <p v-reveal="{ variant: 'up', delay: 300 }" class="mt-8 text-sm text-on-ink-3">
             Desde <span class="font-semibold text-on-ink">{{ formatMXN(nfcIndividual.fromPrice) }} {{ NFC_PRICING.currency }}</span>
-            · {{ NFC_PRICING.vatLabel }} · Combos y envíos a toda la República
+            · {{ NFC_PRICING.vatLabel }} · Soporte de madera incluido · Combos y envíos a toda la República
           </p>
 
           <RouterLink v-reveal="{ variant: 'up', delay: 320 }" to="/productos/tarjetas-nfc" class="btn btn-light mt-8">

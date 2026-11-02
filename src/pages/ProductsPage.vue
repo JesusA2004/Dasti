@@ -38,15 +38,22 @@ import { formatMXN } from '@/utils/format'
             </div>
             <p class="mt-8 text-sm text-on-ink-3">
               Desde <span class="font-semibold text-on-ink">{{ formatMXN(nfcIndividual.fromPrice) }} {{ NFC_PRICING.currency }}</span>
-              · {{ NFC_PRICING.vatLabel }} · Envíos a toda la República
+              · {{ NFC_PRICING.vatLabel }} · Soporte de madera incluido · Envíos a toda la República
             </p>
             <span class="btn btn-light mt-8">
               Descubrir tarjetas NFC
               <span class="btn-orb"><ArrowUpRight :size="16" /></span>
             </span>
           </div>
-          <div class="mx-auto w-full max-w-[520px] transition-transform duration-700 group-hover:-translate-y-2 lg:col-span-6">
-            <NfcCardVisual label="Tarjeta inteligente" />
+          <div class="mx-auto w-full max-w-[440px] transition-transform duration-700 group-hover:-translate-y-2 lg:col-span-6">
+            <div class="relative aspect-[5/4] w-full">
+              <div class="absolute left-[8%] top-0 w-[42%]">
+                <NfcCardVisual label="Tarjeta inteligente" />
+              </div>
+              <div class="absolute bottom-0 right-[8%] w-[35%] rotate-[5deg]">
+                <NfcCardVisual label="Tarjeta inteligente" side="back" finish="pearl" :waves="false" :interactive="false" />
+              </div>
+            </div>
           </div>
         </div>
       </RouterLink>
