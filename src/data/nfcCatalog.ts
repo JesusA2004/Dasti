@@ -5,12 +5,17 @@ import { NFC_IMAGE_BASE, type NfcProduct } from '@/data/nfc'
 /**
  * CATÁLOGO DE DISEÑOS NFC (modalidad «Lista para usar»)
  * ------------------------------------------------------------------
- * Los diseños se muestran SIEMPRE a partir de sus imágenes originales
- * (frente y reverso). No se recrean con CSS ni se dibuja texto encima.
+ * Cada categoría tiene DOS DISEÑOS FRONTALES (Modelo 01 y Modelo 02).
+ * Se muestran SIEMPRE a partir de sus imágenes originales; no se recrean
+ * con CSS ni se dibuja texto encima.
  *
- * Imágenes: public/img/products/nfc/catalogo/<categoria>/modelo-XX-frente.png
- *                                                 modelo-XX-reverso.png
+ * Imágenes: public/img/products/nfc/catalogo/<categoria>/modelo-01-frente.png
+ *                                                 modelo-02-frente.png
  * Si un archivo aún no existe, la interfaz muestra «Imagen pendiente».
+ *
+ * El reverso NO forma parte del catálogo: se personaliza con el QR de cada
+ * negocio. Un reverso de ejemplo (`modelo-XX-reverso.png`) es opcional y
+ * solo se usa si el modelo se declara con `withBack: true`.
  *
  * Agregar un diseño: añade un objeto a `nfcCatalogModels` con `catalogModel()`.
  * Agregar una categoría: añade el id a `NfcCatalogCategoryId`, un objeto en
@@ -54,8 +59,6 @@ export const nfcCatalogCategories: NfcCatalogCategory[] = [
   { id: 'menu-digital', name: 'Menú digital', purpose: 'Abre tu menú digital desde la mesa.', icon: UtensilsCrossed, order: 8 },
 ]
 
-export type NfcCardSide = 'front' | 'back'
-
 export interface NfcCatalogImage {
   /** Ruta pública de la imagen original. */
   src: string
@@ -63,13 +66,24 @@ export interface NfcCatalogImage {
 }
 
 export interface NfcCatalogModel {
-  /** Identificador estable, p. ej. `facebook-01`. */
+  /** Identificador estable, p. ej. `facebook-02`. Referencia de artículo para la futura tienda. */
   id: string
   categoryId: NfcCatalogCategoryId
+  /** Número de modelo dentro de su categoría (1 = izquierda, 2 = derecha en la referencia original). */
+  model: number
+  /** Nombre visible: «Modelo 01», «Modelo 02». */
   name: string
+  /** Frase principal impresa en el diseño, si se conoce. Se muestra como texto, nunca encima de la imagen. */
+  headline?: string
   description: string
+  /** Diseño FRONTAL original (genérico, listo para usar). Es la única imagen obligatoria. */
   front: NfcCatalogImage
-  back: NfcCatalogImage
+  /**
+   * Reverso de ejemplo (OPCIONAL, uso futuro). El reverso real se personaliza
+   * con el QR de cada negocio; mientras no exista una imagen aprobada, se deja
+   * sin definir y la interfaz muestra la explicación del reverso personalizado.
+   */
+  back?: NfcCatalogImage
   /** Orden dentro de su categoría. */
   order: number
   /** `false` oculta el modelo del catálogo sin borrarlo. */
@@ -78,41 +92,91 @@ export interface NfcCatalogModel {
 
 const pad = (n: number) => String(n).padStart(2, '0')
 
-/** Rutas convencionales de frente y reverso de un modelo. */
-export function catalogImagePath(categoryId: NfcCatalogCategoryId, model: number, side: NfcCardSide): string {
-  return `${NFC_CATALOG_BASE}/${categoryId}/modelo-${pad(model)}-${side === 'front' ? 'frente' : 'reverso'}.png`
+/** Ruta convencional del diseño frontal de un modelo. */
+export function catalogImagePath(categoryId: NfcCatalogCategoryId, model: number): string {
+  return `${NFC_CATALOG_BASE}/${categoryId}/modelo-${pad(model)}-frente.png`
 }
 
-function catalogModel(categoryId: NfcCatalogCategoryId, model: number, description: string, available = true): NfcCatalogModel {
+/** Ruta convencional de un reverso de ejemplo (opcional, para uso futuro). */
+export function catalogBackImagePath(categoryId: NfcCatalogCategoryId, model: number): string {
+  return `${NFC_CATALOG_BASE}/${categoryId}/modelo-${pad(model)}-reverso.png`
+}
+
+interface CatalogModelOptions {
+  headline?: string
+  /** Si se omite, se usa la función de la categoría. */
+  description?: string
+  /** `true` cuando exista un reverso de ejemplo aprobado en la carpeta. */
+  withBack?: boolean
+  available?: boolean
+}
+
+function catalogModel(categoryId: NfcCatalogCategoryId, model: number, options: CatalogModelOptions = {}): NfcCatalogModel {
   const category = nfcCatalogCategories.find((c) => c.id === categoryId)
+  const categoryName = category?.name ?? categoryId
   const name = `Modelo ${pad(model)}`
-  const label = `Tarjeta NFC de ${category?.name ?? categoryId}, ${name.toLowerCase()}`
+  const label = `Diseño frontal de tarjeta NFC para ${categoryName}, ${name}`
   return {
     id: `${categoryId}-${pad(model)}`,
     categoryId,
+    model,
     name,
-    description,
-    front: { src: catalogImagePath(categoryId, model, 'front'), alt: `${label}: frente con el diseño` },
-    back: { src: catalogImagePath(categoryId, model, 'back'), alt: `${label}: reverso con instrucciones y código QR` },
+    headline: options.headline,
+    description: options.description ?? category?.purpose ?? '',
+    front: {
+      src: catalogImagePath(categoryId, model),
+      alt: options.headline ? `${label}: «${options.headline}»` : label,
+    },
+    back: options.withBack
+      ? { src: catalogBackImagePath(categoryId, model), alt: `Reverso de ejemplo de la tarjeta NFC para ${categoryName}, ${name}` }
+      : undefined,
     order: model,
-    available,
+    available: options.available ?? true,
   }
 }
 
+/** 8 categorías × 2 diseños frontales = 16 modelos. */
 export const nfcCatalogModels: NfcCatalogModel[] = [
-  catalogModel('facebook', 1, 'Invita a tus clientes a unirse a tu comunidad y descubrir tus novedades en Facebook.'),
-  catalogModel('instagram', 1, 'Comparte tus fotos, ideas y novedades para que te sigan en Instagram.'),
-  catalogModel('google-maps', 1, 'Pide a tus clientes que compartan su experiencia con una reseña en Google Maps.'),
-  catalogModel('whatsapp', 1, 'Permite que te escriban al instante por WhatsApp, sin guardar tu número.'),
-  catalogModel('tiktok', 1, 'Lleva a las personas a tus videos, tips y novedades en TikTok.'),
-  catalogModel('wifi', 1, 'Ayuda a tus visitantes a conectarse a tu red Wi-Fi en pocos pasos.'),
-  catalogModel('sitio-web', 1, 'Reúne todo en un solo lugar dirigiendo a tu sitio web.'),
-  catalogModel('menu-digital', 1, 'Muestra tu menú digital al acercar el teléfono o escanear el QR.'),
+  catalogModel('facebook', 1, {
+    headline: '¡Únete a nuestra comunidad!',
+    description: 'Fondo azul intenso con el ícono de Facebook y elementos gráficos tecnológicos.',
+  }),
+  catalogModel('facebook', 2, {
+    headline: 'Descubre más en un solo toque',
+    description: 'Fondo blanco y azul con la ilustración de un teléfono con Facebook e instrucciones NFC.',
+  }),
+  catalogModel('instagram', 1, { headline: '¡Inspírate con nuestro contenido!' }),
+  catalogModel('instagram', 2, { headline: 'Encuentra inspiración cada día' }),
+  catalogModel('google-maps', 1, { headline: '¡Tu opinión es muy importante!' }),
+  catalogModel('google-maps', 2, { headline: 'Tu opinión hace la diferencia' }),
+  catalogModel('whatsapp', 1, { headline: '¡Hablemos al instante!' }),
+  catalogModel('whatsapp', 2, { headline: 'Tu mensaje, en un toque' }),
+  catalogModel('tiktok', 1, { headline: '¡Disfruta tips y novedades!' }),
+  catalogModel('tiktok', 2, { headline: 'Mira tips al instante' }),
+  catalogModel('wifi', 1, { headline: '¡Mantente conectado!' }),
+  catalogModel('wifi', 2, { headline: 'Conexión en 3 pasos' }),
+  catalogModel('sitio-web', 1, { headline: '¡Descúbrelo todo en un solo lugar!' }),
+  catalogModel('sitio-web', 2, {
+    description: 'Otra composición del mismo concepto, con indicaciones para abrir el sitio web mediante NFC.',
+  }),
+  catalogModel('menu-digital', 1, { headline: '¡Conoce nuestro menú!' }),
+  catalogModel('menu-digital', 2, { headline: 'Descubre nuestro menú digital' }),
 ]
 
 export const NFC_CATALOG_COPY = {
-  qrNote: 'Elige tu diseño. Nosotros configuramos el NFC y personalizamos el QR para tu negocio.',
-  qrDetail: 'El reverso incorpora un QR personalizado: el diseño base puede ser el mismo, pero el destino es el de tu negocio.',
+  qrNote: 'Cada función tiene dos diseños frontales para elegir. Nosotros configuramos el NFC y personalizamos el QR del reverso para tu negocio.',
+  backTitle: 'El frente lo eliges tú.',
+  backTitleAccent: 'El reverso lo personalizamos para tu negocio.',
+  backText:
+    'Cada tarjeta lleva en la parte posterior un código QR personalizado, configurado para llevar a tus clientes al enlace que elijas. Al acercar el teléfono, el NFC abre ese mismo destino.',
+  backPoints: [
+    'Eliges uno de los dos diseños frontales de tu categoría.',
+    'El frente es un diseño genérico, listo para usar.',
+    'El reverso se prepara con el QR de tu negocio.',
+    'NFC y QR llevan al mismo destino digital que configuramos.',
+  ],
+  backWhyNoImage: 'Por eso no mostramos un reverso fijo: depende de cada cliente.',
+  backIllustrationLabel: 'Ilustración conceptual del reverso, no es un diseño final',
 }
 
 export const categoryById = (id: NfcCatalogCategoryId) => nfcCatalogCategories.find((c) => c.id === id)
@@ -127,7 +191,8 @@ export function catalogModelsFor(categoryId: NfcCatalogCategoryId | 'all'): NfcC
 
 export function catalogModelMessage(model: NfcCatalogModel): string {
   const category = categoryById(model.categoryId)?.name ?? model.categoryId
-  return `Hola, me interesa una tarjeta NFC con el diseño de ${category} (${model.name.toLowerCase()}). Me gustaría solicitar información.`
+  const headline = model.headline ? ` («${model.headline}»)` : ''
+  return `Hola, me interesa la tarjeta NFC para ${category}, ${model.name}${headline}. Me gustaría solicitar información.`
 }
 
 /* ── Combinaciones de funciones (datos estructurados) ────────────── */

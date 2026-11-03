@@ -503,35 +503,7 @@ Evolución de la página `/productos/tarjetas-nfc` sin cambiar el diseño genera
 
 ### Catálogo de diseños
 
-Archivo de datos: **`src/data/nfcCatalog.ts`**.
-
-- `nfcCatalogCategories`: Facebook, Instagram, Google Maps, WhatsApp, TikTok, Wi-Fi, Sitio web, Menú digital (id estable, nombre, función, ícono genérico —no logotipos oficiales—, orden).
-- `nfcCatalogModels`: un modelo por categoría (`facebook-01`, `instagram-01`, …) con `categoryId`, `name`, `description`, `front`/`back` (`src` + `alt`), `order` y `available`.
-- Interfaz (`NfcDesignCatalog.vue`): filtros «Todos | Facebook | … | Menú digital» con contador (botones `aria-pressed`, desplazables en móvil), transición entre categorías, ficha con **frente y reverso** etiquetados, nota «QR del reverso personalizado para tu negocio», botón **Consultar diseño** (WhatsApp: *«Hola, me interesa una tarjeta NFC con el diseño de WhatsApp (modelo 01). Me gustaría solicitar información.»*) y **Ver en grande** (diálogo nativo `<dialog>`: Esc o clic fuera para cerrar, flechas ←/→ y botones para recorrer, selector Frente/Reverso en móvil, ambas caras en escritorio).
-- `NfcDesignImage.vue`: imagen con `object-contain` en proporción 54 × 85.6 (no recorta ni deforma). Si el archivo no existe, muestra **«Imagen pendiente»** (sin ícono roto). En modo desarrollo también muestra la ruta esperada.
-
-#### Estructura de imágenes
-
-```
-public/img/products/nfc/catalogo/
-  facebook/      modelo-01-frente.png  modelo-01-reverso.png
-  instagram/     modelo-01-frente.png  modelo-01-reverso.png
-  google-maps/   modelo-01-frente.png  modelo-01-reverso.png
-  whatsapp/      modelo-01-frente.png  modelo-01-reverso.png
-  tiktok/        modelo-01-frente.png  modelo-01-reverso.png
-  wifi/          modelo-01-frente.png  modelo-01-reverso.png
-  sitio-web/     modelo-01-frente.png  modelo-01-reverso.png
-  menu-digital/  modelo-01-frente.png  modelo-01-reverso.png
-```
-
-Las carpetas están creadas (con `.gitkeep`). **En el repositorio no existía ninguna imagen real de diseños**, así que no se pudo reutilizar ninguna: las **16 imágenes** anteriores están pendientes. Deben ser el archivo original de cada cara, recortado al borde de la tarjeta, vertical (≈ 54 × 85.6, p. ej. 1080 × 1712 px), PNG. Si usas otra extensión, cambia `catalogImagePath()`.
-
-#### Agregar diseños y categorías
-
-- **Otro modelo**: copia `modelo-02-frente.png` / `modelo-02-reverso.png` en la carpeta de la categoría y agrega `catalogModel('facebook', 2, 'Descripción…')` a `nfcCatalogModels`. La interfaz no cambia.
-- **Ocultar un modelo**: cuarto argumento `available = false`.
-- **Nueva categoría**: agrega el id a `NfcCatalogCategoryId`, un objeto en `nfcCatalogCategories` (con `order` e ícono de `@lucide/vue`) y su carpeta. Aparece sola en los filtros y en la demostración de combinaciones.
-- No cambies los `id` ya publicados: servirán como referencia de artículo para el carrito y Stripe.
+> Corregido en la sección M: cada categoría tiene **dos diseños frontales** (Modelo 01 y Modelo 02), no frente y reverso. La descripción vigente del catálogo y la estructura de imágenes están en **M**.
 
 ### Administración de enlaces (en desarrollo)
 
@@ -550,7 +522,7 @@ Las carpetas están creadas (con `.gitkeep`). **En el repositorio no existía ni
 
 ### Pendientes y limitaciones
 
-- Agregar las 16 imágenes del catálogo (y, opcionalmente, la foto del soporte de madera).
+- Agregar las 16 imágenes frontales del catálogo (ver sección M) y, opcionalmente, la foto del soporte de madera.
 - Revisar en móvil (320–430 px): filtros desplazables, diálogo ampliado, mezclador (2 filas de 3 en Presencia Total) y composición del hero.
 - Las ilustraciones usan unidades `cqw` (navegadores actuales); en navegadores muy antiguos el texto de la ilustración puede verse con tamaño por defecto.
 - Los íconos de categoría son genéricos de Lucide (no logotipos oficiales de Facebook, Instagram, etc.).
@@ -558,3 +530,74 @@ Las carpetas están creadas (con `.gitkeep`). **En el repositorio no existía ni
 - `npm run type-check` y build no ejecutados.
 
 No se ejecutaron build, pruebas ni type-check. No se hizo commit, push, pull ni se crearon ramas. No se modificó el backend.
+
+## M. Corrección del catálogo: dos diseños frontales por categoría (2026-11-02)
+
+La indicación anterior («frente y reverso por categoría») era incorrecta. **Cada categoría tiene dos diseños frontales diferentes**; en la referencia original, el de la izquierda es el Modelo 01 y el de la derecha el Modelo 02. Total: **16 diseños frontales**.
+
+### Modelos cargados (`src/data/nfcCatalog.ts` → `nfcCatalogModels`)
+
+| Categoría | Modelo 01 | Modelo 02 |
+| --- | --- | --- |
+| Facebook | «¡Únete a nuestra comunidad!» (fondo azul intenso, ícono de Facebook, elementos tecnológicos) | «Descubre más en un solo toque» (fondo blanco y azul, teléfono con Facebook e instrucciones NFC) |
+| Instagram | «¡Inspírate con nuestro contenido!» | «Encuentra inspiración cada día» |
+| Google Maps | «¡Tu opinión es muy importante!» | «Tu opinión hace la diferencia» |
+| WhatsApp | «¡Hablemos al instante!» | «Tu mensaje, en un toque» |
+| TikTok | «¡Disfruta tips y novedades!» | «Mira tips al instante» |
+| Wi-Fi | «¡Mantente conectado!» | «Conexión en 3 pasos» |
+| Sitio web | «¡Descúbrelo todo en un solo lugar!» | Otra composición del mismo concepto, con indicaciones para abrir el sitio web mediante NFC (sin frase registrada) |
+| Menú digital | «¡Conoce nuestro menú!» | «Descubre nuestro menú digital» |
+
+Cada modelo es una opción independiente con id estable: `facebook-01`, `facebook-02`, …, `menu-digital-02`.
+
+### Modelo de datos
+
+- `NfcCatalogModel`: `id`, `categoryId`, `model` (1 o 2), `name` («Modelo 01»), `headline` (frase del diseño, opcional), `description`, `front` (**única imagen obligatoria**), `back` (**opcional, uso futuro**), `order`, `available`.
+- `catalogModel(categoria, n, { headline, description, withBack, available })`. Si no se da `description`, se usa la función de la categoría.
+- La frase (`headline`) se muestra como texto junto a la imagen, nunca encima de ella.
+
+### Interfaz (`NfcDesignCatalog.vue`)
+
+- Mismos filtros y transiciones. «Todos» muestra 16 diseños; cada categoría muestra sus 2 modelos lado a lado (columna única en móvil).
+- Cada ficha: diseño frontal vertical (`object-contain`, 54 × 85.6, sin recortar ni deformar), distintivo «Modelo 01/02», categoría, frase, descripción, botón **Elegir este diseño** (WhatsApp) y **Ver en grande**. La imagen también abre la vista ampliada.
+- Vista ampliada: diseño frontal grande, frase y descripción, nota del reverso personalizado, **Elegir este diseño**, navegación ←/→ con contador (p. ej. «1 / 2»), cierre con Esc, botón o clic fuera.
+- WhatsApp: *«Hola, me interesa la tarjeta NFC para Facebook, Modelo 02 («Descubre más en un solo toque»). Me gustaría solicitar información.»* (número oficial +52 777 877 9239).
+- Bloque **«El frente lo eliges tú. El reverso lo personalizamos para tu negocio.»** debajo de la rejilla: explica que el reverso lleva un QR personalizado, que NFC y QR llevan al mismo destino y que no se muestra un reverso fijo porque depende de cada cliente. Usa una ilustración conceptual (`NfcCardVisual`, cara posterior) rotulada «Ilustración conceptual del reverso, no es un diseño final».
+
+### Estructura de imágenes (16 archivos)
+
+```
+public/img/products/nfc/catalogo/facebook/modelo-01-frente.png
+public/img/products/nfc/catalogo/facebook/modelo-02-frente.png
+public/img/products/nfc/catalogo/instagram/modelo-01-frente.png
+public/img/products/nfc/catalogo/instagram/modelo-02-frente.png
+public/img/products/nfc/catalogo/google-maps/modelo-01-frente.png
+public/img/products/nfc/catalogo/google-maps/modelo-02-frente.png
+public/img/products/nfc/catalogo/whatsapp/modelo-01-frente.png
+public/img/products/nfc/catalogo/whatsapp/modelo-02-frente.png
+public/img/products/nfc/catalogo/tiktok/modelo-01-frente.png
+public/img/products/nfc/catalogo/tiktok/modelo-02-frente.png
+public/img/products/nfc/catalogo/wifi/modelo-01-frente.png
+public/img/products/nfc/catalogo/wifi/modelo-02-frente.png
+public/img/products/nfc/catalogo/sitio-web/modelo-01-frente.png
+public/img/products/nfc/catalogo/sitio-web/modelo-02-frente.png
+public/img/products/nfc/catalogo/menu-digital/modelo-01-frente.png
+public/img/products/nfc/catalogo/menu-digital/modelo-02-frente.png
+```
+
+- Modelo 01 = diseño izquierdo de la pareja en la referencia original; Modelo 02 = diseño derecho.
+- PNG vertical, recortado al borde de la tarjeta (≈ 54 × 85.6, p. ej. 1080 × 1712 px). Si falta un archivo, se ve «Imagen pendiente».
+- **No se requieren** archivos `modelo-XX-reverso.png`.
+
+### Reversos de ejemplo (opcional, futuro)
+
+Si más adelante hay un reverso aprobado para un modelo, colócalo como `modelo-XX-reverso.png` en la misma carpeta y declara el modelo con `withBack: true`. La vista ampliada mostrará un selector «Frente / Reverso de ejemplo». Sin `withBack`, no se busca ningún reverso.
+
+### Archivos de esta corrección
+
+- `src/data/nfcCatalog.ts`: 16 modelos, `back` opcional, `catalogBackImagePath()`, textos del reverso personalizado, nuevo mensaje de WhatsApp. Se eliminó el tipo `NfcCardSide`.
+- `src/components/products/NfcDesignCatalog.vue`: fichas de un solo diseño frontal, bloque del reverso personalizado y vista ampliada.
+- `src/components/products/NfcDesignImage.vue`: solo comentarios.
+- `docs/REDISENO-FRONTEND-DASTI.md`: esta sección y la nota en L.
+
+Sin cambios en precios, combos, soportes de madera, métodos de pago, administración de enlaces ni diseño global. No se ejecutaron build, pruebas ni type-check; no hubo commit, push, pull ni ramas; no se tocó el backend.

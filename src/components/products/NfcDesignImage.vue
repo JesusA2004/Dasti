@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import { ImageOff } from '@lucide/vue'
 
 /**
- * Imagen original de una cara de tarjeta del catálogo, en proporción vertical
+ * Imagen original de un diseño del catálogo (normalmente el frente), en proporción vertical
  * CR80 (54 × 85.6). Usa `object-contain`: nunca recorta ni deforma el diseño.
  * Si el archivo todavía no existe, muestra un estado «Imagen pendiente»
  * (sin ícono de imagen rota y sin recrear el diseño).
@@ -12,7 +12,7 @@ const props = withDefaults(
   defineProps<{
     src: string
     alt: string
-    /** Texto de la cara: «Frente» o «Reverso». */
+    /** Etiqueta del estado pendiente, p. ej. «Modelo 02 · Frente». */
     sideLabel: string
     eager?: boolean
   }>(),
